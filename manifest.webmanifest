@@ -1,7 +1,7 @@
 {
   "name": "ONIT \u2014 Time + People + Status",
   "short_name": "ONIT",
-  "description": "ONIT work traffic management with Account Management-only brief creation, role-specific dashboards, Team Lead first review, CD/DCD final approval, Pulse, Risk Radar, Brief Replay, Handover and approved-job archives.",
+  "description": "ONIT work traffic management with Brief creation for Account Management, Creative Director and Deputy Creative Director, role-specific dashboards, Team Lead first review, CD/DCD final approval, Pulse, Risk Radar, Brief Replay, Handover and approved-job archives.",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
