@@ -155,7 +155,7 @@
 <div id="broadcastModal" class="modal hidden broadcastPopup"><div class="modalBox"><div class="modalTop"><div><span class="code">ONIT ANNOUNCEMENT</span><h2 id="broadcastTitle" style="margin:4px 0 0"></h2></div></div><div id="broadcastMessage" class="broadcastMessage"></div><div id="broadcastAttachment"></div><div class="actions" style="justify-content:flex-end"><button class="new" onclick="ackBroadcast()">GOT IT</button></div></div></div>
 <script>
 
-const APP_VERSION='0.15.1';
+const APP_VERSION='0.15.2';
 const BACKEND_DATASETS=['USERS','CLIENTS','BRIEFS','ASSIGNMENTS','ITERATIONS','ACTIVITY_LOG','NOTIFICATIONS','REPORTS'];
 const API_URL='https://script.google.com/macros/s/AKfycbyY98jKIh2ls8jKsB5w2H7YG3Okj61AoIkt3-2x0LBnvRVwDgBhrQnVr1Ghfu04J7YB/exec';
 let ORG_ID=localStorage.getItem('onit-org')||'';
@@ -194,6 +194,13 @@ function canManagePeople(u=currentUser){return isOwner(u)||isHR(u)||isSenior(u)}
 function canManageClients(u=currentUser){return canCreateBrief(u)||isOwner(u)||isHR(u)||isSenior(u)}
 function canSeeReports(u=currentUser){return isOwner(u)||backendAccess(u).includes('REPORTS')}
 function currentUserName(){return rowVal(currentUser,'Full Name','fullName')||'User'}
+function greetingText(){
+  const parts=new Intl.DateTimeFormat('en-GB',{hour:'numeric',hour12:false,timeZone:'Africa/Lagos'}).formatToParts(new Date());
+  const hour=Number(parts.find(p=>p.type==='hour')?.value||0)%24;
+  if(hour<12)return 'Good morning';
+  if(hour<17)return 'Good afternoon';
+  return 'Good evening';
+}
 function currentUserAssignment(code,type='TO'){return allAssignments.find(a=>sameBrief(a,code)&&rowVal(a,'User ID','userId')===CURRENT_USER_ID&&String(rowVal(a,'Assignment Type','assignmentType')).toUpperCase()===type&&String(rowVal(a,'Active','active')).toLowerCase()!=='false')}
 function sameBrief(r,code){return String(rowVal(r,'Brief Code','briefCode','code'))===String(code)}
 function parseJsonArray(v){try{const a=JSON.parse(v||'[]');return Array.isArray(a)?a:[]}catch(e){return []}}
