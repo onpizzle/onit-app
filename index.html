@@ -93,7 +93,7 @@
 </nav>
 <main class="main">
 <section id="home">
-  <div class="hello"><div><div class="muted" id="todayLabel"></div><h1 id="greeting">Good morning.</h1><p class="muted" id="homeSub">Here’s what’s moving.</p></div><button class="new createBriefBtn" onclick="openNew()">+ NEW BRIEF</button></div>
+  <div class="hello"><div><div class="muted" id="todayLabel"></div><h1 id="greeting">Good morning.</h1><p class="muted" id="homeSub">Here’s what’s moving.</p></div><button class="new createBriefBtn hiddenByRole" onclick="openNew()">+ NEW BRIEF</button></div>
   <div class="stats" id="homeStats"></div>
   <div id="pulseSummary"></div>
   <div class="section hidden" id="homeQueueSection"><h2 id="homeQueueTitle">WAITING FOR REVIEW</h2><p class="muted" id="homeQueueCopy"></p><div class="card" id="homeQueueList"></div></div>
@@ -102,7 +102,7 @@
 </section>
 
 <section id="briefs" class="hidden">
-  <div class="hello"><div><h1 id="briefsTitle">Briefs</h1><p class="muted" id="briefsSub">Work moving through ONIT.</p></div><button class="new createBriefBtn" onclick="openNew()">+ NEW BRIEF</button></div>
+  <div class="hello"><div><h1 id="briefsTitle">Briefs</h1><p class="muted" id="briefsSub">Work moving through ONIT.</p></div><button class="new createBriefBtn hiddenByRole" onclick="openNew()">+ NEW BRIEF</button></div>
   <div class="searchbar"><input id="briefSearch" placeholder="Search brief code, client, project or team member" oninput="renderBriefs()"></div>
   <div class="filterRow" id="briefFilters"></div>
   <div class="card" id="briefList"></div>
@@ -155,7 +155,7 @@
 <div id="broadcastModal" class="modal hidden broadcastPopup"><div class="modalBox"><div class="modalTop"><div><span class="code">ONIT ANNOUNCEMENT</span><h2 id="broadcastTitle" style="margin:4px 0 0"></h2></div></div><div id="broadcastMessage" class="broadcastMessage"></div><div id="broadcastAttachment"></div><div class="actions" style="justify-content:flex-end"><button class="new" onclick="ackBroadcast()">GOT IT</button></div></div></div>
 <script>
 
-const APP_VERSION='0.15.0';
+const APP_VERSION='0.15.1';
 const BACKEND_DATASETS=['USERS','CLIENTS','BRIEFS','ASSIGNMENTS','ITERATIONS','ACTIVITY_LOG','NOTIFICATIONS','REPORTS'];
 const API_URL='https://script.google.com/macros/s/AKfycbyY98jKIh2ls8jKsB5w2H7YG3Okj61AoIkt3-2x0LBnvRVwDgBhrQnVr1Ghfu04J7YB/exec';
 let ORG_ID=localStorage.getItem('onit-org')||'';
@@ -179,7 +179,7 @@ function departmentOf(u){return String(rowVal(u,'Department','department')||'').
 function permissionProfile(u){return String(rowVal(u,'Permission Profile','permissionProfile')||'').toUpperCase()}
 function isOwner(u=currentUser){return !!u&&(permissionProfile(u)==='ORG_OWNER'||String(rowVal(u,'Role')).toLowerCase()==='system owner')}
 function backendAccess(u=currentUser){if(isOwner(u))return BACKEND_DATASETS.slice();const v=String(rowVal(u,'Backend Data Access')||'').trim().toUpperCase();return v?v.split(',').map(x=>x.trim()).filter(x=>BACKEND_DATASETS.includes(x)):[]}
-function canCreateBrief(u=currentUser){if(!u||isOwner(u))return false;if(u===currentUser&&permissions&&typeof permissions.createBrief!=='undefined')return !!permissions.createBrief;return permissionProfile(u)==='ACCOUNT_MANAGER'||departmentOf(u).toLowerCase()==='account management'||isCreativeLeadership(u)}
+function canCreateBrief(u=currentUser){if(!u||isOwner(u))return false;const roleAllowed=permissionProfile(u)==='ACCOUNT_MANAGER'||departmentOf(u).toLowerCase()==='account management'||isCreativeLeadership(u);if(u===currentUser&&permissions&&typeof permissions.createBrief!=='undefined')return !!permissions.createBrief||roleAllowed;return roleAllowed}
 function canApprove(u=currentUser){if(!u)return false;const p=positionOf(u).toLowerCase();return truthy(rowVal(u,'Can Approve Final'))||['creative director','deputy creative director','md','managing director'].includes(p)}
 function canReview(u=currentUser){return !!u&&(canApprove(u)||['ceo','chief executive officer'].includes(positionOf(u).toLowerCase()))}
 function isTeamLeadUser(u=currentUser){return !!u&&truthy(rowVal(u,'Team Lead'))}
