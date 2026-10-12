@@ -157,7 +157,7 @@
 <div id="broadcastModal" class="modal hidden broadcastPopup"><div class="modalBox"><div class="modalTop"><div><span class="code">ONIT ANNOUNCEMENT</span><h2 id="broadcastTitle" style="margin:4px 0 0"></h2></div></div><div id="broadcastMessage" class="broadcastMessage"></div><div id="broadcastAttachment"></div><div class="actions" style="justify-content:flex-end"><button class="new" onclick="ackBroadcast()">GOT IT</button></div></div></div>
 <script>
 
-const APP_VERSION='0.15.3';
+const APP_VERSION='0.15.4';
 const BACKEND_DATASETS=['USERS','CLIENTS','BRIEFS','ASSIGNMENTS','ITERATIONS','ACTIVITY_LOG','NOTIFICATIONS','REPORTS'];
 const API_URL='https://script.google.com/macros/s/AKfycbyY98jKIh2ls8jKsB5w2H7YG3Okj61AoIkt3-2x0LBnvRVwDgBhrQnVr1Ghfu04J7YB/exec';
 let ORG_ID=localStorage.getItem('onit-org')||'';
@@ -167,7 +167,7 @@ let SESSION_TOKEN=localStorage.getItem('onit-session')||'';
 let briefs=[],users=[],clients=[],allAssignments=[],notifications=[],teamWorkload=[],reports=[],reportSummary=null,organisations=[],pendingUsers=[],securityInfo=null,accessDirectory=[],permissions={},dataExports=[];
 let selectedAccessEmail='',activeBackendDataset='',currentBroadcast=null;
 const profilePhotoCache=new Map();
-let current=null,currentUser=null,apiOnline=false,mutationBusy=false,backendVersion='',serverOffset=0,loadGeneration=0,lastListSection='home',briefFilter='ALL',refreshInFlight=false;
+let current=null,currentUser=null,apiOnline=false,mutationBusy=false,backendVersion='',serverOffset=0,loadGeneration=0,lastListSection='home',briefFilter='ALL',refreshInFlight=false,lastStateVersion='';
 let audioReady=false,currentDetailTab='brief';
 const submissionRequests=new Map();
 const announcedKey=id=>'onit-announced-'+id;
@@ -217,12 +217,18 @@ function sheetBriefToUI(r){return {
   iterations:[],activity:[],activityRows:[],assignee:'Assigned team',assigneeUserId:'',assigneeFullName:''
 }}
 
+async function fetchWithTimeout(url,options={},timeoutMs=25000){
+  const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),timeoutMs);
+  try{return await fetch(url,{...options,signal:controller.signal})}
+  catch(e){if(e&&e.name==='AbortError')throw new Error('Request timed out. Please retry.');throw e}
+  finally{clearTimeout(timer)}
+}
 async function apiGet(action='bootstrap'){
   if(!SESSION_TOKEN)throw new Error('AUTH_REQUIRED');
   const url=API_URL+'?action='+encodeURIComponent(action)+'&token='+encodeURIComponent(SESSION_TOKEN);
-  const r=await fetch(url);if(!r.ok)throw new Error('API '+r.status);const data=await r.json();if(data.success!==true)throw new Error(data.error||'Could not load ONIT backend.');return data
+  const r=await fetchWithTimeout(url,{},20000);if(!r.ok)throw new Error('API '+r.status);const data=await r.json();if(data.success!==true)throw new Error(data.error||'Could not load ONIT backend.');return data
 }
-async function apiPost(action,payload={},requiresAuth=true){const data={...payload};if(requiresAuth){if(!SESSION_TOKEN)throw new Error('AUTH_REQUIRED');data.sessionToken=SESSION_TOKEN}const r=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action,data})});if(!r.ok)throw new Error('API '+r.status);const result=await r.json();if(!result.success)throw new Error(result.error||result.message||'API request failed');return result}
+async function apiPost(action,payload={},requiresAuth=true){const data={...payload};if(requiresAuth){if(!SESSION_TOKEN)throw new Error('AUTH_REQUIRED');data.sessionToken=SESSION_TOKEN}const r=await fetchWithTimeout(API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action,data})},30000);if(!r.ok)throw new Error('API '+r.status);const result=await r.json();if(!result.success)throw new Error(result.error||result.message||'API request failed');return result}
 function table(data,name){if(name==='ACTIVITY_LOG'&&Array.isArray(data.activity))return data.activity;return data[name]||data[name.toLowerCase()]||data.data?.[name]||data.data?.[name.toLowerCase()]||[]}
 function sleep(ms){return new Promise(r=>setTimeout(r,ms))}
 function saveSession(result){const d=result.data||result;if(!d.sessionToken)throw new Error('No session token returned.');SESSION_TOKEN=d.sessionToken;CURRENT_USER_ID=rowVal(d.user,'User ID');ORG_ID=rowVal(d.organisation,'Organisation ID');localStorage.setItem('onit-session',SESSION_TOKEN);localStorage.setItem('onit-user',CURRENT_USER_ID);localStorage.setItem('onit-org',ORG_ID);announcedNotifications=new Set(JSON.parse(localStorage.getItem(announcedKey(CURRENT_USER_ID))||'[]'));}
@@ -248,8 +254,8 @@ async function loadFromGoogle(strict=false,silent=false){
       try{
         const data=await apiGet('bootstrap');if(generation!==loadGeneration)return;
         backendVersion=data.version||'';serverOffset=data.serverTime?new Date(data.serverTime).getTime()-Date.now():0;
-        if(!versionAtLeast(backendVersion,'0.12.0'))throw new Error('Backend '+backendVersion+' is older than the ONIT V0.13 backend.');
-        organisations=data.organisations||[];users=table(data,'USERS');pendingUsers=data.pendingUsers||[];accessDirectory=data.accessDirectory||[];securityInfo=data.security||null;permissions=data.permissions||{};clients=table(data,'CLIENTS');allAssignments=table(data,'ASSIGNMENTS');notifications=table(data,'NOTIFICATIONS');reports=table(data,'REPORTS');dataExports=data.dataExports||[];teamWorkload=data.teamWorkload||[];reportSummary=data.reportSummary||null;currentUser=data.currentUser||users.find(u=>rowVal(u,'User ID','userId')===CURRENT_USER_ID)||null;
+        if(!versionAtLeast(backendVersion,'0.14.2'))throw new Error('Backend '+backendVersion+' is older than the ONIT V0.14.2 backend required by this frontend.');
+        lastStateVersion=String(data.stateVersion||lastStateVersion||'');organisations=data.organisations||[];users=table(data,'USERS');pendingUsers=data.pendingUsers||[];accessDirectory=data.accessDirectory||[];securityInfo=data.security||null;permissions=data.permissions||{};clients=table(data,'CLIENTS');allAssignments=table(data,'ASSIGNMENTS');notifications=table(data,'NOTIFICATIONS');reports=table(data,'REPORTS');dataExports=data.dataExports||[];teamWorkload=data.teamWorkload||[];reportSummary=data.reportSummary||null;currentUser=data.currentUser||users.find(u=>rowVal(u,'User ID','userId')===CURRENT_USER_ID)||null;
         if(!currentUser)throw new Error('Your signed-in profile is not available.');CURRENT_USER_ID=rowVal(currentUser,'User ID');ORG_ID=rowVal(currentUser,'Organisation ID');localStorage.setItem('onit-user',CURRENT_USER_ID);localStorage.setItem('onit-org',ORG_ID);
         const rows=table(data,'BRIEFS'),iterations=table(data,'ITERATIONS'),activities=table(data,'ACTIVITY_LOG');briefs=rows.map(sheetBriefToUI);briefs.forEach(b=>{const as=allAssignments.filter(r=>sameBrief(r,b.code)&&String(rowVal(r,'Assignment Type','assignmentType')).toUpperCase()==='TO'&&String(rowVal(r,'Active','active')).toLowerCase()!=='false');if(as.length){b.assignee=as.map(r=>rowVal(r,'Full Name','fullName')||'Assigned team').join(' + ');b.assigneeUserId=rowVal(as[0],'User ID','userId');b.assigneeFullName=rowVal(as[0],'Full Name','fullName')||b.assignee}b.iterations=iterations.filter(r=>sameBrief(r,b.code)).sort((a,z)=>Number(rowVal(a,'Version Number','versionNumber')||0)-Number(rowVal(z,'Version Number','versionNumber')||0)).map(r=>({v:Number(rowVal(r,'Version Number','versionNumber')||0),file:rowVal(r,'File Name','fileName')||'Submission',fileType:rowVal(r,'File Type','fileType')||'',driveFileId:rowVal(r,'Drive File ID','driveFileId')||'',driveFileUrl:rowVal(r,'Drive File URL','driveFileUrl')||'',note:rowVal(r,'Submission Note')||'',clientSent:truthy(rowVal(r,'Client Sent')),clientSentAt:rowVal(r,'Client Sent At'),state:rowVal(r,'Status','status')||'Submitted',id:rowVal(r,'Iteration ID','iterationId'),feedback:rowVal(r,'Feedback'),submittedAt:rowVal(r,'Submitted At'),approvedBy:rowVal(r,'Approved By User ID'),approvedAt:rowVal(r,'Approved At'),teamLeadRequired:truthy(rowVal(r,'Team Lead Required')),teamLeadApproved:truthy(rowVal(r,'Team Lead Approved')),teamLeadApprovedBy:rowVal(r,'Team Lead Approved By User ID'),teamLeadApprovedAt:rowVal(r,'Team Lead Approved At')}));b.activityRows=activities.filter(r=>sameBrief(r,b.code)).sort((a,z)=>new Date(rowVal(a,'Timestamp','timestamp')||0)-new Date(rowVal(z,'Timestamp','timestamp')||0));b.activity=b.activityRows.map(r=>`${formatTime(rowVal(r,'Timestamp','timestamp'))} — ${rowVal(r,'Action','action')}${rowVal(r,'Reason','reason')?' — '+rowVal(r,'Reason','reason'):''}`)});
         apiOnline=true;connectionNotice('');applyPermissions();populateClients();populateAssignees();renderHome();renderBriefFilters();renderBriefs();renderArchive();renderTeam();renderMore();renderNotifications();hydrateProfilePhotos();showNextBroadcast();if(!document.getElementById('data').classList.contains('hidden'))renderDataPage();if(current){current=briefs.find(b=>b.code===current.code)||null;if(current)renderDetail();else show('home')}return;
@@ -360,7 +366,44 @@ function populateAssignees(){const el=document.getElementById('assignee');if(!el
 function openNew(){if(!canCreateBrief())return alert('Only Account Management, the Creative Director or the Deputy Creative Director can create and send briefs.');document.getElementById('deadline').value=lagosInput(new Date(Date.now()+4*3600000));document.getElementById('project').value='';document.getElementById('brieftext').value='';document.getElementById('deliverables').value='';document.getElementById('briefAttachments').value='';populateClients();populateAssignees();show('newbrief')}
 function clash(){const id=document.getElementById('assignee')?.value,w=teamWorkload.find(x=>x.userId===id),el=document.getElementById('clash');if(!w){el.classList.add('hidden');return}const deadlineVal=document.getElementById('deadline')?.value;let close=false;if(deadlineVal&&w.nextDeadline){try{close=Math.abs(parseLagos(deadlineVal).getTime()-new Date(w.nextDeadline).getTime())<=4*3600000}catch(e){}}if(w.activeCount>=2||close){el.textContent=`⚠ TIMELINE CLASH: ${w.fullName} currently has ${w.activeCount} active brief(s)${w.nextDeadline?' • next deadline '+formatDateTime(w.nextDeadline):''}. You can still assign this brief.`;el.classList.remove('hidden')}else if(w.activeCount){el.textContent=`Heads-up: ${w.fullName} already has ${w.activeCount} active brief(s).`;el.classList.remove('hidden')}else el.classList.add('hidden')}
 
-async function sent(button){if(mutationBusy)return;const client=window.clientChoices?.[Number(document.getElementById('client').value)]||{id:'',name:'Client',brand:'Client'},project=document.getElementById('project').value.trim(),deadline=document.getElementById('deadline').value;if(!project)return alert('Please enter a project title.');if(!deadline)return alert('Please set a deadline.');let attachments;try{attachments=await filesToPayload(document.getElementById('briefAttachments').files,MAX_FILE_BYTES)}catch(e){return alert(e.message)}let requestId=sessionStorage.getItem('onit-create-request');if(!requestId){requestId=makeId();sessionStorage.setItem('onit-create-request',requestId)}const original=button.textContent;mutationBusy=true;button.disabled=true;button.textContent=attachments.length?'UPLOADING & SENDING…':'SENDING…';setBusy(true);try{const d=parseLagos(deadline),payload={requestId,organisationId:ORG_ID,clientId:client.id||'',clientName:client.name,brand:client.brand||client.name,projectTitle:project,description:document.getElementById('brieftext').value,deliverables:document.getElementById('deliverables').value,priority:document.getElementById('priority').value,createdByUserId:CURRENT_USER_ID,createdByName:currentUserName(),deadline:d.toISOString(),attachments};const created=await apiPost('createBrief',payload),code=created.data?.['Brief Code']||created.data?.briefCode||created['Brief Code']||created.briefCode;if(!code)throw new Error('The server returned no brief code.');const assigneeId=document.getElementById('assignee').value,assigneeUser=users.find(u=>rowVal(u,'User ID')===assigneeId),person=rowVal(assigneeUser,'Full Name')||assigneeId;await apiPost('assignUser',{briefCode:code,organisationId:ORG_ID,userId:assigneeId,fullName:person,assignmentType:'TO',assignedByUserId:CURRENT_USER_ID,assignedByName:currentUserName()});sessionStorage.removeItem('onit-create-request');await loadFromGoogle(true);alert(`Brief ${code} created and assigned.`);show('briefs')}catch(e){console.error(e);alert('ONIT could not complete this brief. '+e.message+' You can retry; ONIT will reuse the same request instead of creating a duplicate.')}finally{mutationBusy=false;button.disabled=false;button.textContent=original;setBusy(false)}}
+async function sent(button){
+  if(mutationBusy)return;
+  if(!canCreateBrief())return alert('Only Account Management, the Creative Director or the Deputy Creative Director can create and send briefs.');
+  const client=window.clientChoices?.[Number(document.getElementById('client').value)]||{id:'',name:'Client',brand:'Client'},
+        project=document.getElementById('project').value.trim(),
+        deadline=document.getElementById('deadline').value;
+  if(!project)return alert('Please enter a project title.');
+  if(!deadline)return alert('Please set a deadline.');
+  let attachments;
+  try{attachments=await filesToPayload(document.getElementById('briefAttachments').files,MAX_FILE_BYTES)}catch(e){return alert(e.message)}
+  let requestId=sessionStorage.getItem('onit-create-request');
+  if(!requestId){requestId=makeId();sessionStorage.setItem('onit-create-request',requestId)}
+  const assigneeId=document.getElementById('assignee').value,
+        assigneeUser=users.find(u=>rowVal(u,'User ID')===assigneeId),
+        person=rowVal(assigneeUser,'Full Name')||assigneeId,
+        original=button.textContent;
+  mutationBusy=true;button.disabled=true;button.textContent=attachments.length?'UPLOADING & SENDING…':'SENDING…';setBusy(true);
+  try{
+    const d=parseLagos(deadline),
+          payload={requestId,organisationId:ORG_ID,clientId:client.id||'',clientName:client.name,brand:client.brand||client.name,projectTitle:project,description:document.getElementById('brieftext').value,deliverables:document.getElementById('deliverables').value,priority:document.getElementById('priority').value,createdByUserId:CURRENT_USER_ID,createdByName:currentUserName(),deadline:d.toISOString(),attachments,assigneeUserId:assigneeId,assigneeFullName:person};
+    let created;
+    try{created=await apiPost('createBrief',payload)}
+    catch(firstError){
+      if(!/Failed to fetch|timed out|NetworkError/i.test(String(firstError?.message||firstError)))throw firstError;
+      await sleep(900);
+      created=await apiPost('createBrief',payload);
+    }
+    const code=created.data?.['Brief Code']||created.data?.briefCode||created['Brief Code']||created.briefCode;
+    if(!code)throw new Error('The server returned no brief code.');
+    sessionStorage.removeItem('onit-create-request');
+    await loadFromGoogle(true);
+    alert(`Brief ${code} created and assigned.`);
+    show('briefs');
+  }catch(e){
+    console.error(e);
+    alert('ONIT could not complete this brief. '+e.message+' You can retry; ONIT will reuse the same request instead of creating a duplicate.');
+  }finally{mutationBusy=false;button.disabled=false;button.textContent=original;setBusy(false)}
+}
 
 function detail(code){current=briefs.find(b=>b.code===code);if(!current)return;currentDetailTab='brief';renderDetail();show('detail')}
 function setDetailTab(name,btn){currentDetailTab=name;document.querySelectorAll('#detailTabs button').forEach(b=>b.classList.remove('active'));if(btn)btn.classList.add('active');document.querySelectorAll('.detailPanel').forEach(p=>p.classList.add('hidden'));document.getElementById(name+'Panel').classList.remove('hidden')}
@@ -565,7 +608,7 @@ function renderMore(){if(!currentUser)return;const names=backendAccess();let htm
   if(names.length){html+=`<div class='morecard' style='grid-column:1/-1'><h3>BACKEND DATA</h3><div class='bigTiny'>Read-only data access is enforced inside ONIT. Raw Google Sheet access is not granted to staff. CD, DCD and MD can download directly. Other staff need one approval from any one of them.</div><div class='bigTiny'>${escapeHTML(names.join(' • '))}</div><button class='secondary linkbtn' onclick="show('data')">OPEN DATA CONSOLE</button></div>`}
   html+=dataExportRequestsMarkup();
   html+=`<div class='morecard' style='grid-column:1/-1'><h3>INSTALL ONIT</h3><div class='bigTiny'>Install ONIT on this device for quick access and automatic app updates. Backend updates are live automatically; frontend updates install automatically when ONIT is hosted on its secure HTTPS address.</div><button class='secondary linkbtn' onclick='installOnit()'>INSTALL ON THIS DEVICE</button></div>`;
-  html+=`<div class='morecard' style='grid-column:1/-1'><h3>HELP / ABOUT</h3><div class='bigTiny'>ONIT V${APP_VERSION} • Time + People + Status<br>Every brief has an owner, deadline, status and visible history.<br>ONIT Pulse, Risk Radar, Brief Replay and Handover Mode are active.<br>Profile photos, governed PDF data exports, Owner Broadcasts and approved-job staff archives are active.<br>Account Management, Creative Director and Deputy Creative Director can create/send briefs. Staff dashboards remain role-specific: managed work, my work, Team Lead review or final approval queues.<br>Owner-assigned Team Leads provide first-stage approval before CD/DCD final approval.<br>Installed HTTPS/PWA copies check automatically for frontend updates; backend changes are live immediately.<br>The System Owner account administers data access separately from operational staff roles.</div></div></div>`;document.getElementById('moreContent').innerHTML=html;hydrateProfilePhotos()}
+  html+=`<div class='morecard' style='grid-column:1/-1'><h3>HELP / ABOUT</h3><div class='bigTiny'>ONIT V${APP_VERSION} • Time + People + Status<br>Every brief has an owner, deadline, status and visible history.<br>ONIT Pulse, Risk Radar, Brief Replay and Handover Mode are active.<br>Profile photos, governed PDF data exports, Owner Broadcasts and approved-job staff archives are active.<br>Only Account Management, Creative Director and Deputy Creative Director can create/send briefs. Brief visibility is private by workflow: sender, assigned/CC users, relevant Team Lead review, final approver stage and System Owner only.<br>Owner-assigned Team Leads provide first-stage approval before CD/DCD final approval.<br>Installed HTTPS/PWA copies check automatically for frontend updates; backend changes are live immediately.<br>The System Owner account administers data access separately from operational staff roles.</div></div></div>`;document.getElementById('moreContent').innerHTML=html;hydrateProfilePhotos()}
 async function approvePending(id){try{await apiPost('approvePendingUser',{targetUserId:decodeURIComponent(id)});await loadFromGoogle(true);showToast('Account approved','The member can now sign in.')}catch(e){alert(e.message)}}
 async function rejectPending(id){if(!confirm('Reject this signup request?'))return;try{await apiPost('rejectPendingUser',{targetUserId:decodeURIComponent(id)});await loadFromGoogle(true);showToast('Signup rejected','The request was closed.')}catch(e){alert(e.message)}}
 async function regenerateJoinCode(){if(!confirm('Regenerate the organisation join code? The old code will stop working immediately.'))return;try{const res=await apiPost('regenerateInviteCode',{});securityInfo.inviteCode=(res.data||res).inviteCode;renderMore();showToast('Join code updated','Share the new code only with authorised people.')}catch(e){alert(e.message)}}
@@ -607,7 +650,21 @@ async function installOnit(){
   if(isIOS()){alert('On iPhone/iPad: tap Share in Safari, then choose “Add to Home Screen”.');return}
   alert('Your browser has not offered the install prompt yet. In Chrome or Edge, open the browser menu and choose “Install ONIT” or “Install app”.');
 }
-function refreshWhenActive(){if(!SESSION_TOKEN||mutationBusy||document.hidden)return;const now=Date.now();if(now-lastFocusRefresh<4000)return;lastFocusRefresh=now;loadFromGoogle(false,true)}
+async function checkForUpdates(){
+  if(!SESSION_TOKEN||mutationBusy||document.hidden||navigator.onLine===false)return;
+  try{
+    const pulse=await apiGet('pulse');
+    backendVersion=pulse.version||backendVersion;
+    if(pulse.serverTime)serverOffset=new Date(pulse.serverTime).getTime()-Date.now();
+    const next=String(pulse.stateVersion||'');
+    if(next&&lastStateVersion&&next!==lastStateVersion){await loadFromGoogle(false,true);return}
+    if(next&&!lastStateVersion)lastStateVersion=next;
+  }catch(e){
+    if(authError(e)){await loadFromGoogle(false,true);return}
+    console.warn('ONIT pulse:',e);
+  }
+}
+function refreshWhenActive(){if(!SESSION_TOKEN||mutationBusy||document.hidden)return;const now=Date.now();if(now-lastFocusRefresh<4000)return;lastFocusRefresh=now;checkForUpdates()}
 window.addEventListener('focus',refreshWhenActive);document.addEventListener('visibilitychange',()=>{if(!document.hidden)refreshWhenActive()});
 window.addEventListener('online',()=>{connectionNotice('');refreshWhenActive()});
 window.addEventListener('offline',()=>connectionNotice('You are offline. ONIT will update when your connection returns.'));
@@ -622,7 +679,7 @@ if('serviceWorker' in navigator && isHttpsApp()){
 refreshInstallButton();
 
 setInterval(()=>{if(!document.getElementById('briefs').classList.contains('hidden'))renderBriefs();if(current&&!document.getElementById('detail').classList.contains('hidden')){const t=timeInfo(current),el=document.getElementById('dtimer');el.textContent=t.text;el.className='num '+t.cls}},1000);
-setInterval(()=>{if(SESSION_TOKEN&&!mutationBusy&&!document.hidden&&navigator.onLine!==false)loadFromGoogle(false,true)},10000);
+setInterval(()=>{checkForUpdates()},5000);
 async function boot(){if(SESSION_TOKEN){document.getElementById('authGate').classList.add('hidden');document.getElementById('appShell').classList.remove('hidden');await loadFromGoogle(false);if(SESSION_TOKEN)return}document.getElementById('appShell').classList.add('hidden');document.getElementById('authGate').classList.remove('hidden');showAuthMode('signin')}
 boot();
 
