@@ -440,3 +440,7 @@ svg{display:block}
   .statCard b{font-size:19px}
   .feedTime{display:none}
 }
+
+
+/* v0.17.5 typography readability pass: active build keeps these rules embedded in index.html. */
+body{font-size:15px}

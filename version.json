@@ -1,6 +1,6 @@
 {
   "app": "ONIT",
-  "version": "0.17.4",
+  "version": "0.17.5",
   "channel": "stable",
-  "release": "approved-layout-atomic-css"
+  "release": "approved-layout-larger-type"
 }

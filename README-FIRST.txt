@@ -1,3 +1,10 @@
+ONIT v0.17.5 — Approved Layout + Larger Typography
+
+This update keeps the approved v0.17.4 layout and working login/API connection. Only typography has been increased slightly (mostly +1px, key headings/numbers +2px) for readability.
+
+Upload the contents of this folder to the existing ONIT GitHub repository root and replace matching files.
+Suggested commit: ONIT v0.17.5 — increase UI font sizes
+
 # ONIT v0.17.4 — Approved Layout / Atomic CSS Fix
 
 This patch fixes the broken-looking v0.17.3 dashboard caused by the installed PWA loading a mismatched/stale stylesheet.

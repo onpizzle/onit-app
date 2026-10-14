@@ -45,7 +45,7 @@
 @media(display-mode:standalone){body{overscroll-behavior-y:none}.installBtn{display:none!important}}
 
 </style>
-<!-- ONIT v0.17.4: approved UI is embedded so the app shell and its styles always deploy together. -->
+<!-- ONIT v0.17.5: approved UI with slightly larger typography for readability. -->
 <style id="onit-approved-ui-v0174">
 
 :root{
@@ -441,6 +441,41 @@ svg{display:block}
 .modal{background:rgba(23,21,19,.63)!important;backdrop-filter:blur(5px)!important}
 .modalBox{border-radius:16px!important;border:1px solid rgba(255,255,255,.55)!important;box-shadow:0 30px 75px rgba(0,0,0,.23)!important}
 
+/* ---------- TYPOGRAPHY +1 / +2 READABILITY PASS ---------- */
+/* Approved layout is unchanged. Only type sizes are raised slightly for easier reading. */
+.authCard>.muted{font-size:14px!important}
+.authTabs button{font-size:13px!important}
+.authMessage{font-size:13px!important}
+.nav button{font-size:13px!important}
+.navOrgCopy b{font-size:12px!important}.navOrgCopy span{font-size:10px!important}
+.topSearch input{font-size:12px!important}
+.user{font-size:11px!important}.user b{font-size:12px!important}.user .muted{font-size:10px!important}.userMeta{font-size:9px!important}
+.avatar{font-size:11px!important}.avatar.large{font-size:15px!important}
+.badge{font-size:9px!important}.installBtn{font-size:11px!important}
+.dashboardHeading h1,.hello h1{font-size:27px!important}
+.dashboardHeading p,.hello p{font-size:12px!important}
+.dashboardDate{font-size:11px!important}
+.sectionHeading h2{font-size:13px!important}.sectionHeading p{font-size:11px!important}
+.statCard b{font-size:23px!important}.statCard small{font-size:10px!important}.statIcon{font-size:15px!important}
+.panelHeading h2{font-size:13px!important}.panelHint{font-size:10px!important}
+.feedAvatar{font-size:10px!important}.feedCopy b{font-size:11px!important}.feedCopy small{font-size:10px!important}.feedTime,.deadlineWhen{font-size:10px!important}
+.pulseTitle{font-size:10px!important}.pulseSentence{font-size:13px!important}.pulseTop .muted{font-size:10px!important}.pulseTop>.pill{font-size:9px!important}
+.pulseMini span{font-size:9px!important}.pulseMini b{font-size:14px!important}
+.briefIcon{font-size:13px!important}.briefCopy b{font-size:11px!important}.briefCopy small{font-size:10px!important}
+.pill,.statuspill{font-size:9px!important}.timer{font-size:10px!important}
+.personInfo b{font-size:11px!important}.personInfo .muted{font-size:10px!important}.person>b{font-size:10px!important}
+.riskScore{font-size:12px!important}.riskCard .code{font-size:9px!important}.riskCard b{font-size:11px!important}.riskReasons{font-size:9.5px!important}.riskLabel{font-size:9px!important}
+.new{font-size:11px!important}.secondary{font-size:10px!important}.back{font-size:11px!important}
+.field label{font-size:10px!important}.field input,.field textarea,.field select{font-size:12px!important}
+.tabs button,.filterRow button{font-size:10px!important}
+.notice,.ownerNotice,.approvalWarning,.handoverHint{font-size:11px!important}
+#dtimer{font-size:24px!important}
+.metaBlock{font-size:11px!important}.metaBlock b{font-size:9px!important}.replayItem{font-size:11px!important}
+.morecard h3{font-size:11px!important}.bigTiny{font-size:13px!important}.tiny{font-size:12px!important}.code{font-size:13px!important}
+.reportTable{font-size:10px!important}.reportTable th{font-size:10px!important}
+.notifItem{font-size:11px!important}.toast{font-size:11px!important}
+.replyComposer h2{font-size:17px!important}.replyRoute{font-size:12px!important}.replyState,.replyFeedback,.staffInboxHint{font-size:14px!important}
+
 /* ---------- MOBILE ---------- */
 @media(max-width:1050px){
   .app{width:calc(100% - 20px)!important;margin:10px auto!important;min-height:calc(100vh - 20px)!important}
@@ -462,13 +497,13 @@ svg{display:block}
   }
   .sideBrand,.navFooter{display:none!important}
   .navStack{padding:0!important;display:flex!important;flex-direction:row!important;justify-content:space-around!important;gap:2px!important;height:100%!important}
-  .nav button{flex:1!important;min-width:0!important;display:flex!important;flex-direction:column!important;justify-content:center!important;gap:3px!important;padding:5px 2px!important;border-radius:9px!important;font-size:8px!important}
+  .nav button{flex:1!important;min-width:0!important;display:flex!important;flex-direction:column!important;justify-content:center!important;gap:3px!important;padding:5px 2px!important;border-radius:9px!important;font-size:9px!important}
   .navIcon{width:17px;height:17px}.navIcon svg{width:17px;height:17px}
   .top{height:58px!important;padding:0 14px!important}
   .topSearch{display:none!important}
   .user{display:none!important}
   .main{padding:20px 14px 28px!important}
-  .dashboardHeading h1,.hello h1{font-size:23px!important}
+  .dashboardHeading h1,.hello h1{font-size:25px!important}
   .dashboardHeadingRight .new{display:none!important}
   .dashboardStats{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:9px!important;margin-top:18px!important}
   .statCard{min-height:70px;padding:12px!important}
@@ -485,8 +520,8 @@ svg{display:block}
 }
 @media(max-width:430px){
   .dashboardHeading{align-items:flex-start!important}
-  .dashboardDate{font-size:8px}
-  .statCard b{font-size:19px}
+  .dashboardDate{font-size:9px}
+  .statCard b{font-size:21px}
   .feedTime{display:none}
 }
 
@@ -655,7 +690,7 @@ svg{display:block}
 <div id="broadcastModal" class="modal hidden broadcastPopup"><div class="modalBox"><div class="modalTop"><div><span class="code">ONIT ANNOUNCEMENT</span><h2 id="broadcastTitle" style="margin:4px 0 0"></h2></div></div><div id="broadcastMessage" class="broadcastMessage"></div><div id="broadcastAttachment"></div><div class="actions" style="justify-content:flex-end"><button class="new" onclick="ackBroadcast()">GOT IT</button></div></div></div>
 <script>
 
-const APP_VERSION='0.17.4';
+const APP_VERSION='0.17.5';
 const BACKEND_DATASETS=['USERS','CLIENTS','BRIEFS','ASSIGNMENTS','ITERATIONS','ACTIVITY_LOG','NOTIFICATIONS','REPORTS'];
 const API_URL='https://script.google.com/macros/s/AKfycbyY98jKIh2ls8jKsB5w2H7YG3Okj61AoIkt3-2x0LBnvRVwDgBhrQnVr1Ghfu04J7YB/exec';
 let ORG_ID=localStorage.getItem('onit-org')||'';
