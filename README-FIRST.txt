@@ -1,14 +1,11 @@
-ONIT v0.17.2 SAFE UI + LOGIN FIX
+ONIT v0.17.3 — APPROVED LAYOUT FIX
 
-This patch restores the exact working v0.16.1 sign-in/API logic and keeps the approved premium UI.
+Purpose:
+- Rebuilds the actual app shell and page structure to follow the approved ONIT UI board.
+- Preserves the working v0.16.1 direct Apps Script login/API connection used by the current live app.
+- Does not include or overwrite onit-config.js, onboarding.js, or any Google Apps Script backend file.
 
-Upload ALL contents of this folder to the root of the GitHub onit-app repository and replace matching files.
-The assets/ folder is required.
+Upload all files/folders in this package to the root of the existing GitHub onit-app repository and replace matching files.
+Suggested commit: ONIT v0.17.3 — approved layout implementation
 
-Do NOT change your Google Apps Script backend or Sheet.
-Do NOT add onit-config.js or onboarding.js for this fix.
-
-Suggested commit message:
-ONIT v0.17.2 — restore login and keep premium UI
-
-After Render is live, open /reset.html once, then reopen the main app.
+After Render deploys, visit /reset.html once, then reopen the main ONIT URL.

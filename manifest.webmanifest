@@ -10,8 +10,8 @@
     "window-controls-overlay",
     "minimal-ui"
   ],
-  "background_color": "#ffffff",
-  "theme_color": "#171717",
+  "background_color": "#f1efeb",
+  "theme_color": "#fbfaf8",
   "orientation": "any",
   "icons": [
     {
