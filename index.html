@@ -1,6 +1,9 @@
 <!doctype html>
 <html>
 <head>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#171717">
@@ -162,7 +165,7 @@
 <div id="broadcastModal" class="modal hidden broadcastPopup"><div class="modalBox"><div class="modalTop"><div><span class="code">ONIT ANNOUNCEMENT</span><h2 id="broadcastTitle" style="margin:4px 0 0"></h2></div></div><div id="broadcastMessage" class="broadcastMessage"></div><div id="broadcastAttachment"></div><div class="actions" style="justify-content:flex-end"><button class="new" onclick="ackBroadcast()">GOT IT</button></div></div></div>
 <script>
 
-const APP_VERSION='0.15.9';
+const APP_VERSION='0.16.0';
 const BACKEND_DATASETS=['USERS','CLIENTS','BRIEFS','ASSIGNMENTS','ITERATIONS','ACTIVITY_LOG','NOTIFICATIONS','REPORTS'];
 const API_URL='https://script.google.com/macros/s/AKfycbyY98jKIh2ls8jKsB5w2H7YG3Okj61AoIkt3-2x0LBnvRVwDgBhrQnVr1Ghfu04J7YB/exec';
 let ORG_ID=localStorage.getItem('onit-org')||'';
@@ -704,8 +707,8 @@ function renderMore(){if(!currentUser)return;const names=backendAccess();let htm
   if(canSeeReports()&&reportSummary){html+=`<div class='morecard' style='grid-column:1/-1'><h3>REPORTS — LIVE SUMMARY</h3>${reportSummaryTable()}<button class='secondary linkbtn' onclick='refreshReportsNow()'>REFRESH REPORTS</button><button class='secondary linkbtn' onclick="activeBackendDataset='REPORTS';show('data')">OPEN REPORTS DATA</button></div>`}
   if(names.length){html+=`<div class='morecard' style='grid-column:1/-1'><h3>BACKEND DATA</h3><div class='bigTiny'>Read-only data access is enforced inside ONIT. Raw Google Sheet access is not granted to staff. CD, DCD and MD can download directly. Other staff need one approval from any one of them.</div><div class='bigTiny'>${escapeHTML(names.join(' • '))}</div><button class='secondary linkbtn' onclick="show('data')">OPEN DATA CONSOLE</button></div>`}
   html+=dataExportRequestsMarkup();
-  html+=`<div class='morecard' style='grid-column:1/-1'><h3>INSTALL ONIT</h3><div class='bigTiny'>Install ONIT on this device for quick access and automatic app updates. Backend updates are live automatically; frontend updates install automatically when ONIT is hosted on its secure HTTPS address.</div><button class='secondary linkbtn' onclick='installOnit()'>INSTALL ON THIS DEVICE</button></div>`;
-  html+=`<div class='morecard' style='grid-column:1/-1'><h3>HELP / ABOUT</h3><div class='bigTiny'>ONIT V${APP_VERSION} • Time + People + Status<br>Every brief has an owner, deadline, status and visible history.<br>ONIT Pulse, Risk Radar, Brief Replay and Handover Mode are active.<br>Profile photos, governed PDF data exports, Owner Broadcasts, Account Recovery and approved-job staff archives are active.<br>Only Account Management, Creative Director and Deputy Creative Director can create/send briefs. Brief visibility is private by workflow: sender, assigned/CC users, relevant Team Lead review, final approver stage and System Owner only.<br>Owner-assigned Team Leads provide first-stage approval before CD/DCD final approval.<br>Installed HTTPS/PWA copies check automatically for frontend updates; backend changes are live immediately.<br>The System Owner account administers data access separately from operational staff roles and can securely send password-reset codes to active staff without deleting their account history.</div></div></div>`;document.getElementById('moreContent').innerHTML=html;hydrateProfilePhotos()}
+  html+=`<div class='morecard' style='grid-column:1/-1'><h3>INSTALL / UPDATE ONIT</h3><div class='bigTiny'>Install ONIT on this device for quick access. ONIT now checks the hosted frontend version automatically and repairs stale installed copies without requiring a reinstall.</div><div class='actions'><button class='secondary linkbtn' onclick='installOnit()'>INSTALL ON THIS DEVICE</button><button class='secondary linkbtn' onclick='forceFrontendUpdate()'>CHECK / REPAIR UPDATE</button></div></div>`;
+  html+=`<div class='morecard' style='grid-column:1/-1'><h3>HELP / ABOUT</h3><div class='bigTiny'>ONIT Frontend v${APP_VERSION} • Backend ${backendVersion||'checking…'} • Time + People + Status<br>Every brief has an owner, deadline, status and visible history.<br>ONIT Pulse, Risk Radar, Brief Replay and Handover Mode are active.<br>Profile photos, governed PDF data exports, Owner Broadcasts, Account Recovery and approved-job staff archives are active.<br>Only Account Management, Creative Director and Deputy Creative Director can create/send briefs. Brief visibility is private by workflow: sender, assigned/CC users, relevant Team Lead review, final approver stage and System Owner only.<br>Owner-assigned Team Leads provide first-stage approval before CD/DCD final approval.<br>Installed HTTPS/PWA copies check automatically for frontend updates; backend changes are live immediately.<br>The System Owner account administers data access separately from operational staff roles and can securely send password-reset codes to active staff without deleting their account history.</div></div></div>`;document.getElementById('moreContent').innerHTML=html;hydrateProfilePhotos()}
 async function approvePending(id){try{await apiPost('approvePendingUser',{targetUserId:decodeURIComponent(id)});await loadFromGoogle(true);showToast('Account approved','The member can now sign in.')}catch(e){alert(e.message)}}
 async function rejectPending(id){if(!confirm('Reject this signup request?'))return;try{await apiPost('rejectPendingUser',{targetUserId:decodeURIComponent(id)});await loadFromGoogle(true);showToast('Signup rejected','The request was closed.')}catch(e){alert(e.message)}}
 async function regenerateJoinCode(){if(!confirm('Regenerate the organisation join code? The old code will stop working immediately.'))return;try{const res=await apiPost('regenerateInviteCode',{});securityInfo.inviteCode=(res.data||res).inviteCode;renderMore();showToast('Join code updated','Share the new code only with authorised people.')}catch(e){alert(e.message)}}
@@ -737,6 +740,68 @@ function formatDateTime(value){const d=new Date(value);return Number.isFinite(d.
 function formatTime(value){const d=new Date(value);return Number.isFinite(d.getTime())?d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit',timeZone:'Africa/Lagos'}):'--:--'}
 function makeId(){return crypto.randomUUID?crypto.randomUUID():Array.from(crypto.getRandomValues(new Uint32Array(4)),n=>n.toString(16)).join('-')}
 
+
+
+// ===== Self-healing frontend update manager =====
+let pendingFrontendVersion='';
+async function fetchFrontendRelease(){
+  const r=await fetch('./version.json?t='+Date.now(),{cache:'no-store',headers:{'Cache-Control':'no-cache'}});
+  if(!r.ok)throw new Error('Version check '+r.status);
+  return r.json();
+}
+function safeToReloadForUpdate(){
+  return !mutationBusy && (!window.uiDirtySections || uiDirtySections.size===0);
+}
+async function performFrontendRefresh(targetVersion,force){
+  if(!force && !safeToReloadForUpdate()){
+    pendingFrontendVersion=targetVersion||pendingFrontendVersion;
+    showToast('ONIT update ready','Finish your current form/action. ONIT will update automatically afterwards.');
+    return false;
+  }
+  try{
+    if('serviceWorker' in navigator){
+      const regs=await navigator.serviceWorker.getRegistrations();
+      await Promise.all(regs.map(async reg=>{try{await reg.update()}catch(e){}}));
+    }
+  }catch(e){}
+  const url=new URL(location.href);
+  url.searchParams.set('onit_v',targetVersion||Date.now());
+  url.searchParams.set('_refresh',Date.now());
+  location.replace(url.toString());
+  return true;
+}
+async function checkFrontendRelease(force=false){
+  if(!isHttpsApp()||navigator.onLine===false)return;
+  try{
+    const release=await fetchFrontendRelease();
+    const remote=String(release.version||'').trim();
+    if(remote && remote!==APP_VERSION){
+      pendingFrontendVersion=remote;
+      await performFrontendRefresh(remote,force);
+      return;
+    }
+    if(pendingFrontendVersion && safeToReloadForUpdate()){
+      const target=pendingFrontendVersion;pendingFrontendVersion='';
+      await performFrontendRefresh(target,true);
+    }
+  }catch(e){console.warn('Frontend version check:',e)}
+}
+async function forceFrontendUpdate(){
+  if(window.uiDirtySections && uiDirtySections.size){
+    if(!confirm('You have an unfinished form. Reload ONIT and discard those unsaved changes?'))return;
+  }
+  try{
+    if('serviceWorker' in navigator){
+      const regs=await navigator.serviceWorker.getRegistrations();
+      await Promise.all(regs.map(async reg=>{try{await reg.unregister()}catch(e){}}));
+    }
+    if('caches' in window){
+      const keys=await caches.keys();
+      await Promise.all(keys.filter(k=>k.startsWith('onit-')).map(k=>caches.delete(k)));
+    }
+  }catch(e){}
+  location.replace('./?repair=1&t='+Date.now());
+}
 
 // ===== Installable app / near-real-time shell =====
 let deferredInstallPrompt=null,lastFocusRefresh=0;
@@ -775,16 +840,27 @@ async function checkForUpdates(){
     console.warn('ONIT pulse:',e);
   }
 }
-function refreshWhenActive(){if(!SESSION_TOKEN||mutationBusy||document.hidden)return;const now=Date.now();if(now-lastFocusRefresh<4000)return;lastFocusRefresh=now;checkForUpdates()}
+function refreshWhenActive(){if(document.hidden)return;checkFrontendRelease(false);if(!SESSION_TOKEN||mutationBusy)return;const now=Date.now();if(now-lastFocusRefresh<4000)return;lastFocusRefresh=now;checkForUpdates()}
 window.addEventListener('focus',refreshWhenActive);document.addEventListener('visibilitychange',()=>{if(!document.hidden)refreshWhenActive()});
 window.addEventListener('online',()=>{connectionNotice('');refreshWhenActive()});
 window.addEventListener('offline',()=>connectionNotice('You are offline. ONIT will update when your connection returns.'));
 if('serviceWorker' in navigator && isHttpsApp()){
   window.addEventListener('load',()=>navigator.serviceWorker.register('./service-worker.js',{updateViaCache:'none'}).then(reg=>{
     reg.update().catch(()=>{});
-    setInterval(()=>reg.update().catch(()=>{}),15000);
+    setInterval(()=>reg.update().catch(()=>{}),30000);
     let reloading=false;
-    navigator.serviceWorker.addEventListener('controllerchange',()=>{if(reloading)return;reloading=true;location.reload()});
+    navigator.serviceWorker.addEventListener('controllerchange',()=>{
+      if(reloading)return;
+      if(!safeToReloadForUpdate()){
+        pendingFrontendVersion=pendingFrontendVersion||'new';
+        showToast('ONIT update ready','Finish your current form/action. The app will refresh automatically afterwards.');
+        return;
+      }
+      reloading=true;
+      location.reload();
+    });
+    checkFrontendRelease(false);
+    setInterval(()=>checkFrontendRelease(false),30000);
   }).catch(err=>console.warn('Service worker:',err)))
 }
 refreshInstallButton();

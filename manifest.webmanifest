@@ -1,8 +1,8 @@
 {
   "name": "ONIT \u2014 Time + People + Status",
   "short_name": "ONIT",
-  "description": "ONIT work traffic management with private workflow-scoped briefs, role-specific inbox dashboards, email-style work replies, draft-safe live sync, stable Owner Broadcast console, owner account recovery and prominent Team Lead/CD/DCD approval actions, CD/DCD final creative approval, governed data access, one-step management PDF export approval, Pulse, Risk Radar, Brief Replay, Handover and approved-job archives.",
-  "start_url": "./index.html",
+  "description": "ONIT work traffic management. Stable v0.16 shell with self-healing PWA updates, Owner Broadcast, Account Recovery, role-specific work inboxes and governed data access.",
+  "start_url": "./",
   "scope": "./",
   "display": "standalone",
   "display_override": [
