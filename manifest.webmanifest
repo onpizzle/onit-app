@@ -1,7 +1,7 @@
 {
   "name": "ONIT \u2014 Time + People + Status",
   "short_name": "ONIT",
-  "description": "ONIT work traffic management. Stable v0.16.1 with the new ONIT identity, louder notification chime, self-healing PWA updates, Owner Broadcast and governed work workflows.",
+  "description": "ONIT \u2014 premium work and brief operations for modern creative teams.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
@@ -10,8 +10,8 @@
     "window-controls-overlay",
     "minimal-ui"
   ],
-  "background_color": "#ffffff",
-  "theme_color": "#171717",
+  "background_color": "#fbfaf7",
+  "theme_color": "#f7f4ef",
   "orientation": "any",
   "icons": [
     {

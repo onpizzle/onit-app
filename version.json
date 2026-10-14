@@ -1,5 +1,6 @@
 {
-  "app": "ONIT",
-  "version": "0.16.1",
-  "channel": "stable"
+  "version": "0.17.1",
+  "build": "0.17.1",
+  "minimumBackend": "0.17.0",
+  "releasedAt": "2026-10-14T17:30:00Z"
 }
