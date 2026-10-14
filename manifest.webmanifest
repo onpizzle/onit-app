@@ -1,7 +1,7 @@
 {
   "name": "ONIT \u2014 Time + People + Status",
   "short_name": "ONIT",
-  "description": "ONIT work traffic management. Stable v0.16 shell with self-healing PWA updates, Owner Broadcast, Account Recovery, role-specific work inboxes and governed data access.",
+  "description": "ONIT work traffic management. Stable v0.16.1 with the new ONIT identity, louder notification chime, self-healing PWA updates, Owner Broadcast and governed work workflows.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",

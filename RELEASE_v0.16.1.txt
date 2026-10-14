@@ -1,0 +1,29 @@
+ONIT v0.16.1 — Notification Sound + Brand Logo
+
+Frontend-only stability update. No Apps Script/backend deployment is required.
+
+Changes
+- Replaced the old text/dot ONIT mark in the sign-in screen and main header with the supplied ONIT logo.
+- Replaced PWA/desktop icons and Apple touch icon with the supplied logo.
+- Added a louder three-stage ONIT notification chime.
+- Notification sound is ON by default when a user has no saved preference.
+- Existing users who explicitly switched sound OFF remain OFF.
+- Added MORE > NOTIFICATIONS > TEST SOUND.
+- New notifications and Owner Broadcast popups both use the louder chime.
+- Device/OS volume still controls final loudness.
+- Kept the v0.16 self-healing PWA update system so installed users receive this frontend automatically.
+
+Deploy
+1. Upload/replace the CONTENTS of this folder in the root of onpizzle/onit-app.
+2. Commit to main:
+   ONIT v0.16.1 — New Logo + Louder Notifications
+3. Render should auto-deploy from the GitHub commit.
+4. Once Render is live, installed PWA users should self-update. If one is stuck, open:
+   https://onit-d5sr.onrender.com/reset.html
+   once in Chrome and reopen ONIT.
+
+Testing
+- Confirm the new logo appears on the sign-in screen and header.
+- MORE > NOTIFICATIONS > TEST SOUND.
+- Send an Owner Broadcast to one test staff account.
+- Create a test notification/brief and confirm the recipient hears the chime once.
