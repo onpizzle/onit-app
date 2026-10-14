@@ -444,3 +444,5 @@ svg{display:block}
 
 /* v0.17.5 typography readability pass: active build keeps these rules embedded in index.html. */
 body{font-size:15px}
+
+.dangerAction{border-color:#e9b6b0!important;color:#b62f25!important;background:#fff7f5!important}.dangerAction:hover{background:#fff0ed!important}
