@@ -690,7 +690,7 @@ svg{display:block}
 <div id="broadcastModal" class="modal hidden broadcastPopup"><div class="modalBox"><div class="modalTop"><div><span class="code">ONIT ANNOUNCEMENT</span><h2 id="broadcastTitle" style="margin:4px 0 0"></h2></div></div><div id="broadcastMessage" class="broadcastMessage"></div><div id="broadcastAttachment"></div><div class="actions" style="justify-content:flex-end"><button class="new" onclick="ackBroadcast()">GOT IT</button></div></div></div>
 <script>
 
-const APP_VERSION='0.17.7';
+const APP_VERSION='0.17.8';
 const BACKEND_DATASETS=['USERS','CLIENTS','BRIEFS','ASSIGNMENTS','ITERATIONS','ACTIVITY_LOG','NOTIFICATIONS','REPORTS'];
 const API_URL='https://script.google.com/macros/s/AKfycbyY98jKIh2ls8jKsB5w2H7YG3Okj61AoIkt3-2x0LBnvRVwDgBhrQnVr1Ghfu04J7YB/exec';
 let ORG_ID=localStorage.getItem('onit-org')||'';
@@ -1310,8 +1310,34 @@ function renderMore(){if(!currentUser)return;const names=backendAccess();let htm
   html+=dataExportRequestsMarkup();
   html+=`<div class='morecard' style='grid-column:1/-1'><h3>INSTALL / UPDATE ONIT</h3><div class='bigTiny'>Install ONIT on this device for quick access. ONIT now checks the hosted frontend version automatically and repairs stale installed copies without requiring a reinstall.</div><div class='actions'><button class='secondary linkbtn' onclick='installOnit()'>INSTALL ON THIS DEVICE</button><button class='secondary linkbtn' onclick='forceFrontendUpdate()'>CHECK / REPAIR UPDATE</button></div></div>`;
   html+=`<div class='morecard' style='grid-column:1/-1'><h3>HELP / ABOUT</h3><div class='bigTiny'>ONIT Frontend v${APP_VERSION} • Backend ${backendVersion||'checking…'} • Time + People + Status<br>Every brief has an owner, deadline, status and visible history.<br>ONIT Pulse, Risk Radar, Brief Replay and Handover Mode are active.<br>Profile photos, governed PDF data exports, Owner Broadcasts, Staff Account Management and approved-job staff archives are active.<br>Only Account Management, Creative Director and Deputy Creative Director can create/send briefs. Brief visibility is private by workflow: sender, assigned/CC users, relevant Team Lead review, final approver stage and System Owner only.<br>Owner-assigned Team Leads provide first-stage approval before CD/DCD final approval.<br>Installed HTTPS/PWA copies check automatically for frontend updates; backend changes are live immediately.<br>The System Owner account administers data access separately from operational staff roles and can correct staff emails, send password-reset codes, deactivate/reactivate staff and preserve historical work.</div></div></div>`;document.getElementById('moreContent').innerHTML=html;hydrateProfilePhotos()}
-async function approvePending(id){try{await apiPost('approvePendingUser',{targetUserId:decodeURIComponent(id)});await loadFromGoogle(true);showToast('Account approved','The member can now sign in.')}catch(e){alert(e.message)}}
-async function rejectPending(id){if(!confirm('Reject this signup request?'))return;try{await apiPost('rejectPendingUser',{targetUserId:decodeURIComponent(id)});await loadFromGoogle(true);showToast('Signup rejected','The request was closed.')}catch(e){alert(e.message)}}
+async function approvePending(id){
+  const targetUserId=decodeURIComponent(id),target=pendingUsers.find(u=>String(rowVal(u,'User ID'))===String(targetUserId)),name=target?rowVal(target,'Full Name'):'The member';
+  try{
+    const res=await apiPost('approvePendingUser',{targetUserId}),d=res.data||res;
+    pendingUsers=pendingUsers.filter(u=>String(rowVal(u,'User ID'))!==String(targetUserId));
+    renderMore();
+    showToast(d.alreadyProcessed?'Account already active':'Account approved',d.alreadyProcessed?`${name} was already approved. The list has been refreshed.`:`${name} can now sign in.`);
+    await loadFromGoogle(false,true);
+  }catch(e){
+    if(/not awaiting approval|already active/i.test(String(e&&e.message||e))){
+      pendingUsers=pendingUsers.filter(u=>String(rowVal(u,'User ID'))!==String(targetUserId));renderMore();await loadFromGoogle(false,true);showToast('Account already processed',`${name} is no longer waiting for approval.`);return;
+    }
+    alert('Could not approve this account. '+e.message);
+  }
+}
+async function rejectPending(id){
+  if(!confirm('Reject this signup request?'))return;
+  const targetUserId=decodeURIComponent(id),target=pendingUsers.find(u=>String(rowVal(u,'User ID'))===String(targetUserId)),name=target?rowVal(target,'Full Name'):'The member';
+  try{
+    const res=await apiPost('rejectPendingUser',{targetUserId}),d=res.data||res;
+    pendingUsers=pendingUsers.filter(u=>String(rowVal(u,'User ID'))!==String(targetUserId));renderMore();
+    showToast(d.alreadyProcessed?'Signup already closed':'Signup rejected',d.alreadyProcessed?`${name}'s request had already been processed.`:`${name}'s signup request was closed.`);
+    await loadFromGoogle(false,true);
+  }catch(e){
+    if(/not awaiting approval|already inactive|already processed/i.test(String(e&&e.message||e))){pendingUsers=pendingUsers.filter(u=>String(rowVal(u,'User ID'))!==String(targetUserId));renderMore();await loadFromGoogle(false,true);showToast('Signup already processed',`${name} is no longer waiting for approval.`);return;}
+    alert('Could not reject this signup. '+e.message);
+  }
+}
 async function regenerateJoinCode(){if(!confirm('Regenerate the organisation join code? The old code will stop working immediately.'))return;try{const res=await apiPost('regenerateInviteCode',{});securityInfo.inviteCode=(res.data||res).inviteCode;renderMore();showToast('Join code updated','Share the new code only with authorised people.')}catch(e){alert(e.message)}}
 async function toggleSignupAccess(){try{const res=await apiPost('setSignupsEnabled',{enabled:!securityInfo.signupsEnabled});securityInfo.signupsEnabled=(res.data||res).enabled;renderMore();showToast('Signup access',securityInfo.signupsEnabled?'New signups enabled.':'New signups disabled.')}catch(e){alert(e.message)}}
 function ownerAccountRecord(id){
