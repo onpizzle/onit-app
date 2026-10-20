@@ -1,6 +1,6 @@
 
 
-const APP_VERSION='0.18.1';
+const APP_VERSION='0.18.3';
 const BACKEND_DATASETS=['USERS','CLIENTS','BRIEFS','ASSIGNMENTS','ITERATIONS','ACTIVITY_LOG','NOTIFICATIONS','REPORTS'];
 const API_URL='https://script.google.com/macros/s/AKfycbyY98jKIh2ls8jKsB5w2H7YG3Okj61AoIkt3-2x0LBnvRVwDgBhrQnVr1Ghfu04J7YB/exec';
 let ORG_ID=localStorage.getItem('onit-org')||'';
@@ -502,15 +502,27 @@ async function showNextBroadcast(){
   if(currentBroadcast||!SESSION_TOKEN)return;
   const n=notifications.filter(x=>rowVal(x,'Type')==='OWNER_BROADCAST'&&!truthy(rowVal(x,'Read'))).sort((a,b)=>new Date(rowVal(a,'Created At'))-new Date(rowVal(b,'Created At')))[0];
   if(!n)return;currentBroadcast=n;
-  document.getElementById('broadcastTitle').textContent=rowVal(n,'Title')||'Announcement';
-  document.getElementById('broadcastMessage').textContent=rowVal(n,'Message')||'';
+  const modal=document.getElementById('broadcastModal'),title=rowVal(n,'Title')||'Announcement',message=rowVal(n,'Message')||'';
+  document.getElementById('broadcastTitle').textContent=title;
+  document.getElementById('broadcastMessage').textContent=message;
   const box=document.getElementById('broadcastAttachment');box.innerHTML='';
   const fileName=rowVal(n,'File Name'),type=String(rowVal(n,'File Type')||'');
   if(fileName){
-    box.innerHTML=`<div class='card'><b>${escapeHTML(fileName)}</b><div class='tiny'>Attachment from ${escapeHTML(rowVal(n,'Sender Name')||'Management')}</div><div id='broadcastFileBody' style='margin-top:10px'><div class='muted'>Loading attachment…</div></div></div>`;
-    try{const res=await apiPost('getBroadcastFile',{notificationId:rowVal(n,'Notification ID')}),d=res.data||res,body=document.getElementById('broadcastFileBody');if(type.startsWith('image/')&&d.base64){body.innerHTML=`<img class='broadcastImage' src='data:${d.mimeType||type};base64,${d.base64}' alt='Announcement attachment'><div class='actions'><button class='secondary' onclick='downloadBroadcastAttachment()'>DOWNLOAD FILE</button></div>`}else{body.innerHTML=`<button class='secondary' onclick='downloadBroadcastAttachment()'>DOWNLOAD ${escapeHTML(fileName)}</button>`}}catch(e){document.getElementById('broadcastFileBody').innerHTML=`<div class='dangerText'>Attachment could not be previewed. ${escapeHTML(e.message)}</div>`}
+    box.innerHTML=`<div class='broadcastLoading'>Loading announcement…</div>`;
+    try{
+      const res=await apiPost('getBroadcastFile',{notificationId:rowVal(n,'Notification ID')}),d=res.data||res;
+      if(type.startsWith('image/')&&d.base64){
+        box.innerHTML=`<div class='broadcastMedia'><img class='broadcastImage' src='data:${d.mimeType||type};base64,${d.base64}' alt='${escapeHTML(title)}'></div>`;
+      }else{
+        box.innerHTML=`<div class='broadcastMediaFallback'><div><b>${escapeHTML(fileName)}</b><div class='tiny' style='margin:8px 0 12px'>Announcement attachment</div><button class='secondary' onclick='downloadBroadcastAttachment()'>DOWNLOAD FILE</button></div></div>`;
+      }
+    }catch(e){
+      box.innerHTML=`<div class='broadcastMediaFallback'>The announcement image could not be loaded.</div>`;
+    }
   }
-  document.getElementById('broadcastModal').classList.remove('hidden');playNotificationSound();
+  modal.classList.remove('hidden');
+  setTimeout(()=>modal.querySelector('.broadcastClose')?.focus(),40);
+  playNotificationSound();
 }
 async function downloadBroadcastAttachment(){
   if(!currentBroadcast)return;
@@ -521,6 +533,7 @@ async function ackBroadcast(){
   const id=rowVal(currentBroadcast,'Notification ID');try{await apiPost('markNotificationsRead',{notificationIds:[id]});const n=notifications.find(x=>rowVal(x,'Notification ID')===id);if(n)n['Read']=true}catch(e){console.warn(e)}
   document.getElementById('broadcastModal').classList.add('hidden');currentBroadcast=null;renderNotifications();setTimeout(showNextBroadcast,200);
 }
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&currentBroadcast&&!document.getElementById('broadcastModal').classList.contains('hidden'))ackBroadcast()});
 function enableAudio(){audioReady=true;try{const C=window.AudioContext||window.webkitAudioContext;if(C){const c=new C();c.resume();c.close()}}catch(e){}}
 document.addEventListener('pointerdown',enableAudio,{once:true});
 document.addEventListener('keydown',enableAudio,{once:true});

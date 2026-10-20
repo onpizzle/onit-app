@@ -1,6 +1,6 @@
 {
   "app": "ONIT",
-  "version": "0.18.1",
+  "version": "0.18.3",
   "channel": "stable",
-  "release": "office-workflow-upgrade"
+  "release": "broadcast-popup-experience"
 }
