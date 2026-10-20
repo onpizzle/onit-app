@@ -1,4 +1,4 @@
-const CACHE='onit-v0.18.3';
+const CACHE='onit-v0.18.4';
 const STATIC=['./offline.html','./manifest.webmanifest','./icons/icon-192.png','./icons/icon-512.png','./icons/apple-touch-icon.png','./assets/onit-logo-horizontal.png','./assets/onit-logo-full.png','./icons/favicon-32.png'];
 
 self.addEventListener('install',event=>{

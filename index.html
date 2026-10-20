@@ -302,6 +302,37 @@ svg{display:block}
 .deadlineDot.red{background:var(--red)}.deadlineDot.orange{background:var(--amber)}.deadlineDot.green{background:var(--green)}
 .rowArrow{font-size:17px;line-height:1;color:#aaa59e}
 
+/* ---------- HOME ANALYTICS ---------- */
+.homeAnalytics{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(260px,.75fr);gap:14px;margin:18px 0 0}
+.analyticsCard{background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow-soft);padding:16px;min-width:0}
+.analyticsHead{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:14px}
+.analyticsEyebrow{font-size:9px;letter-spacing:.08em;font-weight:850;color:#716c65;text-transform:uppercase}
+.analyticsTitle{font-size:15px;font-weight:800;letter-spacing:-.025em;margin-top:3px}
+.analyticsMeta{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.analyticsChip{font-size:8px;font-weight:800;border-radius:999px;padding:5px 8px;background:#f4f1ed;color:#77716a;white-space:nowrap}
+.analyticsChip.alert{background:#fff0ed;color:#bb4639}
+.briefOverviewBars{height:205px;display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:9px;align-items:end;padding:6px 2px 0}
+.overviewBarCell{height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;min-width:0}
+.overviewBarBubble{font-size:8px;line-height:1.15;text-align:center;background:#fff;border:1px solid #ebe6df;border-radius:8px;padding:5px 6px;margin-bottom:6px;box-shadow:0 5px 12px rgba(31,26,21,.04);white-space:nowrap}
+.overviewBarBubble b{display:block;font-size:13px;letter-spacing:-.03em;color:#1d1a17}
+.overviewBarTrack{height:136px;width:min(54px,78%);background:#f4f1ed;border-radius:10px 10px 4px 4px;display:flex;align-items:flex-end;overflow:hidden;position:relative}
+.overviewBarFill{width:100%;min-height:0;border-radius:10px 10px 4px 4px;transition:height .45s ease;background:var(--bar,#f15b35)}
+.overviewBarCell:nth-child(1){--bar:#f4b942}.overviewBarCell:nth-child(2){--bar:#f15b35}.overviewBarCell:nth-child(3){--bar:#a979c7}.overviewBarCell:nth-child(4){--bar:#5a8de1}.overviewBarCell:nth-child(5){--bar:#e78d4b}.overviewBarCell:nth-child(6){--bar:#27a875}
+.overviewBarLabel{font-size:8px;color:#77716a;margin-top:7px;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:100%}
+.utilCard{display:flex;flex-direction:column}
+.utilMode{display:flex;background:#f2efea;border-radius:999px;padding:3px;gap:3px}
+.utilMode button{border:0;background:transparent;border-radius:999px;padding:6px 10px;font-size:8px;font-weight:800;color:#817a72;cursor:pointer}
+.utilMode button.active{background:#fff;color:#1d1a17;box-shadow:0 2px 8px rgba(31,26,21,.08)}
+.utilRingWrap{display:grid;place-items:center;padding:7px 0 10px}
+.utilRing{--fill:0;width:158px;height:158px;border-radius:50%;background:conic-gradient(#f45b35 calc(var(--fill)*1%),#f1ece6 0);display:grid;place-items:center;position:relative;box-shadow:inset 0 0 0 1px rgba(0,0,0,.02)}
+.utilRing.over{box-shadow:0 0 0 7px #fff4ee,inset 0 0 0 1px rgba(0,0,0,.02)}
+.utilRing:after{content:'';position:absolute;width:116px;height:116px;border-radius:50%;background:#fff;border:1px solid #f2eee8}
+.utilRingValue{position:relative;z-index:1;text-align:center}.utilRingValue b{display:block;font-size:31px;letter-spacing:-.055em}.utilRingValue span{font-size:8px;color:#89837c;font-weight:750;letter-spacing:.06em;text-transform:uppercase}
+.utilStats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:auto}.utilStats>div{border:1px solid #f0ece6;border-radius:10px;padding:9px 10px;background:#fcfbf9}.utilStats span{display:block;font-size:8px;color:#8c867f}.utilStats b{display:block;font-size:13px;margin-top:3px}
+.analyticsFoot{font-size:8px;color:#99928a;line-height:1.45;margin-top:10px}
+@media(max-width:900px){.homeAnalytics{grid-template-columns:1fr}.briefOverviewBars{height:190px}.utilCard{min-height:310px}}
+@media(max-width:560px){.briefOverviewBars{grid-template-columns:repeat(6,minmax(45px,1fr));gap:5px;overflow-x:auto}.overviewBarTrack{width:38px}.overviewBarBubble{padding:4px}.analyticsCard{padding:13px}.utilRing{width:142px;height:142px}.utilRing:after{width:104px;height:104px}}
+
 /* ONIT Pulse becomes a secondary compact operational strip */
 #pulseSummary{margin-top:16px}
 .pulseCard{
@@ -628,6 +659,7 @@ svg{display:block}
     </div>
   </div>
 
+  <div id="homeAnalytics" class="homeAnalytics"></div>
   <div class="stats dashboardStats" id="homeStats"></div>
 
   <div class="section hidden" id="accountPortfolioSection"><div class="sectionHeading"><div><h2>MY ACCOUNTS</h2><p class="muted">Every account you manage, with live briefs underneath.</p></div><button class="secondary" onclick="quickAddAccount()">+ ADD ACCOUNT</button></div><div id="accountPortfolioBoard" class="accountPortfolioBoard"></div></div>
@@ -707,14 +739,15 @@ svg{display:block}
 <div id="broadcastModal" class="modal hidden broadcastPopup" role="dialog" aria-modal="true" aria-labelledby="broadcastTitle"><div class="modalBox"><button class="broadcastClose" type="button" aria-label="Close announcement" title="Close" onclick="ackBroadcast()">×</button><div id="broadcastAttachment" class="broadcastAttachment"></div><div class="broadcastCopy"><div class="broadcastKicker">ONIT ANNOUNCEMENT</div><h2 id="broadcastTitle" class="broadcastTitle"></h2><div id="broadcastMessage" class="broadcastMessage"></div></div></div></div>
 <script>
 
-const APP_VERSION='0.18.3';
+const APP_VERSION='0.18.4';
 const BACKEND_DATASETS=['USERS','CLIENTS','BRIEFS','ASSIGNMENTS','ITERATIONS','ACTIVITY_LOG','NOTIFICATIONS','REPORTS'];
 const API_URL='https://script.google.com/macros/s/AKfycbyY98jKIh2ls8jKsB5w2H7YG3Okj61AoIkt3-2x0LBnvRVwDgBhrQnVr1Ghfu04J7YB/exec';
 let ORG_ID=localStorage.getItem('onit-org')||'';
 const MAX_FILE_BYTES=8*1024*1024;
 let CURRENT_USER_ID=localStorage.getItem('onit-user')||'';
 let SESSION_TOKEN=localStorage.getItem('onit-session')||'';
-let briefs=[],users=[],clients=[],allAssignments=[],notifications=[],teamWorkload=[],reports=[],reportSummary=null,organisations=[],pendingUsers=[],securityInfo=null,accessDirectory=[],permissions={},dataExports=[];
+let briefs=[],users=[],clients=[],allAssignments=[],notifications=[],teamWorkload=[],reports=[],reportSummary=null,homeAnalytics=null,organisations=[],pendingUsers=[],securityInfo=null,accessDirectory=[],permissions={},dataExports=[];
+let utilisationMode='weekly';
 let selectedAccessEmail='',activeBackendDataset='',currentBroadcast=null;
 const profilePhotoCache=new Map();
 let current=null,currentUser=null,apiOnline=false,mutationBusy=false,backendVersion='',serverOffset=0,loadGeneration=0,lastListSection='home',briefFilter='ALL',refreshInFlight=false,lastStateVersion='';
@@ -822,8 +855,8 @@ async function loadFromGoogle(strict=false,silent=false){
       try{
         const data=await apiGet('bootstrap');if(generation!==loadGeneration)return;
         backendVersion=data.version||'';serverOffset=data.serverTime?new Date(data.serverTime).getTime()-Date.now():0;
-        if(!versionAtLeast(backendVersion,'0.14.3'))throw new Error('Backend '+backendVersion+' is older than the ONIT V0.14.3 backend required by this frontend.');
-        lastStateVersion=String(data.stateVersion||lastStateVersion||'');organisations=data.organisations||[];users=table(data,'USERS');pendingUsers=data.pendingUsers||[];accessDirectory=data.accessDirectory||[];securityInfo=data.security||null;permissions=data.permissions||{};clients=table(data,'CLIENTS');allAssignments=table(data,'ASSIGNMENTS');notifications=table(data,'NOTIFICATIONS');reports=table(data,'REPORTS');dataExports=data.dataExports||[];teamWorkload=data.teamWorkload||[];reportSummary=data.reportSummary||null;currentUser=data.currentUser||users.find(u=>rowVal(u,'User ID','userId')===CURRENT_USER_ID)||null;
+        if(!versionAtLeast(backendVersion,'0.15.4'))throw new Error('Backend '+backendVersion+' is older than the ONIT V0.15.4 backend required by this frontend. Deploy backend V0.15.4 first.');
+        lastStateVersion=String(data.stateVersion||lastStateVersion||'');organisations=data.organisations||[];users=table(data,'USERS');pendingUsers=data.pendingUsers||[];accessDirectory=data.accessDirectory||[];securityInfo=data.security||null;permissions=data.permissions||{};clients=table(data,'CLIENTS');allAssignments=table(data,'ASSIGNMENTS');notifications=table(data,'NOTIFICATIONS');reports=table(data,'REPORTS');dataExports=data.dataExports||[];teamWorkload=data.teamWorkload||[];reportSummary=data.reportSummary||null;homeAnalytics=data.homeAnalytics||null;currentUser=data.currentUser||users.find(u=>rowVal(u,'User ID','userId')===CURRENT_USER_ID)||null;
         if(!currentUser)throw new Error('Your signed-in profile is not available.');CURRENT_USER_ID=rowVal(currentUser,'User ID');ORG_ID=rowVal(currentUser,'Organisation ID');localStorage.setItem('onit-user',CURRENT_USER_ID);localStorage.setItem('onit-org',ORG_ID);
         const rows=table(data,'BRIEFS'),iterations=table(data,'ITERATIONS'),activities=table(data,'ACTIVITY_LOG');briefs=rows.map(sheetBriefToUI);briefs.forEach(b=>{const as=allAssignments.filter(r=>sameBrief(r,b.code)&&String(rowVal(r,'Assignment Type','assignmentType')).toUpperCase()==='TO'&&String(rowVal(r,'Active','active')).toLowerCase()!=='false');if(as.length){b.assignee=as.map(r=>rowVal(r,'Full Name','fullName')||'Assigned team').join(' + ');b.assigneeUserId=rowVal(as[0],'User ID','userId');b.assigneeFullName=rowVal(as[0],'Full Name','fullName')||b.assignee}b.iterations=iterations.filter(r=>sameBrief(r,b.code)).sort((a,z)=>Number(rowVal(a,'Version Number','versionNumber')||0)-Number(rowVal(z,'Version Number','versionNumber')||0)).map(r=>({v:Number(rowVal(r,'Version Number','versionNumber')||0),file:rowVal(r,'File Name','fileName')||'Submission',fileType:rowVal(r,'File Type','fileType')||'',driveFileId:rowVal(r,'Drive File ID','driveFileId')||'',driveFileUrl:rowVal(r,'Drive File URL','driveFileUrl')||'',note:rowVal(r,'Submission Note')||'',clientSent:truthy(rowVal(r,'Client Sent')),clientSentAt:rowVal(r,'Client Sent At'),state:rowVal(r,'Status','status')||'Submitted',id:rowVal(r,'Iteration ID','iterationId'),feedback:rowVal(r,'Feedback'),submittedAt:rowVal(r,'Submitted At'),approvedBy:rowVal(r,'Approved By User ID'),approvedAt:rowVal(r,'Approved At'),teamLeadRequired:truthy(rowVal(r,'Team Lead Required')),teamLeadApproved:truthy(rowVal(r,'Team Lead Approved')),teamLeadApprovedBy:rowVal(r,'Team Lead Approved By User ID'),teamLeadApprovedAt:rowVal(r,'Team Lead Approved At')}));b.activityRows=activities.filter(r=>sameBrief(r,b.code)).sort((a,z)=>new Date(rowVal(a,'Timestamp','timestamp')||0)-new Date(rowVal(z,'Timestamp','timestamp')||0));b.activity=b.activityRows.map(r=>`${formatTime(rowVal(r,'Timestamp','timestamp'))} — ${rowVal(r,'Action','action')}${rowVal(r,'Reason','reason')?' — '+rowVal(r,'Reason','reason'):''}`)});
         apiOnline=true;connectionNotice('');applyPermissions();
@@ -933,6 +966,34 @@ function accountBriefMarkup(b){const code=encodeURIComponent(b.code).replace(/'/
 function renderAccountPortfolio(){const sec=document.getElementById('accountPortfolioSection'),board=document.getElementById('accountPortfolioBoard');if(!sec||!board)return;const accountMode=dashboardMode()==='ACCOUNT';sec.classList.toggle('hidden',!accountMode);document.getElementById('addAccountBtn')?.classList.toggle('hidden',!accountMode);if(!accountMode)return;const accounts=myAccounts();board.innerHTML=accounts.length?accounts.map(c=>{const jobs=briefsForAccount(c).filter(b=>b.status!=='Closed').sort((a,z)=>new Date(z.createdAt||0)-new Date(a.createdAt||0));const id=encodeURIComponent(rowVal(c,'Client ID'));return `<div class='accountColumn'><div class='accountColumnHead'><div><h3>${escapeHTML(rowVal(c,'Brand')||rowVal(c,'Client Name')||'Account')}</h3><div class='tiny'>${jobs.length} active / recent brief${jobs.length===1?'':'s'}</div></div><button class='mini' onclick="openNewForAccount('${id}')">+ BRIEF</button></div>${jobs.length?jobs.map(accountBriefMarkup).join(''):`<div class='accountEmpty'>No briefs yet.<br>Send the first brief for this account.</div>`}</div>`}).join(''):`<div class='accountColumn'><div class='accountColumnHead'><h3>Start your portfolio</h3></div><div class='accountEmpty'>Create your first account / brand. Every brief you send for it will appear here automatically.</div><button class='new' style='width:100%' onclick='quickAddAccount()'>+ ADD ACCOUNT</button></div>`;renderApprovalClocks()}
 async function quickAddAccount(){if(!isAccountManagerUser())return alert('Accounts / brands are created by Account Management.');const name=prompt('Account / brand name:');if(!name?.trim())return;try{setBusy(true);await apiPost('createClient',{clientName:name.trim(),brand:name.trim()});await loadFromGoogle(true);renderAccountPortfolio();showToast('Account created',name.trim())}catch(e){alert('Could not create account. '+e.message)}finally{setBusy(false)}}
 function openNewForAccount(encodedId){openNew();const id=decodeURIComponent(encodedId||'');const i=(window.clientChoices||[]).findIndex(c=>String(c.id)===String(id));if(i>=0)document.getElementById('client').value=String(i)}
+function setUtilisationMode(mode){
+  utilisationMode=mode==='daily'?'daily':'weekly';
+  renderHomeAnalytics();
+}
+function renderHomeAnalytics(){
+  const host=document.getElementById('homeAnalytics');if(!host)return;
+  const overview=homeAnalytics?.briefOverview||{total:0,overdue:0,buckets:[]};
+  const buckets=(overview.buckets||[]),maxCount=Math.max(1,...buckets.map(b=>Number(b.count||0)));
+  const bars=buckets.map(b=>{
+    const count=Number(b.count||0),pct=Number(b.percentage||0),height=count?Math.max(10,Math.round(count/maxCount*100)):0;
+    return `<div class='overviewBarCell'><div class='overviewBarBubble'><b>${count}</b>${pct.toFixed(pct%1?1:0)}%</div><div class='overviewBarTrack'><div class='overviewBarFill' style='height:${height}%'></div></div><div class='overviewBarLabel'>${escapeHTML(b.label||'')}</div></div>`;
+  }).join('');
+  const util=homeAnalytics?.utilisation||{},metric=util[utilisationMode]||{percentage:0,trackedHours:0,averageHours:0,targetHours:utilisationMode==='daily'?8:40,capacityHours:0},teamSize=Number(util.staffCount||0);
+  const generated=new Date(util.generatedAt||homeAnalytics?.generatedAt||0).getTime(),elapsedHours=Number.isFinite(generated)?Math.max(0,(Date.now()+serverOffset-generated)/3600000):0,workingNow=Number(util.currentlyWorkingCount||0);
+  const liveTracked=Number(metric.trackedHours||0)+(workingNow*elapsedHours),capacity=Number(metric.capacityHours||0),liveAverage=teamSize?liveTracked/teamSize:0,pct=Math.max(0,capacity?liveTracked/capacity*100:Number(metric.percentage||0)),fill=Math.min(100,pct),over=pct>100;
+  const periodLabel=utilisationMode==='daily'?'Today':'This week';
+  host.innerHTML=`
+    <section class='analyticsCard'>
+      <div class='analyticsHead'><div><div class='analyticsEyebrow'>LIVE BRIEF OVERVIEW</div><div class='analyticsTitle'>Where all ONIT briefs are right now</div></div><div class='analyticsMeta'><span class='analyticsChip'>${Number(overview.total||0)} TOTAL</span>${Number(overview.overdue||0)?`<span class='analyticsChip alert'>${Number(overview.overdue)} OVERDUE</span>`:''}</div></div>
+      <div class='briefOverviewBars'>${bars||`<div class='empty compactEmpty'>No briefs yet.</div>`}</div>
+    </section>
+    <section class='analyticsCard utilCard'>
+      <div class='analyticsHead'><div><div class='analyticsEyebrow'>TEAM WORK UTILISATION</div><div class='analyticsTitle'>${periodLabel}</div></div><div class='utilMode'><button class='${utilisationMode==='daily'?'active':''}' onclick="setUtilisationMode('daily')">DAILY</button><button class='${utilisationMode==='weekly'?'active':''}' onclick="setUtilisationMode('weekly')">WEEKLY</button></div></div>
+      <div class='utilRingWrap'><div class='utilRing ${over?'over':''}' style='--fill:${fill}'><div class='utilRingValue'><b>${pct.toFixed(pct%1?1:0)}%</b><span>${over?'ABOVE TARGET':'OF TARGET'}</span></div></div></div>
+      <div class='utilStats'><div><span>AVG / PERSON</span><b>${liveAverage.toFixed(1)}h / ${Number(metric.targetHours||0)}h</b></div><div><span>TEAM TRACKED</span><b>${liveTracked.toFixed(1)}h</b></div></div>
+      <div class='analyticsFoot'>${teamSize} active staff • ${escapeHTML(homeAnalytics?.note||'Based on ONIT-tracked work activity.')}</div>
+    </section>`;
+}
 function renderHome(){
   if(!currentUser)return;
   const orgName=rowVal(organisations[0],'Organisation Name')||'your organisation';
@@ -940,6 +1001,7 @@ function renderHome(){
   document.getElementById('greeting').textContent=`${greetingText()}, ${currentUserName().split(' ')[0]} 👋`;
   const mode=dashboardMode(),queueSection=document.getElementById('homeQueueSection'),queueTitle=document.getElementById('homeQueueTitle'),queueCopy=document.getElementById('homeQueueCopy'),queueList=document.getElementById('homeQueueList'),primaryTitle=document.getElementById('homePrimaryTitle'),primaryCopy=document.getElementById('homePrimaryCopy'),home=document.getElementById('home');
   let scope=[],queue=[];
+  renderHomeAnalytics();
   home.classList.toggle('homeStaffSimple',mode==='STAFF');
   queueSection.classList.add('hidden');
   if(mode==='ACCOUNT'){
@@ -1366,7 +1428,7 @@ function renderMore(){if(!currentUser)return;const names=backendAccess();let htm
   if(names.length){html+=`<div class='morecard' style='grid-column:1/-1'><h3>BACKEND DATA</h3><div class='bigTiny'>Read-only data access is enforced inside ONIT. Raw Google Sheet access is not granted to staff. CD, DCD and MD can download directly. Other staff need one approval from any one of them.</div><div class='bigTiny'>${escapeHTML(names.join(' • '))}</div><button class='secondary linkbtn' onclick="show('data')">OPEN DATA CONSOLE</button></div>`}
   html+=dataExportRequestsMarkup();
   html+=`<div class='morecard' style='grid-column:1/-1'><h3>INSTALL / UPDATE ONIT</h3><div class='bigTiny'>Install ONIT on this device for quick access. ONIT now checks the hosted frontend version automatically and repairs stale installed copies without requiring a reinstall.</div><div class='actions'><button class='secondary linkbtn' onclick='installOnit()'>INSTALL ON THIS DEVICE</button><button class='secondary linkbtn' onclick='forceFrontendUpdate()'>CHECK / REPAIR UPDATE</button></div></div>`;
-  html+=`<div class='morecard' style='grid-column:1/-1'><h3>HELP / ABOUT</h3><div class='bigTiny'>ONIT Frontend v${APP_VERSION} • Backend ${backendVersion||'checking…'} • Time + People + Status<br>Every brief has an owner, deadline, status and visible history.<br>ONIT Pulse, Risk Radar, Brief Replay and Handover Mode are active.<br>Profile photos, governed PDF data exports, Owner Broadcasts, Staff Account Management and approved-job staff archives are active.<br>Account Management, Dr. Kunbi, Creative Director, Deputy Creative Director and Managing Director can create/send briefs. Brief visibility is private by workflow: sender, assigned/CC users, relevant Team Lead review, final approver stage and System Owner only.<br>Owner-assigned Team Leads provide first-stage approval before CD/DCD final approval.<br>Installed HTTPS/PWA copies check automatically for frontend updates; backend changes are live immediately.<br>The System Owner account administers data access separately from operational staff roles and can correct staff emails, send password-reset codes, deactivate/reactivate staff and preserve historical work.</div></div></div>`;document.getElementById('moreContent').innerHTML=html;hydrateProfilePhotos()}
+  html+=`<div class='morecard' style='grid-column:1/-1'><h3>HELP / ABOUT</h3><div class='bigTiny'>ONIT Frontend v${APP_VERSION} • Backend ${backendVersion||'checking…'} • Time + People + Status<br>Every brief has an owner, deadline, status and visible history.<br>Live Brief Overview, Daily/Weekly Team Work Utilisation, ONIT Pulse, Risk Radar, Brief Replay and Handover Mode are active.<br>Profile photos, governed PDF data exports, Owner Broadcasts, Staff Account Management and approved-job staff archives are active.<br>Account Management, Dr. Kunbi, Creative Director, Deputy Creative Director and Managing Director can create/send briefs. Brief visibility is private by workflow: sender, assigned/CC users, relevant Team Lead review, final approver stage and System Owner only.<br>Owner-assigned Team Leads provide first-stage approval before CD/DCD final approval.<br>Installed HTTPS/PWA copies check automatically for frontend updates; backend changes are live immediately.<br>The System Owner account administers data access separately from operational staff roles and can correct staff emails, send password-reset codes, deactivate/reactivate staff and preserve historical work.</div></div></div>`;document.getElementById('moreContent').innerHTML=html;hydrateProfilePhotos()}
 async function approvePending(id){
   const targetUserId=decodeURIComponent(id),target=pendingUsers.find(u=>String(rowVal(u,'User ID'))===String(targetUserId)),name=target?rowVal(target,'Full Name'):'The member';
   try{
@@ -1600,6 +1662,7 @@ async function checkForUpdates(){
     const next=String(pulse.stateVersion||'');
     if(next&&lastStateVersion&&next!==lastStateVersion){await loadFromGoogle(false,true);return}
     if(next&&!lastStateVersion)lastStateVersion=next;
+    if(!document.getElementById('home').classList.contains('hidden'))renderHomeAnalytics();
   }catch(e){
     if(authError(e)){await loadFromGoogle(false,true);return}
     console.warn('ONIT pulse:',e);
