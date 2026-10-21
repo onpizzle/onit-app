@@ -595,7 +595,7 @@ img,video,canvas,svg{max-width:100%}
 
 
 /* =========================================================
-   ONIT v0.18.9 — DESKTOP VERTICAL SCROLL STABILITY
+   ONIT v0.19.0 — DESKTOP VERTICAL SCROLL STABILITY
    Desktop uses the workspace as the vertical scroll container.
    This prevents long role-specific pages (including DCD/CD)
    from being clipped by the rounded app shell.
