@@ -1,8 +1,8 @@
-const APP_VERSION='0.19.2';
+const APP_VERSION='0.19.3';
 const BACKEND_DATASETS=['USERS','CLIENTS','BRIEFS','ASSIGNMENTS','ITERATIONS','ACTIVITY_LOG','NOTIFICATIONS','REPORTS'];
 const API_URL='https://script.google.com/macros/s/AKfycbyY98jKIh2ls8jKsB5w2H7YG3Okj61AoIkt3-2x0LBnvRVwDgBhrQnVr1Ghfu04J7YB/exec';
 let ORG_ID=localStorage.getItem('onit-org')||'';
-const MAX_FILE_BYTES=8*1024*1024;
+const MAX_FILE_BYTES=20*1024*1024;
 let CURRENT_USER_ID=localStorage.getItem('onit-user')||'';
 let SESSION_TOKEN=localStorage.getItem('onit-session')||'';
 let briefs=[],users=[],clients=[],allAssignments=[],notifications=[],teamWorkload=[],reports=[],reportSummary=null,homeAnalytics=null,organisations=[],pendingUsers=[],securityInfo=null,accessDirectory=[],permissions={},dataExports=[];

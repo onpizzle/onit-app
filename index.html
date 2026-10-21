@@ -802,6 +802,21 @@ img,video,canvas,svg{max-width:100%}
     max-height:calc(100vh - 20px)!important;
   }
 }
+
+/* V0.19.3 REVIEW + PREVIEW EXPERIENCE */
+.reviewPreviewModal .modalBox{width:min(1220px,97vw)!important;height:min(900px,94vh)!important;padding:12px!important}
+.previewBody{display:flex!important;flex:1 1 auto!important;min-height:0!important;flex-direction:column!important;align-items:stretch!important;justify-content:flex-start!important;gap:10px!important;overflow:hidden!important;padding:10px!important;background:#f3f1ee!important}
+.previewAssetStage{flex:1 1 auto;min-height:0;width:100%;display:flex;align-items:center;justify-content:center;overflow:auto;background:#dedbd6;border-radius:10px;padding:10px}
+.previewAssetStage img,.previewAssetStage video{display:block;max-width:100%!important;max-height:100%!important;width:auto!important;height:auto!important;object-fit:contain!important;border-radius:8px}
+.previewAssetStage iframe{width:100%!important;height:100%!important;min-height:0!important;border:0;border-radius:8px;background:#fff}
+.previewAssetStage .previewMessage{max-width:680px;margin:auto}
+.previewFooter{flex:0 0 auto;background:#fff;border:1px solid #e6e1da;border-radius:10px;padding:9px 10px}
+.previewFooter .actions{margin-top:0!important;justify-content:center}
+.previewNav{display:flex;gap:7px;align-items:center;justify-content:center;flex-wrap:wrap;margin-bottom:8px}
+.previewNav .mini.active{background:#171717;color:#fff;border-color:#171717}
+.previewCounter{font-size:11px;color:#777;font-weight:800}
+.reviewQueueNote{font-size:11px;color:#777;margin-top:6px}
+@media(max-width:760px){.reviewPreviewModal{padding:4px!important}.reviewPreviewModal .modalBox{width:100%!important;height:calc(100dvh - 8px)!important;max-height:none!important;border-radius:12px!important}.previewAssetStage{padding:5px}.previewFooter{padding:7px}.previewNav{justify-content:flex-start;overflow-x:auto;flex-wrap:nowrap}.previewNav .mini{white-space:nowrap}}
 </style>
 </head>
 <body>
@@ -885,7 +900,7 @@ img,video,canvas,svg{max-width:100%}
       <p class="muted" id="homeSub">Here’s what’s happening today.</p>
     </div>
       <div class="dashboardHeadingRight">
-      <div class="dashboardActions"><button class="secondary buzzerBtn" onclick="openBuzzerComposer()">BUZZER</button><button id="addAccountBtn" class="secondary hidden" onclick="quickAddAccount()">+ New Account</button><button class="new createBriefBtn hiddenByRole" onclick="openNew()">+ New Brief</button></div>
+      <div class="dashboardActions"><button id="buzzerBtn" class="secondary buzzerBtn hiddenByRole" onclick="openBuzzerComposer()">BUZZER</button><button id="addAccountBtn" class="secondary hidden" onclick="quickAddAccount()">+ New Account</button><button class="new createBriefBtn hiddenByRole" onclick="openNew()">+ New Brief</button></div>
       <div class="dashboardDate" id="todayLabel"></div>
     </div>
   </div>
@@ -941,7 +956,7 @@ img,video,canvas,svg{max-width:100%}
   <div class="row"><div class="field"><label>PRIORITY</label><select id="priority"><option>Normal</option><option>High</option><option>Urgent</option><option>Low</option></select></div><div class="field"><label>DEADLINE — NIGERIA TIME</label><input id="deadline" type="datetime-local" onchange="clash()"></div></div>
   <div class="field"><label>BRIEF</label><textarea id="brieftext" placeholder="Paste or write the brief here..."></textarea></div>
   <div class="field"><label>DELIVERABLES</label><textarea id="deliverables" placeholder="e.g. 1 x KV, 3 x social adaptations, 15s video"></textarea></div>
-  <div class="field"><label>BRIEF ATTACHMENTS — MULTIPLE FILES ALLOWED</label><input id="briefAttachments" type="file" multiple onchange="previewBriefFiles(this)"><div id="briefFileList" class="selectedFileList"></div><div class="tiny">Select several files in one go. Total attachments: up to 8 MB in this build. They are securely stored with the brief in ONIT.</div></div>
+  <div class="field"><label>BRIEF ATTACHMENTS — MULTIPLE FILES ALLOWED</label><input id="briefAttachments" type="file" multiple onchange="previewBriefFiles(this)"><div id="briefFileList" class="selectedFileList"></div><div class="tiny">Select several files in one go. Total attachments: up to 20 MB per send. For larger work, add a view-only Drive / Frame.io / other work link instead. They are securely stored with the brief in ONIT.</div></div>
   <button class="new send" onclick="sent(this)">SEND BRIEF</button>
 </section>
 
@@ -966,7 +981,7 @@ img,video,canvas,svg{max-width:100%}
 
 <div id="handoverModal" class="modal hidden" onclick="if(event.target===this)closeHandover()"><div class="modalBox" style="height:auto;max-width:560px"><div class="modalTop"><b>HANDOVER BRIEF</b><button class="secondary" onclick="closeHandover()">CLOSE</button></div><div class="handoverHint">The brief history, files, versions and deadline stay intact. The current TO assignment is closed and the new assignee must press START WORKING.</div><div class="field"><label>HAND OVER TO</label><select id="handoverUser"></select></div><div class="field"><label>REASON</label><textarea id="handoverReason" placeholder="e.g. Annual leave, unavailable, workload shift"></textarea></div><div id="handoverClash" class="notice hidden"></div><div class="actions"><button class="new" onclick="confirmHandover(this)">CONFIRM HANDOVER</button></div></div></div>
 
-<div id="previewModal" class="modal hidden" onclick="if(event.target===this)closePreview()"><div class="modalBox"><div class="modalTop"><b id="previewTitle">Preview</b><button class="secondary" onclick="closePreview()">CLOSE</button></div><div id="previewBody" class="previewBody"><div class="muted">Select a file to preview.</div></div></div></div>
+<div id="previewModal" class="modal hidden reviewPreviewModal" onclick="if(event.target===this)closePreview()"><div class="modalBox"><div class="modalTop"><b id="previewTitle">Preview</b><button class="secondary" onclick="closePreview()">CLOSE</button></div><div id="previewBody" class="previewBody"><div class="muted">Select a file to preview.</div></div></div></div>
 
 <div id="buzzerComposeModal" class="modal hidden buzzerCompose" onclick="if(event.target===this)closeBuzzerComposer()"><div class="modalBox"><div class="modalTop"><b>BUZZER</b><button class="secondary" onclick="closeBuzzerComposer()">CLOSE</button></div><div class="buzzerHero"><div class="tiny" style="color:#ff8a69">QUICK PROGRESS NUDGE</div><h2>Where are we ONIT?</h2><p>Select a person and the live brief they are working on. You can select several people only when they are on the same brief.</p></div><div class="field"><label>WHO DO YOU WANT TO BUZZ?</label><select id="buzzerTargets" class="buzzerTargetSelect" multiple></select><div class="buzzerNote">Each line shows the person, active job and current status. Same person + same brief has a 20-minute cooldown.</div></div><div class="actions"><button class="new" onclick="sendBuzzerNow(this)">SEND BUZZER</button></div></div></div>
 <div id="buzzerReceiveModal" class="modal hidden buzzerPopup" role="dialog" aria-modal="true" aria-labelledby="buzzerReceiveTitle"><div class="modalBox"><div class="buzzerPopupTop"><div class="buzzerPulse"></div><div class="tiny" style="color:#ff9a7d">ONIT BUZZER</div><h2 id="buzzerReceiveTitle">WHERE ARE WE ONIT?</h2><div id="buzzerFrom" class="buzzerFrom"></div></div><div class="buzzerPopupBody"><div id="buzzerBrief" class="buzzerBrief"></div><div id="buzzerResponseStage"><div class="buzzerResponses"><button class="primaryBuzzResponse" onclick="respondToBuzzer('Almost done')">ALMOST DONE</button><button onclick="respondToBuzzer('Still working')">STILL WORKING</button><button onclick="openMoreTimeOptions()">NEED MORE TIME</button><button onclick="respondBlockedBuzzer()">I'M BLOCKED</button></div></div></div></div></div>
@@ -975,11 +990,12 @@ img,video,canvas,svg{max-width:100%}
 <script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-messaging-compat.js"></script>
-<script>const APP_VERSION='0.19.2';
+<script>const APP_VERSION='0.19.3';
 const BACKEND_DATASETS=['USERS','CLIENTS','BRIEFS','ASSIGNMENTS','ITERATIONS','ACTIVITY_LOG','NOTIFICATIONS','REPORTS'];
 const API_URL='https://script.google.com/macros/s/AKfycbyY98jKIh2ls8jKsB5w2H7YG3Okj61AoIkt3-2x0LBnvRVwDgBhrQnVr1Ghfu04J7YB/exec';
 let ORG_ID=localStorage.getItem('onit-org')||'';
-const MAX_FILE_BYTES=8*1024*1024;
+const MAX_FILE_BYTES=20*1024*1024;
+const MAX_BROADCAST_BYTES=8*1024*1024;
 let CURRENT_USER_ID=localStorage.getItem('onit-user')||'';
 let SESSION_TOKEN=localStorage.getItem('onit-session')||'';
 let briefs=[],users=[],clients=[],allAssignments=[],notifications=[],buzzers=[],teamWorkload=[],reports=[],reportSummary=null,homeAnalytics=null,organisations=[],pendingUsers=[],securityInfo=null,accessDirectory=[],permissions={},dataExports=[];
@@ -1023,6 +1039,7 @@ function isAccountManagerUser(u=currentUser){return !!u&&(permissionProfile(u)==
 function isTrafficManagerUser(u=currentUser){if(!u)return false;const p=positionOf(u).toLowerCase(),d=departmentOf(u).toLowerCase();return p==='traffic manager'||p.includes('traffic manager')||d==='traffic'}
 function isAccountTeamUser(u=currentUser){return !!u&&(isAccountManagerUser(u)||isTrafficManagerUser(u)||isDrKunbiUser(u))}
 function canCreateBrief(u=currentUser){if(!u||isOwner(u))return false;const roleAllowed=isAccountTeamUser(u)||isCreativeLeadership(u)||isManagingDirector(u);if(u===currentUser&&permissions&&typeof permissions.createBrief!=='undefined')return !!permissions.createBrief||roleAllowed;return roleAllowed}
+function canUseBuzzer(u=currentUser){if(!u||isOwner(u))return false;const roleAllowed=isAccountManagerUser(u)||isTrafficManagerUser(u)||isCreativeLeadership(u)||isManagingDirector(u)||isDrKunbiUser(u);if(u===currentUser&&permissions&&typeof permissions.buzzerSend!=='undefined')return !!permissions.buzzerSend&&roleAllowed;return roleAllowed}
 function canApprove(u=currentUser){if(!u)return false;const p=positionOf(u).toLowerCase();return truthy(rowVal(u,'Can Approve Final'))||['creative director','deputy creative director','md','managing director'].includes(p)}
 function canReview(u=currentUser){return !!u&&(canApprove(u)||['ceo','chief executive officer'].includes(positionOf(u).toLowerCase()))}
 function isTeamLeadUser(u=currentUser){return !!u&&truthy(rowVal(u,'Team Lead'))}
@@ -1190,6 +1207,7 @@ function applyPermissions(){
   const sideRole=document.getElementById('sideRoleLabel');if(sideRole)sideRole.textContent=isOwner()?'System Owner':(positionOf(currentUser)||departmentOf(currentUser)||'Workspace');
   const av=document.getElementById('topAvatar');if(av){av.dataset.avatarUser=CURRENT_USER_ID;av.textContent=initials(currentUserName())}
   document.querySelectorAll('.createBriefBtn').forEach(b=>b.classList.toggle('hiddenByRole',!canCreateBrief()));
+  const buzzerBtn=document.getElementById('buzzerBtn');if(buzzerBtn)buzzerBtn.classList.toggle('hiddenByRole',!canUseBuzzer());
   const navBriefs=document.getElementById('navBriefs');navBriefs.classList.toggle('hiddenByRole',isOwner());const navBriefLabel=navBriefs?.querySelector('.navLabel');if(navBriefLabel)navBriefLabel.textContent=canApprove()?'Briefs / Approval':(canCreateBrief()?'Briefs':'My Work');
   document.getElementById('navData').classList.toggle('hiddenByRole',!(isOwner()||backendAccess().length));
   const bt=document.getElementById('briefsTitle'),bs=document.getElementById('briefsSub');if(bt&&bs){if(canApprove()){bt.textContent='Briefs / Approval';bs.textContent='Your assigned work, briefs you have sent, and work available for leadership review.'}else if(canCreateBrief()){bt.textContent='Briefs';bs.textContent='Work you have sent into the organisation and its current status.'}else{bt.textContent='My Work';bs.textContent='Briefs assigned to you and work waiting for your action.'}}
@@ -1301,9 +1319,11 @@ function renderHome(){
   home.classList.toggle('homeStaffSimple',mode==='STAFF');
   queueSection.classList.add('hidden');
   if(mode==='ACCOUNT'){
-    scope=myManagedBriefs();
-    document.getElementById('homeSub').textContent=`Here’s what’s happening across the work you manage at ${orgName} today.`;
-    primaryTitle.textContent="WORK I'M MANAGING";primaryCopy.textContent='Your briefs, deadlines and current approval status.';
+    scope=briefs;
+    queue=briefs.filter(b=>['Team Lead Review','In Review'].includes(String(b.status||''))&&!b.finalApproved);
+    document.getElementById('homeSub').textContent=`Here’s what’s happening across the Account Management / Traffic work at ${orgName} today.`;
+    primaryTitle.textContent="WORK I'M MANAGING";primaryCopy.textContent='Your shared account-team briefs, deadlines and approval status.';
+    queueTitle.textContent='WORK IN REVIEW';queueCopy.textContent='Submitted work currently moving through Team Lead or final creative review.';queueSection.classList.remove('hidden');
   }else if(mode==='LEADERSHIP'){
     scope=[...new Map([...myAssignedBriefs(),...myManagedBriefs()].map(b=>[b.code,b])).values()];queue=myFinalApprovalQueue();
     document.getElementById('homeSub').textContent=`Here’s what needs your attention at ${orgName} today.`;
@@ -1315,9 +1335,10 @@ function renderHome(){
     primaryTitle.textContent='MY WORK';primaryCopy.textContent='Briefs assigned directly to you.';
     queueTitle.textContent='WAITING FOR MY REVIEW';queueCopy.textContent='Review first, then send good work forward for final CD/DCD approval.';queueSection.classList.remove('hidden');
   }else if(mode==='OWNER'){
-    scope=briefs;
+    scope=briefs;queue=briefs.filter(b=>['Team Lead Review','In Review'].includes(String(b.status||''))&&!b.finalApproved);
     document.getElementById('homeSub').textContent=`Here’s what’s happening across ${orgName} today.`;
     primaryTitle.textContent='ORGANISATION RISK RADAR';primaryCopy.textContent='Early warning across active briefs — not a staff performance score.';
+    queueTitle.textContent='WORK IN REVIEW';queueCopy.textContent='Current work moving through the review and approval system.';queueSection.classList.remove('hidden');
   }else{
     scope=myAssignedBriefs();
     document.getElementById('homeSub').textContent=`Here’s what’s happening in your ONIT workspace today.`;
@@ -1411,7 +1432,7 @@ async function sent(button){
   }finally{mutationBusy=false;button.disabled=false;button.textContent=original;setBusy(false)}
 }
 
-function detail(code){current=briefs.find(b=>b.code===code);if(!current)return;currentDetailTab='brief';renderDetail();show('detail')}
+function detail(code){current=briefs.find(b=>b.code===code);if(!current)return;const reviewState=['Team Lead Review','In Review'].includes(String(current.status||''));currentDetailTab=reviewState&&(isTeamLeadUser()||canReview()||canApprove())?'work':'brief';renderDetail();show('detail')}
 function setDetailTab(name,btn){currentDetailTab=name;document.querySelectorAll('#detailTabs button').forEach(b=>b.classList.remove('active'));if(btn)btn.classList.add('active');document.querySelectorAll('.detailPanel').forEach(p=>p.classList.add('hidden'));document.getElementById(name+'Panel').classList.remove('hidden')}
 function renderDetail(){if(!current)return;document.getElementById('dcode').textContent=current.code;document.getElementById('dtitle').textContent=current.client;document.getElementById('dproject').textContent=current.project;document.getElementById('dstatus').textContent=current.status;document.getElementById('diter').textContent=current.iteration?`V${current.iteration}`:'NO SUBMISSION';const sent=document.getElementById('dclientsent');sent.classList.toggle('hidden',!current.clientSent);sent.textContent=current.clientSent?'CLIENT SEND RECORDED':'';document.getElementById('ddeadline').textContent='Deadline: '+formatDateTime(current.deadline)+' (Africa/Lagos)';const t=timeInfo(current),x=document.getElementById('dtimer');x.textContent=t.text;x.className='num '+t.cls;renderApprovalNotice();renderBriefPanel();renderWorkPanel();renderActivityPanel();renderDetailButtons();setDetailTab(currentDetailTab,document.querySelector(`#detailTabs button:nth-child(${currentDetailTab==='brief'?1:currentDetailTab==='work'?2:3})`))}
 function renderApprovalNotice(){
@@ -1422,7 +1443,7 @@ function renderApprovalNotice(){
     notice.className='approvalWarning';
     notice.textContent='DO NOT SEND TO CLIENT — this work is awaiting Team Lead review before CD/DCD final approval.';
     if(isTeamLeadUser()&&last?.teamLeadRequired&&!last?.teamLeadApproved){
-      quick.innerHTML=`<button class="secondary" onclick="teamLeadRework(this)">REQUEST REWORK</button><button class="new" onclick="teamLeadApprove(this)">APPROVE FOR FINAL REVIEW</button>`;
+      quick.innerHTML=`<button class="secondary" onclick="openLatestSubmissionReview()">VIEW SUBMISSION</button><button class="secondary" onclick="teamLeadRework(this)">REQUEST REWORK</button><button class="new" onclick="teamLeadApprove(this)">APPROVE FOR FINAL REVIEW</button>`;
       quick.classList.remove('hidden');
     }
   }else if(current.iteration&&current.status==='In Review'&&!current.finalApproved){
@@ -1430,7 +1451,7 @@ function renderApprovalNotice(){
     const clock=approvalClockInfo(current),baseText=last?.teamLeadApproved?'TEAM LEAD APPROVED — final approval is now required from CD/DCD.':'DO NOT SEND TO CLIENT — this work is awaiting final creative approval.';
     notice.innerHTML=`${escapeHTML(baseText)}${clock?` <span class='approvalClock ${clock.cls}' data-approval-due='${escapeHTML(current.approvalDueAt)}'>${escapeHTML(clock.text)}</span>`:''}`;
     if(canReview()||canApprove()){
-      quick.innerHTML=`${canReview()?'<button class="secondary" onclick="requestRevision(this)">DECLINE / REQUEST REVISION</button>':''}${canApprove()?'<button class="new" onclick="approveFinal(this)">APPROVE FINAL</button>':''}<button class="secondary" onclick="setDetailTab('work',document.querySelector('#detailTabs button:nth-child(2)'))">VIEW SUBMISSION</button>`;
+      quick.innerHTML=`${canReview()?'<button class="secondary" onclick="requestRevision(this)">DECLINE / REQUEST REVISION</button>':''}${canApprove()?'<button class="new" onclick="approveFinal(this)">APPROVE FINAL</button>':''}<button class="secondary" onclick="openLatestSubmissionReview()">VIEW SUBMISSION</button>`;
       quick.classList.remove('hidden');
     }
   }else if(current.finalApproved){
@@ -1542,33 +1563,41 @@ async function downloadBriefAttachment(index,encodedName){if(!current)return;con
 
 let currentPreviewObjectUrl='';
 let currentPreviewDownloadCallback=null;
+let currentPreviewIterationId='';
+let currentPreviewFileIndex=0;
+let currentPreviewFiles=[];
 function clearPreviewObjectUrl(){if(currentPreviewObjectUrl){try{URL.revokeObjectURL(currentPreviewObjectUrl)}catch(e){}currentPreviewObjectUrl=''}}
-function previewActionsMarkup(canDownload){return `<div class="actions" style="justify-content:center;margin-top:14px"><button class="secondary" onclick="openCurrentPreviewInBrowser()">OPEN IN BROWSER</button>${canDownload?'<button class="secondary" onclick="downloadCurrentPreviewOriginal()">DOWNLOAD ORIGINAL</button>':''}</div>`}
-function openCurrentPreviewInBrowser(){if(!currentPreviewObjectUrl)return alert('The preview is still loading.');window.open(currentPreviewObjectUrl,'_blank','noopener')}
+function previewBrowserSafe_(mime){const m=String(mime||'').toLowerCase();return m.startsWith('image/')||m.startsWith('video/')||m.startsWith('audio/')||m==='application/pdf'||m.startsWith('text/')||['application/json','application/xml','application/javascript','application/x-javascript'].includes(m)}
+function previewActionsMarkup(canDownload,allowBrowser=true){return `<div class="actions"><button class="secondary ${allowBrowser?'':'hidden'}" onclick="openCurrentPreviewInBrowser()">OPEN IN BROWSER</button>${canDownload?'<button class="secondary" onclick="downloadCurrentPreviewOriginal()">DOWNLOAD ORIGINAL</button>':''}</div>`}
+function openCurrentPreviewInBrowser(){if(!currentPreviewObjectUrl)return alert('This format cannot safely be opened outside ONIT before approval.');window.open(currentPreviewObjectUrl,'_blank','noopener')}
 function downloadCurrentPreviewOriginal(){if(typeof currentPreviewDownloadCallback==='function')currentPreviewDownloadCallback()}
-async function openIterationPreview(encodedId,encodedName,fileIndex=0){if(!current)return;const id=decodeURIComponent(encodedId),name=decodeURIComponent(encodedName||'Preview');currentPreviewDownloadCallback=current.finalApproved?()=>downloadIteration(encodedId,fileIndex):null;openPreviewShell(name);try{const res=await apiPost('getFilePreview',{briefCode:current.code,organisationId:ORG_ID,userId:CURRENT_USER_ID,iterationId:id,fileIndex:fileIndex});renderPreview(res.data||res,name,!!current.finalApproved)}catch(e){renderPreviewError(e)}}
-async function openBriefAttachmentPreview(index,encodedName){if(!current)return;const name=decodeURIComponent(encodedName||'Brief attachment');currentPreviewDownloadCallback=()=>downloadBriefAttachment(index,encodedName);openPreviewShell(name);try{const res=await apiPost('getBriefAttachmentPreview',{briefCode:current.code,organisationId:ORG_ID,userId:CURRENT_USER_ID,attachmentIndex:index});renderPreview(res.data||res,name,true)}catch(e){renderPreviewError(e)}}
-function openPreviewShell(name){clearPreviewObjectUrl();document.getElementById('previewTitle').textContent=name;document.getElementById('previewBody').innerHTML="<div class='muted'>Loading read-only preview…</div>";document.getElementById('previewModal').classList.remove('hidden')}
+function previewFileNavMarkup_(){if(!currentPreviewFiles.length||currentPreviewFiles.length<2)return'';return `<div class="previewNav"><span class="previewCounter">${currentPreviewFileIndex+1} OF ${currentPreviewFiles.length}</span>${currentPreviewFiles.map((f,i)=>`<button class="mini ${i===currentPreviewFileIndex?'active':''}" onclick="openPreviewFileAt(${i})">${escapeHTML(f.name||('File '+(i+1)))}</button>`).join('')}</div>`}
+async function openPreviewFileAt(index){if(!current||!currentPreviewIterationId||index<0||index>=currentPreviewFiles.length)return;const f=currentPreviewFiles[index];currentPreviewFileIndex=index;currentPreviewDownloadCallback=current.finalApproved?()=>downloadIteration(encodeURIComponent(currentPreviewIterationId),index):null;openPreviewShell(f.name||'Preview',false);try{const res=await apiPost('getFilePreview',{briefCode:current.code,organisationId:ORG_ID,userId:CURRENT_USER_ID,iterationId:currentPreviewIterationId,fileIndex:index});renderPreview(res.data||res,f.name||'Preview',!!current.finalApproved)}catch(e){renderPreviewError(e)}}
+async function openIterationPreview(encodedId,encodedName,fileIndex=0){if(!current)return;const id=decodeURIComponent(encodedId),name=decodeURIComponent(encodedName||'Preview'),it=current.iterations.find(x=>x.id===id);currentPreviewIterationId=id;currentPreviewFiles=(it?.files||[]).slice();currentPreviewFileIndex=Number(fileIndex)||0;currentPreviewDownloadCallback=current.finalApproved?()=>downloadIteration(encodedId,currentPreviewFileIndex):null;openPreviewShell(name,false);try{const res=await apiPost('getFilePreview',{briefCode:current.code,organisationId:ORG_ID,userId:CURRENT_USER_ID,iterationId:id,fileIndex:currentPreviewFileIndex});renderPreview(res.data||res,name,!!current.finalApproved)}catch(e){renderPreviewError(e)}}
+async function openLatestSubmissionReview(){if(!current)return;const it=current.iterations[current.iterations.length-1];if(!it)return alert('There is no submitted work to review yet.');setDetailTab('work',document.querySelector('#detailTabs button:nth-child(2)'));if((it.files||[]).length){await openIterationPreview(encodeURIComponent(it.id),encodeURIComponent(it.files[0].name||it.file||'Submission'),0);return}showToast('Submission opened',(it.links||[]).length|| (it.texts||[]).length?'Review the submitted links / text in the WORK tab.':'The submission contains no previewable file.');}
+async function openBriefAttachmentPreview(index,encodedName){if(!current)return;const name=decodeURIComponent(encodedName||'Brief attachment');currentPreviewIterationId='';currentPreviewFiles=[];currentPreviewFileIndex=0;currentPreviewDownloadCallback=()=>downloadBriefAttachment(index,encodedName);openPreviewShell(name,false);try{const res=await apiPost('getBriefAttachmentPreview',{briefCode:current.code,organisationId:ORG_ID,userId:CURRENT_USER_ID,attachmentIndex:index});renderPreview(res.data||res,name,true)}catch(e){renderPreviewError(e)}}
+function openPreviewShell(name,keepNav){clearPreviewObjectUrl();document.getElementById('previewTitle').textContent=name;document.getElementById('previewBody').innerHTML="<div class='previewAssetStage'><div class='muted'>Loading read-only preview…</div></div>";document.getElementById('previewModal').classList.remove('hidden')}
 function renderPreview(d,name,canDownload){
   const body=document.getElementById('previewBody'),mime=d.mimeType||'application/octet-stream',original=d.originalMimeType||mime;
   clearPreviewObjectUrl();
-  let content='';
+  let asset='',allowBrowser=true;
   if(d.previewMode==='text'){
-    const blob=new Blob([d.text||''],{type:mime||'text/plain'});currentPreviewObjectUrl=URL.createObjectURL(blob);content=`<div class='previewMessage' style='text-align:left'><b>${escapeHTML(name)}</b><div class='tiny'>READ-ONLY TEXT PREVIEW • ${escapeHTML(original)}</div><pre style='white-space:pre-wrap;word-break:break-word;max-height:58vh;overflow:auto;background:#fff;border:1px solid #ddd;border-radius:10px;padding:14px'>${escapeHTML(d.text||'')}</pre></div>`;
+    const blob=new Blob([d.text||''],{type:mime||'text/plain'});currentPreviewObjectUrl=URL.createObjectURL(blob);asset=`<div class='previewMessage' style='text-align:left;width:100%'><b>${escapeHTML(name)}</b><div class='tiny'>READ-ONLY TEXT PREVIEW • ${escapeHTML(original)}</div><pre style='white-space:pre-wrap;word-break:break-word;max-height:100%;overflow:auto;background:#fff;border:1px solid #ddd;border-radius:10px;padding:14px'>${escapeHTML(d.text||'')}</pre></div>`;
   }else{
     if(!d.base64)throw new Error('No preview data returned.');
     const blob=base64ToBlob(d.base64,mime);currentPreviewObjectUrl=URL.createObjectURL(blob);
-    if(mime.startsWith('image/'))content=`<img src="${currentPreviewObjectUrl}" alt="${escapeHTML(name)}">`;
-    else if(mime.startsWith('video/'))content=`<video src="${currentPreviewObjectUrl}" controls autoplay playsinline></video>`;
-    else if(mime.startsWith('audio/'))content=`<div class='previewMessage'><b>${escapeHTML(name)}</b><audio src="${currentPreviewObjectUrl}" controls style="width:100%;margin-top:14px"></audio></div>`;
-    else if(mime==='application/pdf')content=`<iframe src="${currentPreviewObjectUrl}" title="${escapeHTML(name)}"></iframe>`;
-    else content=`<div class='previewMessage'><b>${escapeHTML(name)}</b><div class='muted'>${escapeHTML(original)}</div><p class='tiny'>This file cannot be drawn directly inside the ONIT window, but ONIT has loaded it safely as read-only content. Use OPEN IN BROWSER below; your browser will preview it when the format is supported.</p></div>`;
+    if(mime.startsWith('image/'))asset=`<img src="${currentPreviewObjectUrl}" alt="${escapeHTML(name)}" onerror="this.closest('.previewAssetStage').innerHTML='<div class=previewMessage><b>Image preview could not be drawn.</b><p class=tiny>Close and reopen the preview, or use OPEN IN BROWSER.</p></div>'">`;
+    else if(mime.startsWith('video/'))asset=`<video src="${currentPreviewObjectUrl}" controls playsinline preload="metadata"></video>`;
+    else if(mime.startsWith('audio/'))asset=`<div class='previewMessage'><b>${escapeHTML(name)}</b><audio src="${currentPreviewObjectUrl}" controls style="width:min(620px,100%);margin-top:14px"></audio></div>`;
+    else if(mime==='application/pdf')asset=`<iframe src="${currentPreviewObjectUrl}#view=FitH" title="${escapeHTML(name)}"></iframe>`;
+    else {allowBrowser=false;asset=`<div class='previewMessage'><b>${escapeHTML(name)}</b><div class='muted' style='margin-top:6px'>${escapeHTML(original)}</div><p class='tiny' style='margin-top:12px'>ONIT received this file and has kept it locked inside the approval workflow, but this format cannot be rendered safely in a browser preview. It will become downloadable only after final approval. For large or specialist files such as PSD / AI / ZIP, a view-only Drive, Figma, Frame.io or similar work link gives reviewers a better preview.</p></div>`;}
   }
-  const converted=d.converted?`<div class='tiny' style='text-align:center;margin-top:8px'>Read-only preview generated from ${escapeHTML(original)}. Your original file is unchanged.</div>`:'';
-  body.innerHTML=content+converted+previewActionsMarkup(canDownload);
+  const converted=d.converted?`<div class='tiny' style='text-align:center'>Read-only preview generated from ${escapeHTML(original)}. The original file is unchanged.</div>`:'';
+  const footer=`<div class='previewFooter'>${previewFileNavMarkup_()}${converted}${previewActionsMarkup(canDownload,allowBrowser&&previewBrowserSafe_(mime))}</div>`;
+  body.innerHTML=`<div class='previewAssetStage'>${asset}</div>${footer}`;
 }
-function renderPreviewError(e){clearPreviewObjectUrl();document.getElementById('previewBody').innerHTML=`<div class='previewMessage'><b>Preview could not be loaded.</b><div class='muted'>${escapeHTML(e.message)}</div><button class='secondary' onclick="closePreview()">CLOSE</button></div>`}
-function closePreview(){clearPreviewObjectUrl();currentPreviewDownloadCallback=null;document.getElementById('previewBody').innerHTML="<div class='muted'>Select a file to preview.</div>";document.getElementById('previewModal').classList.add('hidden')}
+function renderPreviewError(e){clearPreviewObjectUrl();document.getElementById('previewBody').innerHTML=`<div class='previewAssetStage'><div class='previewMessage'><b>Preview could not be loaded.</b><div class='muted'>${escapeHTML(e.message)}</div><button class='secondary' onclick="closePreview()">CLOSE</button></div></div>`}
+function closePreview(){clearPreviewObjectUrl();currentPreviewDownloadCallback=null;currentPreviewIterationId='';currentPreviewFiles=[];currentPreviewFileIndex=0;document.getElementById('previewBody').innerHTML="<div class='muted'>Select a file to preview.</div>";document.getElementById('previewModal').classList.add('hidden')}
 
 async function downloadIteration(encodedId,fileIndex=0){if(!current)return;const id=decodeURIComponent(encodedId),it=current.iterations.find(x=>x.id===id);if(!it)return;if(!current.finalApproved)return alert('Submitted work is preview-only until final approval.');const f=(it.files||[])[fileIndex],msg='Download this approved file? ONIT will record the download as sent to the client.';if(!confirm(msg))return;try{setBusy(true);const res=await apiPost('recordFileDownload',{briefCode:current.code,organisationId:ORG_ID,userId:CURRENT_USER_ID,userName:currentUserName(),iterationId:id,fileIndex:fileIndex}),d=res.data||res;if(d.inline&&d.base64){const blob=base64ToBlob(d.base64,d.mimeType||'application/octet-stream'),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=d.fileName||f?.name||it.file||'ONIT-file';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),5000)}else if(d.driveUrl){window.open(d.driveUrl,'_blank')}else throw new Error('No downloadable file was returned.');await loadFromGoogle(true);showToast('Download recorded','ONIT recorded this approved file as sent to the client.')}catch(e){alert('Could not download this file. '+e.message)}finally{setBusy(false)}}
 function base64ToBlob(base64,type){const bytes=atob(base64),arrays=[];for(let offset=0;offset<bytes.length;offset+=1024){const slice=bytes.slice(offset,offset+1024),nums=new Array(slice.length);for(let i=0;i<slice.length;i++)nums[i]=slice.charCodeAt(i);arrays.push(new Uint8Array(nums))}return new Blob(arrays,{type})}
@@ -1610,13 +1639,14 @@ function activeBuzzerOptions_(){
   return out.sort((a,b)=>a.name.localeCompare(b.name)||a.label.localeCompare(b.label));
 }
 function openBuzzerComposer(){
-  if(!SESSION_TOKEN)return;const opts=activeBuzzerOptions_(),sel=document.getElementById('buzzerTargets');
+  if(!SESSION_TOKEN)return;if(!canUseBuzzer())return alert('Buzzer can only be sent by Account Managers, Traffic Manager, CD, DCD, MD or Dr. Kunbi.');const opts=activeBuzzerOptions_(),sel=document.getElementById('buzzerTargets');
   sel.innerHTML=opts.map(o=>`<option value="${escapeHTML(o.userId+'|'+o.briefCode)}">${escapeHTML(o.name)} — ${escapeHTML(o.label)} — ${escapeHTML(o.status)}</option>`).join('');
   if(!opts.length)sel.innerHTML=`<option disabled>No active assigned work to buzz right now</option>`;
   document.getElementById('buzzerComposeModal').classList.remove('hidden');
 }
 function closeBuzzerComposer(){document.getElementById('buzzerComposeModal').classList.add('hidden')}
 async function sendBuzzerNow(button){
+  if(!canUseBuzzer())return alert('Your role cannot send a Buzzer.');
   const selected=[...(document.getElementById('buzzerTargets')?.selectedOptions||[])].map(o=>{const [userId,briefCode]=o.value.split('|');return{userId,briefCode}});
   if(!selected.length)return alert('Choose at least one person / active brief.');const codes=[...new Set(selected.map(x=>x.briefCode))];if(selected.length>1&&codes.length>1)return alert('Group Buzzer only works when everyone selected is working on the same brief.');
   const old=button.textContent;try{button.disabled=true;button.textContent='BUZZING…';const res=await apiPost('sendBuzzer',{targets:selected}),d=res.data||res;closeBuzzerComposer();showToast('Buzzer sent',`${d.recipients||selected.length} person(s) buzzed. They can respond in one tap.`)}catch(e){alert('Could not send Buzzer. '+e.message)}finally{button.disabled=false;button.textContent=old}
@@ -1769,7 +1799,7 @@ function ownerBroadcastMarkup(){
       <div>
         <div class='field'><label>TITLE</label><input id='broadcastComposeTitle' placeholder='e.g. Management update'></div>
         <div class='field'><label>MESSAGE</label><textarea id='broadcastComposeMessage' placeholder='Write the announcement here...'></textarea></div>
-        <div class='field'><label>ATTACH IMAGE — OPTIONAL</label><input id='broadcastComposeFile' type='file' accept='image/jpeg,image/png,image/webp'><div class='tiny'>JPG, PNG or WebP • maximum ${MAX_FILE_BYTES/1024/1024} MB</div></div>
+        <div class='field'><label>ATTACH IMAGE — OPTIONAL</label><input id='broadcastComposeFile' type='file' accept='image/jpeg,image/png,image/webp'><div class='tiny'>JPG, PNG or WebP • maximum ${MAX_BROADCAST_BYTES/1024/1024} MB</div></div>
       </div>
       <div>
         <label class='accessCheck broadcastAllCheck'><input id='broadcastAll' type='checkbox' onchange='toggleBroadcastTargets()'> SEND TO ALL ACTIVE STAFF</label>
@@ -1785,7 +1815,7 @@ async function sendOwnerBroadcast(button){
   const title=(document.getElementById('broadcastComposeTitle')?.value||'').trim(),message=(document.getElementById('broadcastComposeMessage')?.value||'').trim(),sendToAll=!!document.getElementById('broadcastAll')?.checked,
     targetUserIds=[...(document.getElementById('broadcastTargets')?.selectedOptions||[])].map(o=>o.value),f=document.getElementById('broadcastComposeFile')?.files?.[0];
   if(!title||!message)return alert('Add a title and message.');if(!sendToAll&&!targetUserIds.length)return alert('Choose staff members or select SEND TO ALL STAFF.');
-  const payload={title,message,sendToAll,targetUserIds};if(f){if(f.size>MAX_FILE_BYTES)return alert(`Attachment must be under ${MAX_FILE_BYTES/1024/1024} MB.`);payload.fileName=f.name;payload.fileType=f.type||'application/octet-stream';payload.fileSize=f.size;payload.fileBase64=await fileToBase64(f)}
+  const payload={title,message,sendToAll,targetUserIds};if(f){if(f.size>MAX_BROADCAST_BYTES)return alert(`Attachment must be under ${MAX_BROADCAST_BYTES/1024/1024} MB.`);payload.fileName=f.name;payload.fileType=f.type||'application/octet-stream';payload.fileSize=f.size;payload.fileBase64=await fileToBase64(f)}
   if(!confirm(`Send this announcement to ${sendToAll?'all staff':targetUserIds.length+' selected staff member(s)'}?`))return;
   const old=button.textContent;try{button.disabled=true;button.textContent='SENDING…';const res=await apiPost('createOwnerBroadcast',payload),d=res.data||res;document.getElementById('broadcastComposeTitle').value='';document.getElementById('broadcastComposeMessage').value='';document.getElementById('broadcastComposeFile').value='';document.getElementById('broadcastAll').checked=false;const targetSelect=document.getElementById('broadcastTargets');if(targetSelect)[...targetSelect.options].forEach(o=>o.selected=false);toggleBroadcastTargets();clearUiDirty('more');showToast('Announcement sent',`${d.recipients||0} staff member(s) will receive the popup.`)}catch(e){alert('Could not send announcement. '+e.message)}finally{button.disabled=false;button.textContent=old}
 }
@@ -1833,7 +1863,7 @@ function renderMore(){if(!currentUser)return;const names=backendAccess();let htm
   if(names.length){html+=`<div class='morecard' style='grid-column:1/-1'><h3>BACKEND DATA</h3><div class='bigTiny'>Read-only data access is enforced inside ONIT. Raw Google Sheet access is not granted to staff. CD, DCD and MD can download directly. Other staff need one approval from any one of them.</div><div class='bigTiny'>${escapeHTML(names.join(' • '))}</div><button class='secondary linkbtn' onclick="show('data')">OPEN DATA CONSOLE</button></div>`}
   html+=dataExportRequestsMarkup();
   html+=`<div class='morecard' style='grid-column:1/-1'><h3>INSTALL / UPDATE ONIT</h3><div class='bigTiny'>Install ONIT on this device for quick access. ONIT now checks the hosted frontend version automatically and repairs stale installed copies without requiring a reinstall.</div><div class='actions'><button class='secondary linkbtn' onclick='installOnit()'>INSTALL ON THIS DEVICE</button><button class='secondary linkbtn' onclick='forceFrontendUpdate()'>CHECK / REPAIR UPDATE</button></div></div>`;
-  html+=`<div class='morecard' style='grid-column:1/-1'><h3>HELP / ABOUT</h3><div class='bigTiny'>ONIT Frontend v${APP_VERSION} • Backend ${backendVersion||'checking…'} • Time + People + Status<br>Every brief has an owner, deadline, status and visible history.<br>Live Brief Overview, Daily/Weekly Team Work Utilisation, Buzzer, ONIT Pulse, Risk Radar, Brief Replay and Handover Mode are active.<br>Profile photos, governed PDF data exports, Owner Broadcasts, Staff Account Management and approved-job staff archives are active.<br>Account Management, the Traffic Manager, Dr. Kunbi, Creative Director, Deputy Creative Director and Managing Director can create/send briefs. Account Management + Traffic share one organisation-wide account / brand pool, and a brief can be assigned to multiple team members at once. Work submissions can contain multiple files, links and text blocks without bypassing approval. Brief visibility is private by workflow: sender, assigned/CC users, relevant Team Lead review, final approver stage and System Owner only.<br>Owner-assigned Team Leads provide first-stage approval before CD/DCD final approval.<br>Installed HTTPS/PWA copies check automatically for frontend updates; backend changes are live immediately.<br>The System Owner account administers data access separately from operational staff roles and can correct staff emails, send password-reset codes, deactivate/reactivate staff and preserve historical work.</div></div></div>`;document.getElementById('moreContent').innerHTML=html;hydrateProfilePhotos()}
+  html+=`<div class='morecard' style='grid-column:1/-1'><h3>HELP / ABOUT</h3><div class='bigTiny'>ONIT Frontend v${APP_VERSION} • Backend ${backendVersion||'checking…'} • Time + People + Status<br>Every brief has an owner, deadline, status and visible history.<br>Live Brief Overview, Daily/Weekly Team Work Utilisation, Buzzer, ONIT Pulse, Risk Radar, Brief Replay and Handover Mode are active.<br>Profile photos, governed PDF data exports, Owner Broadcasts, Staff Account Management and approved-job staff archives are active.<br>Account Management, the Traffic Manager, Dr. Kunbi, Creative Director, Deputy Creative Director and Managing Director can create/send briefs. Account Management + Traffic share one organisation-wide account / brand pool, and a brief can be assigned to multiple team members at once. Work submissions can contain multiple files, links and text blocks without bypassing approval. Review-state work is surfaced directly on the dashboard and opens into the submitted work for faster review. Brief visibility is private by workflow: sender, assigned/CC users, relevant Team Lead review, final approver stage and System Owner only.<br>Owner-assigned Team Leads provide first-stage approval before CD/DCD final approval.<br>Installed HTTPS/PWA copies check automatically for frontend updates; backend changes are live immediately.<br>The System Owner account administers data access separately from operational staff roles and can correct staff emails, send password-reset codes, deactivate/reactivate staff and preserve historical work.</div></div></div>`;document.getElementById('moreContent').innerHTML=html;hydrateProfilePhotos()}
 async function approvePending(id){
   const targetUserId=decodeURIComponent(id),target=pendingUsers.find(u=>String(rowVal(u,'User ID'))===String(targetUserId)),name=target?rowVal(target,'Full Name'):'The member';
   try{

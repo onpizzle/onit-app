@@ -1,6 +1,6 @@
 {
   "app": "ONIT",
-  "version": "0.19.2",
+  "version": "0.19.3",
   "channel": "stable",
-  "release": "multi-format-work-submission"
+  "release": "review-preview-buzzer-roles"
 }
