@@ -1,6 +1,6 @@
 {
   "app": "ONIT",
-  "version": "0.19.3",
+  "version": "0.19.4",
   "channel": "stable",
-  "release": "review-preview-buzzer-roles"
+  "release": "traffic-control-queue"
 }
