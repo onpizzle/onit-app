@@ -1,6 +1,6 @@
 {
   "app": "ONIT",
-  "version": "0.19.4",
+  "version": "0.19.5",
   "channel": "stable",
   "release": "traffic-control-queue"
 }

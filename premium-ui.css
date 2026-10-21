@@ -651,3 +651,10 @@ img,video,canvas,svg{max-width:100%}
     max-height:calc(100vh - 20px)!important;
   }
 }
+
+
+/* ONIT v0.19.5 — Team working-state highlight */
+.person{background:#fff!important;transition:background-color .18s ease,border-color .18s ease,box-shadow .18s ease!important}
+.person.workingPerson{background:#edf8f1!important;border-color:#b9dfc7!important;box-shadow:inset 4px 0 0 #20a85a!important}
+.person.workingPerson .pill{background:#daf0e2!important;color:#176f3d!important}
+.person.workingPerson .dot{background:#20a85a!important}
