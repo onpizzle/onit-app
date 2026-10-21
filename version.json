@@ -1,6 +1,6 @@
 {
   "app": "ONIT",
-  "version": "0.19.1",
+  "version": "0.19.2",
   "channel": "stable",
-  "release": "universal-file-preview-work-reply"
+  "release": "multi-format-work-submission"
 }
