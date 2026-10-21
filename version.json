@@ -1,6 +1,6 @@
 {
   "app": "ONIT",
-  "version": "0.18.4",
+  "version": "0.18.5",
   "channel": "stable",
-  "release": "broadcast-popup-experience"
+  "release": "firebase-live-phase1"
 }
