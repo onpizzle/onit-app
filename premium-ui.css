@@ -592,3 +592,62 @@ img,video,canvas,svg{max-width:100%}
   .briefOverviewBars{gap:2px!important}
   .overviewBarTrack{width:24px!important}
 }
+
+
+/* =========================================================
+   ONIT v0.18.9 — DESKTOP VERTICAL SCROLL STABILITY
+   Desktop uses the workspace as the vertical scroll container.
+   This prevents long role-specific pages (including DCD/CD)
+   from being clipped by the rounded app shell.
+========================================================= */
+@media(min-width:821px){
+  html,body{
+    height:100%!important;
+    min-height:100%!important;
+    overflow:hidden!important;
+  }
+  .app{
+    height:calc(100vh - 44px)!important;
+    min-height:0!important;
+    max-height:calc(100vh - 44px)!important;
+    overflow:hidden!important;
+  }
+  .layout{
+    height:100%!important;
+    min-height:0!important;
+    max-height:100%!important;
+  }
+  .workspace{
+    height:100%!important;
+    min-height:0!important;
+    max-height:100%!important;
+    overflow-y:auto!important;
+    overflow-x:hidden!important;
+    overscroll-behavior-y:contain;
+    scrollbar-gutter:stable;
+  }
+  .main{
+    height:auto!important;
+    min-height:calc(100% - 68px)!important;
+    max-height:none!important;
+    overflow-x:hidden!important;
+    overflow-y:visible!important;
+    padding-bottom:72px!important;
+  }
+  .main>section{
+    height:auto!important;
+    max-height:none!important;
+    overflow:visible!important;
+  }
+  .nav{
+    height:100%!important;
+    min-height:0!important;
+    max-height:100%!important;
+  }
+}
+@media(min-width:821px) and (max-width:1050px){
+  .app{
+    height:calc(100vh - 20px)!important;
+    max-height:calc(100vh - 20px)!important;
+  }
+}

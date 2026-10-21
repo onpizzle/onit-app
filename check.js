@@ -1,4 +1,4 @@
-const APP_VERSION='0.18.8';
+const APP_VERSION='0.18.9';
 const BACKEND_DATASETS=['USERS','CLIENTS','BRIEFS','ASSIGNMENTS','ITERATIONS','ACTIVITY_LOG','NOTIFICATIONS','REPORTS'];
 const API_URL='https://script.google.com/macros/s/AKfycbyY98jKIh2ls8jKsB5w2H7YG3Okj61AoIkt3-2x0LBnvRVwDgBhrQnVr1Ghfu04J7YB/exec';
 let ORG_ID=localStorage.getItem('onit-org')||'';

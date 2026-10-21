@@ -575,7 +575,7 @@ svg{display:block}
 
 
 /* =========================================================
-   ONIT v0.18.8 — SHARED ACCOUNT TEAM ACCESS
+   ONIT v0.18.9 — DESKTOP SCROLL FIX
    Keeps the app shell inside the physical viewport on phones.
 ========================================================= */
 html,body{
@@ -719,6 +719,65 @@ img,video,canvas,svg{max-width:100%}
   .overviewBarTrack{width:24px!important}
 }
 
+
+
+/* =========================================================
+   ONIT v0.18.9 — DESKTOP VERTICAL SCROLL STABILITY
+   Desktop uses the workspace as the vertical scroll container.
+   This prevents long role-specific pages (including DCD/CD)
+   from being clipped by the rounded app shell.
+========================================================= */
+@media(min-width:821px){
+  html,body{
+    height:100%!important;
+    min-height:100%!important;
+    overflow:hidden!important;
+  }
+  .app{
+    height:calc(100vh - 44px)!important;
+    min-height:0!important;
+    max-height:calc(100vh - 44px)!important;
+    overflow:hidden!important;
+  }
+  .layout{
+    height:100%!important;
+    min-height:0!important;
+    max-height:100%!important;
+  }
+  .workspace{
+    height:100%!important;
+    min-height:0!important;
+    max-height:100%!important;
+    overflow-y:auto!important;
+    overflow-x:hidden!important;
+    overscroll-behavior-y:contain;
+    scrollbar-gutter:stable;
+  }
+  .main{
+    height:auto!important;
+    min-height:calc(100% - 68px)!important;
+    max-height:none!important;
+    overflow-x:hidden!important;
+    overflow-y:visible!important;
+    padding-bottom:72px!important;
+  }
+  .main>section{
+    height:auto!important;
+    max-height:none!important;
+    overflow:visible!important;
+  }
+  .nav{
+    height:100%!important;
+    min-height:0!important;
+    max-height:100%!important;
+  }
+}
+@media(min-width:821px) and (max-width:1050px){
+  .app{
+    height:calc(100vh - 20px)!important;
+    max-height:calc(100vh - 20px)!important;
+  }
+}
 </style>
 </head>
 <body>
@@ -892,7 +951,7 @@ img,video,canvas,svg{max-width:100%}
 <script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-messaging-compat.js"></script>
-<script>const APP_VERSION='0.18.8';
+<script>const APP_VERSION='0.18.9';
 const BACKEND_DATASETS=['USERS','CLIENTS','BRIEFS','ASSIGNMENTS','ITERATIONS','ACTIVITY_LOG','NOTIFICATIONS','REPORTS'];
 const API_URL='https://script.google.com/macros/s/AKfycbyY98jKIh2ls8jKsB5w2H7YG3Okj61AoIkt3-2x0LBnvRVwDgBhrQnVr1Ghfu04J7YB/exec';
 let ORG_ID=localStorage.getItem('onit-org')||'';
