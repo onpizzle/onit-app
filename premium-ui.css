@@ -653,8 +653,8 @@ img,video,canvas,svg{max-width:100%}
 }
 
 
-/* ONIT v0.19.5 — Team working-state highlight */
+/* ONIT v0.19.7 — Team occupied-state highlight */
 .person{background:#fff!important;transition:background-color .18s ease,border-color .18s ease,box-shadow .18s ease!important}
-.person.workingPerson{background:#edf8f1!important;border-color:#b9dfc7!important;box-shadow:inset 4px 0 0 #20a85a!important}
-.person.workingPerson .pill{background:#daf0e2!important;color:#176f3d!important}
+.person.workingPerson{background:#e3f5e9!important;border-color:#9ed3b0!important;box-shadow:inset 5px 0 0 #20a85a!important}
+.person.workingPerson .pill{background:#cfead9!important;color:#176f3d!important}
 .person.workingPerson .dot{background:#20a85a!important}

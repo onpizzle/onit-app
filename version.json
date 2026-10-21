@@ -1,6 +1,6 @@
 {
   "app": "ONIT",
-  "version": "0.19.5",
+  "version": "0.19.7",
   "channel": "stable",
-  "release": "traffic-control-queue"
+  "release": "team-status-highlight-data-safe-fix"
 }
