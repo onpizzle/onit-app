@@ -28,3 +28,11 @@
 .caseApproval{padding:14px;border:1px solid #e7e7e2;border-radius:12px;margin:10px 0}.caseApproval.approved{background:#ecf8f0;border-color:#bfe5cb}.caseApproval.revision{background:#fff5e8;border-color:#f1d4ad}
 .casesTestFlag{display:inline-block;padding:5px 8px;border-radius:999px;background:#fff5e8;color:#9b5b08;font-size:10px;font-weight:900}
 @media(max-width:760px){.casesGrid,.caseStudioGrid{grid-template-columns:1fr}.caseStatGrid{grid-template-columns:repeat(2,1fr)}.caseStudioGrid .wide{grid-column:auto}.caseTable{display:block;overflow-x:auto}.caseScore{width:46px;height:46px}}
+
+/* v0.20.0-r2 responsiveness */
+.caseLoading{min-height:120px;border:1px solid #e7e7e2;border-radius:14px;background:#fff;display:flex;align-items:center;justify-content:center;gap:12px;padding:22px;color:#555}
+.caseLoading b{display:block;color:#171717;margin-bottom:3px}
+.caseSpinner{width:20px;height:20px;border:3px solid #ecece8;border-top-color:#f04b23;border-radius:50%;animation:caseSpin .7s linear infinite;flex:0 0 auto}
+@keyframes caseSpin{to{transform:rotate(360deg)}}
+.casesSubnav button{transition:background .12s ease,color .12s ease,border-color .12s ease,transform .12s ease}
+.casesSubnav button:active{transform:scale(.98)}
