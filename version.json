@@ -1,5 +1,5 @@
 {
-  "version": "0.23.0",
-  "name": "ONIT v0.23.0 — Collision Radar Private Pilot",
-  "channel": "private-pilot"
+  "version": "0.24.0",
+  "build": "ONIT-30-SECOND-MORNING-PILOT",
+  "releasedAt": "2026-10-22"
 }
