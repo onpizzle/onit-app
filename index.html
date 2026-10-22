@@ -60,6 +60,30 @@
 .person.workingPerson .pill{background:#cfead9!important;color:#176f3d!important}
 .person.workingPerson .dot{background:#20a85a!important}
 
+
+/* ONIT RADAR v0.22.0 — role-aware attention engine */
+#onitRadar{margin:18px 0 4px}
+.radarShell{position:relative;overflow:hidden;border-radius:20px;background:#171717;color:#fff;padding:19px 20px 18px;box-shadow:0 14px 34px rgba(17,17,17,.12)}
+.radarShell:before{content:"";position:absolute;width:180px;height:180px;border:1px solid rgba(255,86,48,.22);border-radius:50%;right:-55px;top:-95px;box-shadow:0 0 0 28px rgba(255,86,48,.06),0 0 0 58px rgba(255,86,48,.035);pointer-events:none;animation:radarBreathe 3.2s ease-in-out infinite}
+@keyframes radarBreathe{0%,100%{transform:scale(.96);opacity:.72}50%{transform:scale(1.04);opacity:1}}
+.radarTop{position:relative;display:flex;align-items:flex-start;justify-content:space-between;gap:18px;margin-bottom:14px}
+.radarEyebrow{font-size:10px;line-height:1;font-weight:900;letter-spacing:.16em;color:#ff5a34;text-transform:uppercase;margin-bottom:7px}
+.radarHeadline{font-size:21px;line-height:1.18;font-weight:900;letter-spacing:-.02em}
+.radarSub{font-size:12px;line-height:1.45;color:#bdbdb7;margin-top:5px;max-width:680px}
+.radarLive{display:inline-flex;align-items:center;gap:7px;white-space:nowrap;border:1px solid #3b3b38;border-radius:999px;padding:7px 10px;font-size:9px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:#dadad5;background:#232321}
+.radarLive:before{content:"";width:7px;height:7px;border-radius:50%;background:#28b97a;box-shadow:0 0 0 4px rgba(40,185,122,.12)}
+.radarItems{position:relative;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.radarCard{min-width:0;border:1px solid #353532;background:#222220;border-radius:15px;padding:14px;display:flex;flex-direction:column;gap:9px;transition:transform .16s ease,border-color .16s ease,background .16s ease}
+.radarCard:hover{transform:translateY(-1px);border-color:#494945;background:#262624}
+.radarCardTop{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.radarLevel{display:inline-flex;align-items:center;gap:6px;font-size:9px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:#d7d7d2}
+.radarLevel:before{content:"";width:7px;height:7px;border-radius:50%;background:#7c7c76}.radarLevel.high:before{background:#ff5a4a}.radarLevel.watch:before{background:#f7ba42}.radarLevel.info:before{background:#2aae78}
+.radarCode{font-size:9px;color:#888883;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:48%}
+.radarCard h3{font-size:14px;line-height:1.25;margin:0;color:#fff}.radarCard p{font-size:11px;line-height:1.45;margin:0;color:#bdbdb7;min-height:32px}
+.radarActions{display:flex;gap:7px;flex-wrap:wrap;margin-top:auto;padding-top:2px}.radarAction{border:0;border-radius:9px;background:#fff;color:#171717;padding:8px 10px;font-size:9px;font-weight:900;letter-spacing:.02em;cursor:pointer}.radarAction:hover{background:#f2f2ed}.radarIgnore{border:1px solid #41413d;border-radius:9px;background:transparent;color:#aaa9a4;padding:8px 10px;font-size:9px;font-weight:800;cursor:pointer}.radarIgnore:hover{color:#fff;border-color:#5c5c56}
+.radarClear{position:relative;border:1px solid #343431;border-radius:15px;padding:15px 16px;background:#222220;display:flex;align-items:center;gap:12px}.radarClearIcon{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:#183529;color:#47c58c;font-size:17px;font-weight:900}.radarClear b{display:block;font-size:13px;margin-bottom:3px}.radarClear span{font-size:11px;color:#aaa9a4}
+@media(max-width:820px){#onitRadar{margin:14px 0 2px}.radarShell{border-radius:18px;padding:16px 15px}.radarShell:before{width:140px;height:140px;right:-55px;top:-70px}.radarTop{gap:10px;margin-bottom:12px}.radarHeadline{font-size:19px;padding-right:8px}.radarSub{font-size:11px}.radarLive{font-size:8px;padding:6px 8px}.radarItems{grid-template-columns:1fr;gap:8px}.radarCard{padding:13px}.radarCard p{min-height:0}.radarAction,.radarIgnore{min-height:36px;padding:8px 11px}.radarCard:nth-child(n+4){display:none}}
+@media(prefers-reduced-motion:reduce){.radarShell:before{animation:none}.radarCard{transition:none}}
 </style>
 <!-- ONIT v0.17.5: approved UI with slightly larger typography for readability. -->
 <style id="onit-approved-ui-v0174">
@@ -830,7 +854,7 @@ img,video,canvas,svg{max-width:100%}
 @media(max-width:760px){.reviewPreviewModal{padding:4px!important}.reviewPreviewModal .modalBox{width:100%!important;height:calc(100dvh - 8px)!important;max-height:none!important;border-radius:12px!important}.previewAssetStage{padding:5px}.previewFooter{padding:7px}.previewNav{justify-content:flex-start;overflow-x:auto;flex-wrap:nowrap}.previewNav .mini{white-space:nowrap}}
 </style>
 <link rel="stylesheet" href="./cases-module.css?v=0.20.0">
-<link rel="stylesheet" href="./pulse-module.css?v=0.21.3">
+<link rel="stylesheet" href="./pulse-module.css?v=0.22.0">
 
 <style id="onit-mobile-nav-v0212">
 .navLabelMobile{display:none!important}
@@ -969,6 +993,8 @@ img,video,canvas,svg{max-width:100%}
     </div>
   </div>
 
+  <div id="onitRadar" aria-live="polite"></div>
+
   <div id="homeAnalytics" class="homeAnalytics"></div>
   <div class="stats dashboardStats" id="homeStats"></div>
 
@@ -1057,7 +1083,7 @@ img,video,canvas,svg{max-width:100%}
 <script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-messaging-compat.js"></script>
-<script>const APP_VERSION='0.21.3';
+<script>const APP_VERSION='0.22.0';
 const BACKEND_DATASETS=['USERS','CLIENTS','BRIEFS','ASSIGNMENTS','ITERATIONS','ACTIVITY_LOG','NOTIFICATIONS','REPORTS'];
 const API_URL='https://script.google.com/macros/s/AKfycbyLVpsQLFCpQWRIvRndw66sghmu5rtK31cuthS7hXjJ--lf703mJPIbJ2zpLDIlH76b/exec';
 let ORG_ID=localStorage.getItem('onit-org')||'';
@@ -1403,6 +1429,54 @@ function closeTrafficManager(){trafficEditingCode='';document.getElementById('tr
 async function saveTrafficSchedule(button,releaseNow){if(!trafficEditingCode)return;const ids=trafficSelectedAssignees();if(!ids.length)return alert('Select at least one assignee.');const selected=ids.map(id=>userById(id)).filter(Boolean),names=selected.map(u=>rowVal(u,'Full Name')),start=document.getElementById('trafficScheduledStart').value,internal=document.getElementById('trafficInternalDeadline').value,hold=document.getElementById('trafficHold').checked,note=document.getElementById('trafficNote').value.trim(),priority=document.getElementById('trafficPriority').value,old=button.textContent;button.disabled=true;button.textContent=releaseNow?'RELEASING…':'SAVING…';try{const payload={briefCode:trafficEditingCode,assigneeUserIds:ids,assigneeFullNames:names,priority,scheduledStart:start?parseLagos(start).toISOString():'',internalDeadline:internal?parseLagos(internal).toISOString():'',hold,holdReason:hold?note:'',notes:note};await apiPost('trafficUpdateQueueBrief',payload);if(releaseNow){await apiPost('trafficReleaseBrief',{briefCode:trafficEditingCode,assigneeUserIds:ids,assigneeFullNames:names});}closeTrafficManager();await loadFromGoogle(true);renderHome();showToast('Traffic Control',releaseNow?'Brief released into production.':(start?'Brief scheduled.':'Traffic plan saved.'))}catch(e){alert('Traffic update failed. '+e.message)}finally{button.disabled=false;button.textContent=old}}
 async function quickReleaseTraffic(code,button){code=decodeURIComponent(code);const b=briefs.find(x=>x.code===code);if(!b)return;const ids=b.proposedAssigneeIds||[],names=b.proposedAssigneeNames||[];if(!ids.length){openTrafficManager(encodeURIComponent(code));return}if(!confirm(`Release ${code} to ${names.join(' + ')} now?`))return;const old=button.textContent;button.disabled=true;button.textContent='RELEASING…';try{await apiPost('trafficReleaseBrief',{briefCode:code,assigneeUserIds:ids,assigneeFullNames:names});await loadFromGoogle(true);renderHome();showToast('Traffic Control','Brief released into production.')}catch(e){alert('Could not release brief. '+e.message)}finally{button.disabled=false;button.textContent=old}}
 
+function radarDayKey(){return new Date(Date.now()+serverOffset).toLocaleDateString('en-CA',{timeZone:'Africa/Lagos'})}
+function radarIgnored(key){try{return localStorage.getItem('onit-radar-ignore:'+key)===radarDayKey()}catch(e){return false}}
+function ignoreRadarItem(key){try{localStorage.setItem('onit-radar-ignore:'+key,radarDayKey())}catch(e){}renderHome()}
+function radarWaitHours(b){const latest=b?.iterations?.[b.iterations.length-1];return hoursSince(latest?.submittedAt||b?.updatedAt||b?.createdAt)}
+function radarDueCopy(b){if(!b?.deadline)return '';const ms=new Date(b.deadline).getTime()-(Date.now()+serverOffset);if(!Number.isFinite(ms))return '';if(ms<0)return ` Deadline is overdue by ${duration(Math.abs(ms))}.`;if(ms<=86400000)return ` Deadline in ${duration(ms)}.`;return ` Due ${new Date(b.deadline).toLocaleDateString('en-GB',{day:'numeric',month:'short',timeZone:'Africa/Lagos'})}.`}
+function radarOpenBrief(encoded){detail(decodeURIComponent(encoded||''))}
+function radarOpenTraffic(encoded){const code=decodeURIComponent(encoded||'');if(typeof openTrafficManager==='function')openTrafficManager(encodeURIComponent(code));else detail(code)}
+function radarOpenTeam(){show('team')}
+function radarRoleName(mode){return({TRAFFIC:'Traffic',ACCOUNT:'Account Management',LEADERSHIP:'Creative Leadership',TEAM_LEAD:'Team Lead',OWNER:'System Owner',STAFF:'My Work'})[mode]||'My Work'}
+function radarBriefItem(kind,b,title,copy,actionLabel='OPEN BRIEF',action='brief',level){
+  const r=riskForBrief(b),encoded=encodeURIComponent(b.code||''),key=`${kind}:${b.code}`;
+  return{key,level:level||(r.level==='HIGH'?'high':r.level==='WATCH'?'watch':'info'),code:b.code||'',title,copy,actionLabel,onclick:action==='traffic'?`radarOpenTraffic('${encoded}')`:`radarOpenBrief('${encoded}')`}
+}
+function buildRadarItems(mode){
+  const items=[],active=briefs.filter(b=>!['Closed','Approved'].includes(String(b.status||''))),push=x=>{if(x&&!radarIgnored(x.key)&&!items.some(i=>i.key===x.key))items.push(x)};
+  const riskSort=list=>list.slice().map(b=>({b,r:riskForBrief(b)})).sort((a,z)=>z.r.score-a.r.score);
+  if(mode==='LEADERSHIP'){
+    myFinalApprovalQueue().slice().sort((a,z)=>radarWaitHours(z)-radarWaitHours(a)).slice(0,2).forEach(b=>{const h=radarWaitHours(b);push(radarBriefItem('approval',b,`${b.client||b.project} needs your approval`,`${b.project||b.code} has been waiting ${h>=1?Math.round(h)+'h':'less than 1h'} for final review.${radarDueCopy(b)}`,'REVIEW NOW','brief',h>=6?'high':'watch'))});
+    const leadershipScope=[...new Map([...myAssignedBriefs(),...myManagedBriefs()].map(b=>[b.code,b])).values()];riskSort(leadershipScope).filter(x=>x.r.score>=35).slice(0,3).forEach(({b,r})=>push(radarBriefItem('risk',b,`${b.client||b.project} is moving into risk`,`${r.reasons.join(' • ')}.${radarDueCopy(b)}`,'OPEN BRIEF','brief',r.level==='HIGH'?'high':'watch')));
+  }else if(mode==='TRAFFIC'){
+    trafficQueueBriefs().slice(0,3).forEach(b=>{const urgent=['High','Urgent'].includes(String(b.priority)),held=b.status==='Traffic Hold';push(radarBriefItem('traffic',b,held?`${b.client||b.project} is on Traffic hold`:`${b.client||b.project} needs Traffic`,held?(b.trafficHoldReason||'This brief is waiting for a scheduling decision.'):`${b.priority||'Normal'} priority brief is waiting to be scheduled and released.${radarDueCopy(b)}`,'MANAGE SCHEDULE','traffic',urgent?'high':'watch'))});
+    riskSort(active).filter(x=>x.r.reasons.some(r=>/clash|open briefs/i.test(r))&&x.r.score>=35).slice(0,3).forEach(({b,r})=>push(radarBriefItem('collision',b,'Potential workload collision',`${b.assignee||'Assigned team member'}: ${r.reasons.filter(x=>/clash|open briefs/i.test(x)).join(' • ')}.${radarDueCopy(b)}`,'MANAGE SCHEDULE','traffic',r.level==='HIGH'?'high':'watch')));
+  }else if(mode==='ACCOUNT'){
+    myManagedBriefs().filter(b=>isTrafficQueuedBrief(b)).slice(0,2).forEach(b=>push(radarBriefItem('account-traffic',b,`${b.client||b.project} is waiting for Traffic`,`${b.project||b.code} has not entered production yet.${radarDueCopy(b)}`,'OPEN BRIEF','brief',String(b.priority)==='Urgent'?'high':'watch')));
+    myManagedBriefs().filter(b=>['Team Lead Review','In Review'].includes(String(b.status||''))&&!b.finalApproved&&radarWaitHours(b)>=2).slice(0,2).forEach(b=>{const h=radarWaitHours(b);push(radarBriefItem('account-review',b,`${b.client||b.project} review is still pending`,`${b.project||b.code} has been in review for about ${Math.round(h)}h.${radarDueCopy(b)}`,'CHECK REVIEW','brief',h>=6?'high':'watch'))});
+    riskSort(myManagedBriefs()).filter(x=>x.r.score>=35).slice(0,3).forEach(({b,r})=>push(radarBriefItem('account-risk',b,`${b.client||b.project} needs attention`,`${r.reasons.join(' • ')}.${radarDueCopy(b)}`,'OPEN BRIEF','brief',r.level==='HIGH'?'high':'watch')));
+  }else if(mode==='TEAM_LEAD'){
+    myTeamLeadQueue().slice().sort((a,z)=>radarWaitHours(z)-radarWaitHours(a)).slice(0,3).forEach(b=>{const h=radarWaitHours(b);push(radarBriefItem('lead-review',b,`${b.client||b.project} is waiting for your review`,`${b.project||b.code} has been waiting ${h>=1?Math.round(h)+'h':'less than 1h'}.${radarDueCopy(b)}`,'REVIEW NOW','brief',h>=6?'high':'watch'))});
+    riskSort(myAssignedBriefs()).filter(x=>x.r.score>=35).slice(0,2).forEach(({b,r})=>push(radarBriefItem('lead-risk',b,`${b.client||b.project} needs attention`,`${r.reasons.join(' • ')}.${radarDueCopy(b)}`,'OPEN BRIEF','brief',r.level==='HIGH'?'high':'watch')));
+  }else if(mode==='OWNER'){
+    riskSort(active).filter(x=>x.r.score>=35).slice(0,3).forEach(({b,r})=>push(radarBriefItem('owner-risk',b,`${b.client||b.project} needs attention`,`${r.reasons.join(' • ')}.${radarDueCopy(b)}`,'OPEN BRIEF','brief',r.level==='HIGH'?'high':'watch')));
+    const pressure=teamWorkload.slice().sort((a,z)=>teamOpenCount(z)-teamOpenCount(a))[0];if(pressure&&teamOpenCount(pressure)>=5){const key=`capacity:${pressure.userId||pressure.fullName}`;push({key,level:'watch',code:'TEAM CAPACITY',title:'Team capacity needs watching',copy:`${pressure.fullName} currently has ${teamOpenCount(pressure)} open briefs. This is workload visibility, not a performance score.`,actionLabel:'VIEW TEAM',onclick:'radarOpenTeam()'})}
+  }else{
+    const mine=myAssignedBriefs().filter(b=>!['Closed','Approved'].includes(String(b.status||'')));
+    const revisions=mine.filter(b=>String(b.status)==='Revision').slice(0,2);revisions.forEach(b=>push(radarBriefItem('revision',b,`${b.client||b.project} needs your revision`,`${b.project||b.code} has come back for changes.${radarDueCopy(b)}`,'OPEN REVISION','brief','high')));
+    riskSort(mine).filter(x=>x.r.score>=35&&String(x.b.status)!=='Revision').slice(0,2).forEach(({b,r})=>push(radarBriefItem('my-risk',b,`Finish ${b.client||b.project} first`,`${r.reasons.join(' • ')}.${radarDueCopy(b)}`,'OPEN WORK','brief',r.level==='HIGH'?'high':'watch')));
+    const next=mine.filter(b=>['Assigned','In Progress'].includes(String(b.status||''))&&b.deadline).sort((a,z)=>new Date(a.deadline)-new Date(z.deadline))[0];if(next)push(radarBriefItem('next',next,`Next up: ${next.client||next.project}`,`${next.project||next.code}.${radarDueCopy(next)}`,'OPEN WORK','brief','info'));
+  }
+  return items.slice(0,3)
+}
+function renderOnitRadar(mode){
+  const host=document.getElementById('onitRadar');if(!host||!currentUser)return;const items=buildRadarItems(mode),role=radarRoleName(mode),high=items.filter(i=>i.level==='high').length;
+  const headline=items.length?`${items.length} thing${items.length===1?'':'s'} need${items.length===1?'s':''} your attention`:'All clear right now';
+  const sub=items.length?`${role} view • ONIT is prioritising the work, not scoring people.`:`${role} view • Radar is still watching deadlines, reviews and workflow pressure.`;
+  const cards=items.length?`<div class='radarItems'>${items.map(i=>`<article class='radarCard'><div class='radarCardTop'><span class='radarLevel ${i.level}'>${i.level==='high'?'Needs action':i.level==='watch'?'Watch':'Next'}</span><span class='radarCode'>${escapeHTML(i.code||'ONIT')}</span></div><h3>${escapeHTML(i.title)}</h3><p>${escapeHTML(i.copy)}</p><div class='radarActions'><button class='radarAction' onclick="${i.onclick}">${escapeHTML(i.actionLabel)}</button><button class='radarIgnore' onclick="ignoreRadarItem('${escapeHTML(i.key).replace(/'/g,'&#39;')}')">IGNORE TODAY</button></div></article>`).join('')}</div>`:`<div class='radarClear'><div class='radarClearIcon'>✓</div><div><b>No urgent action detected.</b><span>ONIT will surface something here when a deadline, review or workflow condition genuinely needs you.</span></div></div>`;
+  host.innerHTML=`<section class='radarShell'><div class='radarTop'><div><div class='radarEyebrow'>ONIT RADAR</div><div class='radarHeadline'>${escapeHTML(headline)}</div><div class='radarSub'>${escapeHTML(sub)}</div></div><div class='radarLive'>${high?high+' HIGH':'LIVE'}</div></div>${cards}</section>`
+}
+
 function renderHome(){
   if(!currentUser)return;
   const orgName=rowVal(organisations[0],'Organisation Name')||'your organisation';
@@ -1444,6 +1518,7 @@ function renderHome(){
     document.getElementById('homeSub').textContent=`Here’s what’s happening in your ONIT workspace today.`;
     primaryTitle.textContent='MY BRIEFS / INBOX';primaryCopy.textContent='Open a brief to read it, start the job, and reply with your completed work.';
   }
+  renderOnitRadar(mode);
   renderAccountPortfolio();
   document.getElementById('homePrimarySection').classList.toggle('hidden',mode==='ACCOUNT');
   const active=scope.filter(b=>!['Closed','Approved'].includes(b.status));
@@ -1977,7 +2052,7 @@ function renderMore(){if(!currentUser)return;const names=backendAccess();let htm
   if(names.length){html+=`<div class='morecard' style='grid-column:1/-1'><h3>BACKEND DATA</h3><div class='bigTiny'>Read-only data access is enforced inside ONIT. Raw Google Sheet access is not granted to staff. CD, DCD and MD can download directly. Other staff need one approval from any one of them.</div><div class='bigTiny'>${escapeHTML(names.join(' • '))}</div><button class='secondary linkbtn' onclick="show('data')">OPEN DATA CONSOLE</button></div>`}
   html+=dataExportRequestsMarkup();
   html+=`<div class='morecard' style='grid-column:1/-1'><h3>INSTALL / UPDATE ONIT</h3><div class='bigTiny'>Install ONIT on this device for quick access. ONIT now checks the hosted frontend version automatically and repairs stale installed copies without requiring a reinstall.</div><div class='actions'><button class='secondary linkbtn' onclick='installOnit()'>INSTALL ON THIS DEVICE</button><button class='secondary linkbtn' onclick='forceFrontendUpdate()'>CHECK / REPAIR UPDATE</button></div></div>`;
-  html+=`<div class='morecard' style='grid-column:1/-1'><h3>HELP / ABOUT</h3><div class='bigTiny'>ONIT Frontend v${APP_VERSION} • Backend ${backendVersion||'checking…'} • Time + People + Status<br>Every brief has an owner, deadline, status and visible history.<br>Live Brief Overview, Daily/Weekly Team Work Utilisation, Buzzer, ONIT Pulse, Digital Pulse, Risk Radar, Brief Replay and Handover Mode are active.<br>Profile photos, governed PDF data exports, Owner Broadcasts, Staff Account Management and approved-job staff archives are active.<br>Account Managers capture briefs into the Traffic Queue; the Traffic Manager prioritises, schedules and releases them into production. The Traffic Manager, Dr. Kunbi, Creative Director, Deputy Creative Director and Managing Director can still create/send operational briefs directly. Account Management + Traffic share one organisation-wide account / brand pool, and a brief can be assigned to multiple team members at once. Work submissions can contain multiple files, links and text blocks without bypassing approval. Review-state work is surfaced directly on the dashboard and opens into the submitted work for faster review. Brief visibility is private by workflow: sender, assigned/CC users, relevant Team Lead review, final approver stage and System Owner only.<br>Owner-assigned Team Leads provide first-stage approval before CD/DCD final approval.<br>Installed HTTPS/PWA copies check automatically for frontend updates; backend changes are live immediately.<br>The System Owner account administers data access separately from operational staff roles and can correct staff emails, send password-reset codes, deactivate/reactivate staff and preserve historical work.</div></div></div>`;document.getElementById('moreContent').innerHTML=html;hydrateProfilePhotos()}
+  html+=`<div class='morecard' style='grid-column:1/-1'><h3>HELP / ABOUT</h3><div class='bigTiny'>ONIT Frontend v${APP_VERSION} • Backend ${backendVersion||'checking…'} • Time + People + Status<br>Every brief has an owner, deadline, status and visible history.<br>Live Brief Overview, Daily/Weekly Team Work Utilisation, Buzzer, ONIT Pulse, Digital Pulse, ONIT Radar, Risk Radar, Brief Replay and Handover Mode are active.<br>Profile photos, governed PDF data exports, Owner Broadcasts, Staff Account Management and approved-job staff archives are active.<br>Account Managers capture briefs into the Traffic Queue; the Traffic Manager prioritises, schedules and releases them into production. The Traffic Manager, Dr. Kunbi, Creative Director, Deputy Creative Director and Managing Director can still create/send operational briefs directly. Account Management + Traffic share one organisation-wide account / brand pool, and a brief can be assigned to multiple team members at once. Work submissions can contain multiple files, links and text blocks without bypassing approval. Review-state work is surfaced directly on the dashboard and opens into the submitted work for faster review. Brief visibility is private by workflow: sender, assigned/CC users, relevant Team Lead review, final approver stage and System Owner only.<br>Owner-assigned Team Leads provide first-stage approval before CD/DCD final approval.<br>Installed HTTPS/PWA copies check automatically for frontend updates; backend changes are live immediately.<br>The System Owner account administers data access separately from operational staff roles and can correct staff emails, send password-reset codes, deactivate/reactivate staff and preserve historical work.</div></div></div>`;document.getElementById('moreContent').innerHTML=html;hydrateProfilePhotos()}
 async function approvePending(id){
   const targetUserId=decodeURIComponent(id),target=pendingUsers.find(u=>String(rowVal(u,'User ID'))===String(targetUserId)),name=target?rowVal(target,'Full Name'):'The member';
   try{
@@ -2248,6 +2323,6 @@ async function boot(){if(SESSION_TOKEN){document.getElementById('authGate').clas
 boot();
 </script>
 <script src="./cases-module.js?v=0.20.0"></script>
-<script src="./pulse-module.js?v=0.21.3"></script>
+<script src="./pulse-module.js?v=0.22.0"></script>
 </body>
 </html>
