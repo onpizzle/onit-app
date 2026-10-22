@@ -1083,7 +1083,7 @@ img,video,canvas,svg{max-width:100%}
 <script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-messaging-compat.js"></script>
-<script>const APP_VERSION='0.22.0';
+<script>const APP_VERSION='0.22.1';
 const BACKEND_DATASETS=['USERS','CLIENTS','BRIEFS','ASSIGNMENTS','ITERATIONS','ACTIVITY_LOG','NOTIFICATIONS','REPORTS'];
 const API_URL='https://script.google.com/macros/s/AKfycbyLVpsQLFCpQWRIvRndw66sghmu5rtK31cuthS7hXjJ--lf703mJPIbJ2zpLDIlH76b/exec';
 let ORG_ID=localStorage.getItem('onit-org')||'';
@@ -1437,17 +1437,23 @@ function radarDueCopy(b){if(!b?.deadline)return '';const ms=new Date(b.deadline)
 function radarOpenBrief(encoded){detail(decodeURIComponent(encoded||''))}
 function radarOpenTraffic(encoded){const code=decodeURIComponent(encoded||'');if(typeof openTrafficManager==='function')openTrafficManager(encodeURIComponent(code));else detail(code)}
 function radarOpenTeam(){show('team')}
+function radarOpenAdmin(){show('more')}
 function radarRoleName(mode){return({TRAFFIC:'Traffic',ACCOUNT:'Account Management',LEADERSHIP:'Creative Leadership',TEAM_LEAD:'Team Lead',OWNER:'System Owner',STAFF:'My Work'})[mode]||'My Work'}
 function radarBriefItem(kind,b,title,copy,actionLabel='OPEN BRIEF',action='brief',level){
   const r=riskForBrief(b),encoded=encodeURIComponent(b.code||''),key=`${kind}:${b.code}`;
   return{key,level:level||(r.level==='HIGH'?'high':r.level==='WATCH'?'watch':'info'),code:b.code||'',title,copy,actionLabel,onclick:action==='traffic'?`radarOpenTraffic('${encoded}')`:`radarOpenBrief('${encoded}')`}
 }
 function buildRadarItems(mode){
-  const items=[],active=briefs.filter(b=>!['Closed','Approved'].includes(String(b.status||''))),push=x=>{if(x&&!radarIgnored(x.key)&&!items.some(i=>i.key===x.key))items.push(x)};
+  const items=[],active=briefs.filter(b=>!['Closed','Approved'].includes(String(b.status||''))),push=x=>{if(!x||radarIgnored(x.key)||items.some(i=>i.key===x.key)||(x.code&&items.some(i=>i.code===x.code)))return;items.push(x)};
   const riskSort=list=>list.slice().map(b=>({b,r:riskForBrief(b)})).sort((a,z)=>z.r.score-a.r.score);
   if(mode==='LEADERSHIP'){
-    myFinalApprovalQueue().slice().sort((a,z)=>radarWaitHours(z)-radarWaitHours(a)).slice(0,2).forEach(b=>{const h=radarWaitHours(b);push(radarBriefItem('approval',b,`${b.client||b.project} needs your approval`,`${b.project||b.code} has been waiting ${h>=1?Math.round(h)+'h':'less than 1h'} for final review.${radarDueCopy(b)}`,'REVIEW NOW','brief',h>=6?'high':'watch'))});
-    const leadershipScope=[...new Map([...myAssignedBriefs(),...myManagedBriefs()].map(b=>[b.code,b])).values()];riskSort(leadershipScope).filter(x=>x.r.score>=35).slice(0,3).forEach(({b,r})=>push(radarBriefItem('risk',b,`${b.client||b.project} is moving into risk`,`${r.reasons.join(' • ')}.${radarDueCopy(b)}`,'OPEN BRIEF','brief',r.level==='HIGH'?'high':'watch')));
+    // Leadership owns agency-wide operational attention, not only briefs personally assigned/created.
+    myFinalApprovalQueue().slice().sort((a,z)=>radarWaitHours(z)-radarWaitHours(a)).slice(0,3).forEach(b=>{const h=radarWaitHours(b);push(radarBriefItem('approval',b,`${b.client||b.project} needs your approval`,`${b.project||b.code} has been waiting ${h>=1?Math.round(h)+'h':'less than 1h'} for final review.${radarDueCopy(b)}`,'REVIEW NOW','brief',h>=6?'high':'watch'))});
+    riskSort(active).filter(x=>x.r.score>=35).slice(0,8).forEach(({b,r})=>{
+      const traffic=isTrafficQueuedBrief(b),title=traffic?`${b.client||b.project} needs Traffic attention`:`${b.client||b.project} is moving into risk`,actionLabel=traffic?'MANAGE SCHEDULE':'OPEN BRIEF',action=traffic?'traffic':'brief';
+      push(radarBriefItem('leadership-risk',b,title,`${r.reasons.join(' • ')}.${radarDueCopy(b)}`,actionLabel,action,r.level==='HIGH'?'high':'watch'))
+    });
+    const pressure=teamWorkload.slice().sort((a,z)=>teamOpenCount(z)-teamOpenCount(a))[0];if(pressure&&teamOpenCount(pressure)>=5){const key=`leadership-capacity:${pressure.userId||pressure.fullName}`;push({key,level:'watch',code:'TEAM CAPACITY',title:'Agency capacity needs watching',copy:`${pressure.fullName} currently has ${teamOpenCount(pressure)} open briefs. This is workload visibility, not a performance score.`,actionLabel:'VIEW TEAM',onclick:'radarOpenTeam()'})}
   }else if(mode==='TRAFFIC'){
     trafficQueueBriefs().slice(0,3).forEach(b=>{const urgent=['High','Urgent'].includes(String(b.priority)),held=b.status==='Traffic Hold';push(radarBriefItem('traffic',b,held?`${b.client||b.project} is on Traffic hold`:`${b.client||b.project} needs Traffic`,held?(b.trafficHoldReason||'This brief is waiting for a scheduling decision.'):`${b.priority||'Normal'} priority brief is waiting to be scheduled and released.${radarDueCopy(b)}`,'MANAGE SCHEDULE','traffic',urgent?'high':'watch'))});
     riskSort(active).filter(x=>x.r.reasons.some(r=>/clash|open briefs/i.test(r))&&x.r.score>=35).slice(0,3).forEach(({b,r})=>push(radarBriefItem('collision',b,'Potential workload collision',`${b.assignee||'Assigned team member'}: ${r.reasons.filter(x=>/clash|open briefs/i.test(x)).join(' • ')}.${radarDueCopy(b)}`,'MANAGE SCHEDULE','traffic',r.level==='HIGH'?'high':'watch')));
@@ -1459,8 +1465,12 @@ function buildRadarItems(mode){
     myTeamLeadQueue().slice().sort((a,z)=>radarWaitHours(z)-radarWaitHours(a)).slice(0,3).forEach(b=>{const h=radarWaitHours(b);push(radarBriefItem('lead-review',b,`${b.client||b.project} is waiting for your review`,`${b.project||b.code} has been waiting ${h>=1?Math.round(h)+'h':'less than 1h'}.${radarDueCopy(b)}`,'REVIEW NOW','brief',h>=6?'high':'watch'))});
     riskSort(myAssignedBriefs()).filter(x=>x.r.score>=35).slice(0,2).forEach(({b,r})=>push(radarBriefItem('lead-risk',b,`${b.client||b.project} needs attention`,`${r.reasons.join(' • ')}.${radarDueCopy(b)}`,'OPEN BRIEF','brief',r.level==='HIGH'?'high':'watch')));
   }else if(mode==='OWNER'){
-    riskSort(active).filter(x=>x.r.score>=35).slice(0,3).forEach(({b,r})=>push(radarBriefItem('owner-risk',b,`${b.client||b.project} needs attention`,`${r.reasons.join(' • ')}.${radarDueCopy(b)}`,'OPEN BRIEF','brief',r.level==='HIGH'?'high':'watch')));
-    const pressure=teamWorkload.slice().sort((a,z)=>teamOpenCount(z)-teamOpenCount(a))[0];if(pressure&&teamOpenCount(pressure)>=5){const key=`capacity:${pressure.userId||pressure.fullName}`;push({key,level:'watch',code:'TEAM CAPACITY',title:'Team capacity needs watching',copy:`${pressure.fullName} currently has ${teamOpenCount(pressure)} open briefs. This is workload visibility, not a performance score.`,actionLabel:'VIEW TEAM',onclick:'radarOpenTeam()'})}
+    // System Owner Radar is platform/admin health only. Operational agency risk belongs to Leadership.
+    if(pendingUsers.length){const n=pendingUsers.length;push({key:'owner:pending-signups',level:n>=3?'high':'watch',code:'ACCESS',title:`${n} signup request${n===1?' is':'s are'} waiting`,copy:'New staff accounts are waiting for approval before they can enter the organisation workspace.',actionLabel:'REVIEW SIGNUPS',onclick:'radarOpenAdmin()'})}
+    const incomplete=(accessDirectory||[]).filter(u=>permissionProfile(u)!=='ORG_OWNER'&&String(rowVal(u,'Status')||'Active').toLowerCase()!=='inactive'&&(!rowVal(u,'Email')||!departmentOf(u)||!positionOf(u)));
+    if(incomplete.length){const n=incomplete.length;push({key:'owner:incomplete-staff',level:'watch',code:'STAFF SETUP',title:`${n} staff profile${n===1?' needs':'s need'} setup`,copy:'One or more active staff accounts are missing an email, department or position. Complete them so permissions and routing remain accurate.',actionLabel:'MANAGE STAFF',onclick:'radarOpenAdmin()'})}
+    const org=organisations[0],configMissing=[];if(!org||!rowVal(org,'Organisation Name'))configMissing.push('organisation name');if(securityInfo&&!securityInfo.inviteCode)configMissing.push('join code');
+    if(configMissing.length){push({key:'owner:org-config',level:'high',code:'CONFIG',title:'Organisation setup needs attention',copy:`Missing ${configMissing.join(' and ')}. Complete the platform configuration before onboarding more staff.`,actionLabel:'OPEN ADMIN',onclick:'radarOpenAdmin()'})}
   }else{
     const mine=myAssignedBriefs().filter(b=>!['Closed','Approved'].includes(String(b.status||'')));
     const revisions=mine.filter(b=>String(b.status)==='Revision').slice(0,2);revisions.forEach(b=>push(radarBriefItem('revision',b,`${b.client||b.project} needs your revision`,`${b.project||b.code} has come back for changes.${radarDueCopy(b)}`,'OPEN REVISION','brief','high')));
@@ -1471,9 +1481,11 @@ function buildRadarItems(mode){
 }
 function renderOnitRadar(mode){
   const host=document.getElementById('onitRadar');if(!host||!currentUser)return;const items=buildRadarItems(mode),role=radarRoleName(mode),high=items.filter(i=>i.level==='high').length;
-  const headline=items.length?`${items.length} thing${items.length===1?'':'s'} need${items.length===1?'s':''} your attention`:'All clear right now';
-  const sub=items.length?`${role} view • ONIT is prioritising the work, not scoring people.`:`${role} view • Radar is still watching deadlines, reviews and workflow pressure.`;
-  const cards=items.length?`<div class='radarItems'>${items.map(i=>`<article class='radarCard'><div class='radarCardTop'><span class='radarLevel ${i.level}'>${i.level==='high'?'Needs action':i.level==='watch'?'Watch':'Next'}</span><span class='radarCode'>${escapeHTML(i.code||'ONIT')}</span></div><h3>${escapeHTML(i.title)}</h3><p>${escapeHTML(i.copy)}</p><div class='radarActions'><button class='radarAction' onclick="${i.onclick}">${escapeHTML(i.actionLabel)}</button><button class='radarIgnore' onclick="ignoreRadarItem('${escapeHTML(i.key).replace(/'/g,'&#39;')}')">IGNORE TODAY</button></div></article>`).join('')}</div>`:`<div class='radarClear'><div class='radarClearIcon'>✓</div><div><b>No urgent action detected.</b><span>ONIT will surface something here when a deadline, review or workflow condition genuinely needs you.</span></div></div>`;
+  const headline=items.length?(mode==='OWNER'?`${items.length} admin item${items.length===1?'':'s'} need${items.length===1?'s':''} your attention`:`${items.length} thing${items.length===1?'':'s'} need${items.length===1?'s':''} your attention`):'All clear right now';
+  const sub=mode==='OWNER'?'System Owner view • ONIT is watching platform access and administration, not agency workload.':mode==='LEADERSHIP'?'Creative Leadership view • Agency-wide operational attention; ONIT prioritises work, not people.':items.length?`${role} view • ONIT is prioritising the work, not scoring people.`:`${role} view • Radar is still watching deadlines, reviews and workflow pressure.`;
+  const clearCopy=mode==='OWNER'?'No platform or access action needs you right now.':mode==='LEADERSHIP'?'No agency-wide deadline, review or workflow condition needs leadership attention right now.':'No urgent action detected.';
+  const clearDetail=mode==='OWNER'?'ONIT will surface pending sign-ups, staff setup and organisation configuration issues here.':'ONIT will surface something here when a deadline, review or workflow condition genuinely needs you.';
+  const cards=items.length?`<div class='radarItems'>${items.map(i=>`<article class='radarCard'><div class='radarCardTop'><span class='radarLevel ${i.level}'>${i.level==='high'?'Needs action':i.level==='watch'?'Watch':'Next'}</span><span class='radarCode'>${escapeHTML(i.code||'ONIT')}</span></div><h3>${escapeHTML(i.title)}</h3><p>${escapeHTML(i.copy)}</p><div class='radarActions'><button class='radarAction' onclick="${i.onclick}">${escapeHTML(i.actionLabel)}</button><button class='radarIgnore' onclick="ignoreRadarItem('${escapeHTML(i.key).replace(/'/g,'&#39;')}')">IGNORE TODAY</button></div></article>`).join('')}</div>`:`<div class='radarClear'><div class='radarClearIcon'>✓</div><div><b>${escapeHTML(clearCopy)}</b><span>${escapeHTML(clearDetail)}</span></div></div>`;
   host.innerHTML=`<section class='radarShell'><div class='radarTop'><div><div class='radarEyebrow'>ONIT RADAR</div><div class='radarHeadline'>${escapeHTML(headline)}</div><div class='radarSub'>${escapeHTML(sub)}</div></div><div class='radarLive'>${high?high+' HIGH':'LIVE'}</div></div>${cards}</section>`
 }
 
