@@ -1,0 +1,30 @@
+/* ONIT Cases private-pilot module v0.20.0 */
+.casesShell{display:grid;grid-template-columns:minmax(0,1fr);gap:16px}
+.casesTop{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;flex-wrap:wrap}
+.casesTop h1{margin:0;font-size:30px}.casesTop .actions{margin-top:0}
+.casesSubnav{display:flex;gap:8px;flex-wrap:wrap;padding-bottom:6px;border-bottom:1px solid #eee}
+.casesSubnav button{border:1px solid #ddd;background:#fff;border-radius:999px;padding:9px 13px;font-weight:800;cursor:pointer}
+.casesSubnav button.active{background:#171717;color:#fff;border-color:#171717}
+.casesGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.caseCard{border:1px solid #e7e7e2;border-radius:14px;padding:16px;background:#fff;cursor:pointer;transition:.15s ease}
+.caseCard:hover{transform:translateY(-1px);box-shadow:0 10px 28px rgba(0,0,0,.06)}
+.caseCard h3{margin:5px 0 6px;font-size:17px}.caseMeta{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}
+.caseStatus{font-size:10px;font-weight:900;letter-spacing:.04em;padding:5px 8px;border-radius:999px;background:#f1f1ee;text-transform:uppercase}
+.caseScore{display:inline-grid;place-items:center;width:52px;height:52px;border-radius:50%;background:#171717;color:#fff;font-weight:900;font-size:16px;flex:0 0 auto}
+.caseHead{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+.casePanel{border:1px solid #e7e7e2;border-radius:14px;padding:16px;background:#fff}.casePanel h3{margin:0 0 10px;font-size:14px}
+.caseStatGrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.caseStat{padding:13px;border-radius:12px;background:#f7f7f4}.caseStat b{display:block;font-size:22px}.caseStat span{font-size:10px;color:#777;font-weight:800}
+.caseProgress{height:9px;background:#ecece8;border-radius:999px;overflow:hidden}.caseProgress span{display:block;height:100%;background:#171717;border-radius:999px}
+.caseIssue{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;padding:11px 0;border-bottom:1px solid #eee}.caseIssue:last-child{border-bottom:0}.caseIssue b{font-size:13px}.caseIssue .tiny{max-width:560px}
+.caseGood{border-left:4px solid #139447}.caseWarn{border-left:4px solid #e98712}.caseDanger{border-left:4px solid #d6382f}
+.caseEvidence{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;padding:11px 0;border-bottom:1px solid #eee}.caseEvidence:last-child{border-bottom:0}
+.caseTable{width:100%;border-collapse:collapse;font-size:12px}.caseTable th,.caseTable td{text-align:left;padding:9px;border-bottom:1px solid #eee;vertical-align:top}.caseTable th{font-size:10px;color:#777;text-transform:uppercase;letter-spacing:.03em}
+.caseEmpty{padding:24px;border:1px dashed #ccc;border-radius:12px;color:#777;text-align:center}
+.caseLock{padding:18px;border:1px solid #ead8d4;background:#fffafa;border-radius:14px}.caseLock b{display:block;margin-bottom:5px}
+.ownerCasesBar{padding:14px;border:1px solid #dedbd6;background:#f8f7f4;border-radius:12px;margin-bottom:12px}.ownerCasesBar .actions{margin-top:10px}
+.caseMemberRow{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:center;padding:11px 0;border-bottom:1px solid #eee}.caseMemberRow:last-child{border-bottom:0}
+.caseStudioGrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.caseStudioGrid .field{margin:0}.caseStudioGrid .wide{grid-column:1/-1}
+.caseHeroPreview{min-height:220px;border-radius:14px;background:#171717;color:#fff;padding:28px;display:flex;flex-direction:column;justify-content:flex-end}.caseHeroPreview h2{font-size:28px;margin:0 0 8px;max-width:760px}.caseHeroPreview p{margin:0;color:#ddd;max-width:760px}
+.caseApproval{padding:14px;border:1px solid #e7e7e2;border-radius:12px;margin:10px 0}.caseApproval.approved{background:#ecf8f0;border-color:#bfe5cb}.caseApproval.revision{background:#fff5e8;border-color:#f1d4ad}
+.casesTestFlag{display:inline-block;padding:5px 8px;border-radius:999px;background:#fff5e8;color:#9b5b08;font-size:10px;font-weight:900}
+@media(max-width:760px){.casesGrid,.caseStudioGrid{grid-template-columns:1fr}.caseStatGrid{grid-template-columns:repeat(2,1fr)}.caseStudioGrid .wide{grid-column:auto}.caseTable{display:block;overflow-x:auto}.caseScore{width:46px;height:46px}}

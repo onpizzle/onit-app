@@ -829,6 +829,7 @@ img,video,canvas,svg{max-width:100%}
 .reviewQueueNote{font-size:11px;color:#777;margin-top:6px}
 @media(max-width:760px){.reviewPreviewModal{padding:4px!important}.reviewPreviewModal .modalBox{width:100%!important;height:calc(100dvh - 8px)!important;max-height:none!important;border-radius:12px!important}.previewAssetStage{padding:5px}.previewFooter{padding:7px}.previewNav{justify-content:flex-start;overflow-x:auto;flex-wrap:nowrap}.previewNav .mini{white-space:nowrap}}
 </style>
+<link rel="stylesheet" href="./cases-module.css?v=0.20.0">
 </head>
 <body>
 <div id="loadbar" class="loadbar hidden"></div>
@@ -882,6 +883,7 @@ img,video,canvas,svg{max-width:100%}
     <button data-section="team" onclick="show('team',this)"><span class="navIcon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3" fill="none" stroke="currentColor" stroke-width="1.7"/><circle cx="17" cy="9" r="2.3" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M3.5 20c.6-4 2.4-6 5.5-6s4.9 2 5.5 6M14.2 15.2c2.8-.5 5.3 1.1 6.3 4.8" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></span><span class="navLabel">Team</span></button>
     <button data-section="archive" onclick="show('archive',this)"><span class="navIcon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6.5h16v13H4zM3 3.5h18v3H3z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M9 11h6" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></span><span class="navLabel">Archive</span></button>
     <button id="navData" class="hiddenByRole" data-section="data" onclick="show('data',this)"><span class="navIcon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5h14v14H5zM8 9h8M8 13h8M8 17h5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="navLabel">Data</span></button>
+    <button id="navCases" class="hiddenByRole" data-section="cases" onclick="show('cases',this)"><span class="navIcon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7.5h6l1.5 2H20v9.5H4zM4 7.5V5h6l1.5 2.5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="navLabel">Cases</span></button>
     <button data-section="more" onclick="show('more',this)"><span class="navIcon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M19 12a7 7 0 0 0-.1-1l2-1.6-2-3.4-2.5 1a7 7 0 0 0-1.8-1L14.2 3h-4.4l-.4 3a7 7 0 0 0-1.8 1L5.1 6 3 9.4 5.1 11a7 7 0 0 0 0 2L3 14.6 5.1 18l2.5-1a7 7 0 0 0 1.8 1l.4 3h4.4l.4-3a7 7 0 0 0 1.8-1l2.5 1 2.1-3.4-2.1-1.6c.1-.3.1-.7.1-1z" fill="none" stroke="currentColor" stroke-width="1.45" stroke-linejoin="round"/></svg></span><span class="navLabel">Settings</span></button>
   </div>
   <div class="navFooter">
@@ -957,6 +959,7 @@ img,video,canvas,svg{max-width:100%}
   <div id="dataViewer" class="card"><div class="empty">Choose a data area above.</div></div>
 </section>
 
+<section id="cases" class="hidden"><div id="casesRoot"><div class="caseEmpty">Cases is locked until ONIT verifies access.</div></div></section>
 <section id="more" class="hidden"><h1>Settings</h1><p class="muted">Manage your profile, notifications, access and organisation preferences.</p><div id="moreContent"></div></section>
 
 <section id="newbrief" class="hidden">
@@ -1002,7 +1005,7 @@ img,video,canvas,svg{max-width:100%}
 <script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-messaging-compat.js"></script>
-<script>const APP_VERSION='0.19.7';
+<script>const APP_VERSION='0.20.0';
 const BACKEND_DATASETS=['USERS','CLIENTS','BRIEFS','ASSIGNMENTS','ITERATIONS','ACTIVITY_LOG','NOTIFICATIONS','REPORTS'];
 const API_URL='https://script.google.com/macros/s/AKfycbyY98jKIh2ls8jKsB5w2H7YG3Okj61AoIkt3-2x0LBnvRVwDgBhrQnVr1Ghfu04J7YB/exec';
 let ORG_ID=localStorage.getItem('onit-org')||'';
@@ -2184,5 +2187,6 @@ setInterval(()=>{const now=Date.now(),gap=firebaseRealtimeHealthy?60000:15000;if
 async function boot(){if(SESSION_TOKEN){document.getElementById('authGate').classList.add('hidden');document.getElementById('appShell').classList.remove('hidden');await loadFromGoogle(false);if(SESSION_TOKEN)return}document.getElementById('appShell').classList.add('hidden');document.getElementById('authGate').classList.remove('hidden');showAuthMode('signin')}
 boot();
 </script>
+<script src="./cases-module.js?v=0.20.0"></script>
 </body>
 </html>
