@@ -1,0 +1,24 @@
+/* ONIT Digital Pulse v0.21.0 */
+.dpShell{max-width:1240px;margin:0 auto}.dpTop{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:14px}.dpTop h1{margin:3px 0 5px;font-size:27px}.dpEyebrow{font-size:10px;font-weight:900;letter-spacing:.11em;color:#f04b2f}.dpLive{display:inline-flex;align-items:center;gap:6px;border:1px solid #e8e3dd;border-radius:999px;padding:8px 10px;font-size:10px;font-weight:900;background:#fff}.dpLive i{width:7px;height:7px;border-radius:50%;background:#25ae72;box-shadow:0 0 0 4px rgba(37,174,114,.10)}.pulseTabs{display:flex;gap:7px;flex-wrap:wrap;padding-bottom:12px;margin-bottom:14px;border-bottom:1px solid #eee9e3}.pulseTabs button{border:1px solid #e6e1db;background:#fff;border-radius:999px;padding:9px 13px;font-size:11px;font-weight:900;cursor:pointer}.pulseTabs button.active{background:#171717;color:#fff;border-color:#171717}.dpCard{background:#fff;border:1px solid #e7e2dc;border-radius:14px;padding:16px;margin-bottom:14px}.dpCard h3{font-size:13px;margin:0 0 8px}.dpCard p{margin:2px 0;font-size:12px}.dpCardHead{display:flex;justify-content:space-between;gap:14px;align-items:flex-start;margin-bottom:12px}.dpGrid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.dpMetrics{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:0 0 14px}.dpMetric{background:#fff;border:1px solid #e7e2dc;border-radius:13px;padding:14px;display:flex;flex-direction:column;gap:3px}.dpMetric span{font-size:9px;font-weight:900;letter-spacing:.08em;color:#777}.dpMetric b{font-size:23px}.dpMetric small{color:#888;font-size:10px}.dpChecklist{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:13px}.dpChecklist label,.dpCandidate{display:flex;gap:9px;align-items:center;background:#f8f6f3;border:1px solid #eee9e3;border-radius:10px;padding:11px 12px;font-size:12px;font-weight:700}.dpCandidate{margin:10px 0 12px;background:#fff8f2}.dpFormRow,.dpFormGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.dpFormGrid .wide{grid-column:1/-1}.dpFormGrid textarea{min-height:86px}.dpRow{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid #f0ece7}.dpRow:last-child{border-bottom:0}.dpRow>div:first-child{min-width:0}.dpRow b{display:block;font-size:12px}.dpRow small{display:block;color:#777;margin-top:3px;font-size:10.5px;line-height:1.4;white-space:normal}.dpRowActions{display:flex;gap:6px;flex-wrap:wrap}.dpPerson{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #f0ece7}.dpPerson:last-child{border-bottom:0}.dpPerson b{display:block;font-size:12px}.dpPerson small{display:block;font-size:10px;color:#777;margin-top:2px}.dpDot{width:9px;height:9px;border-radius:50%;background:#c9c4bd;flex:0 0 9px}.dpDot.active{background:#25ae72}.dpDot.watch{background:#f7b840}.dpDot.alert{background:#e65b4f}.dpCaseFlag{font-size:9px;font-weight:900;letter-spacing:.08em;color:#8a4b00;background:#fff1dc;border:1px solid #f3d4aa;border-radius:999px;padding:6px 8px}.dpSentiment{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.dpSentiment div{border:1px solid #eee9e3;border-radius:12px;padding:14px;text-align:center}.dpSentiment b{display:block;font-size:22px}.dpSentiment span{font-size:10px;color:#777}.dpLoading,.dpLock{border:1px dashed #dcd6cf;border-radius:13px;padding:26px;display:flex;align-items:center;justify-content:center;gap:12px;text-align:left;color:#666}.dpSpinner{width:18px;height:18px;border:2px solid #ddd;border-top-color:#f04b2f;border-radius:50%;animation:dpSpin .8s linear infinite}@keyframes dpSpin{to{transform:rotate(360deg)}}
+@media(max-width:760px){.dpTop{align-items:flex-start}.dpTop .actions{flex-direction:column;align-items:flex-end}.dpGrid,.dpMetrics,.dpFormRow,.dpFormGrid,.dpChecklist{grid-template-columns:1fr}.dpFormGrid .wide{grid-column:auto}.dpMetrics{grid-template-columns:repeat(2,1fr)}.dpRow{align-items:flex-start;flex-direction:column}.dpRowActions{width:100%}.dpRowActions button{flex:1}.pulseTabs{overflow-x:auto;flex-wrap:nowrap;padding-bottom:10px}.pulseTabs button{white-space:nowrap}}
+
+/* ONIT v0.21.3 — mobile Pulse header containment */
+@media(max-width:760px){
+  .dpShell{width:100%;max-width:100%;min-width:0;overflow-x:hidden}
+  .dpTop{display:block;width:100%;max-width:100%;margin-bottom:16px}
+  .dpTop>div:first-child{width:100%;min-width:0;max-width:100%}
+  .dpTop .actions{
+    display:flex!important;
+    flex-direction:row!important;
+    align-items:center!important;
+    justify-content:flex-start!important;
+    flex-wrap:wrap!important;
+    width:100%!important;
+    max-width:100%!important;
+    gap:8px!important;
+    margin-top:14px!important;
+  }
+  .dpTop .actions>*{flex:0 0 auto;max-width:100%}
+  .dpTop .actions .secondary{width:auto!important;min-width:0!important;padding:9px 12px!important}
+  .dpTop .actions .pill,.dpTop .actions .dpLive{white-space:nowrap}
+}

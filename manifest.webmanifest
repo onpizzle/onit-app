@@ -1,7 +1,7 @@
 {
   "name": "ONIT \u2014 Time + People + Status",
   "short_name": "ONIT",
-  "description": "ONIT work traffic management with premium Owner Broadcast popups, live notifications and governed work workflows.",
+  "description": "ONIT agency operations: briefs, traffic, digital Pulse, live notifications, governed data and Cases.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
