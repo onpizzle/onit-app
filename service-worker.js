@@ -4,8 +4,25 @@ importScripts('https://www.gstatic.com/firebasejs/13.0.0/firebase-messaging-comp
 const FIREBASE_CONFIG={apiKey:'AIzaSyAmpqFDMfo6zAorD-f14hTQnSNFDFU6VHM',authDomain:'onit-backend-api.firebaseapp.com',projectId:'onit-backend-api',storageBucket:'onit-backend-api.firebasestorage.app',messagingSenderId:'1052909191157',appId:'1:1052909191157:web:392c4a50b453deb5ebeabc'};
 try{firebase.initializeApp(FIREBASE_CONFIG);firebase.messaging();}catch(e){}
 
-const CACHE='onit-v0.29.3-refresh-hotfix';
-const STATIC=['./offline.html','./manifest.webmanifest','./icons/icon-192.png','./icons/icon-512.png','./icons/apple-touch-icon.png','./assets/onit-logo-horizontal.png','./assets/onit-logo-full.png','./icons/favicon-32.png','./cases-module.css','./cases-module.js','./pulse-module.css','./pulse-module.js'];
+const CACHE='onit-v0.30.0-traffic-assist';
+try{
+  const messaging=firebase.messaging();
+  messaging.onBackgroundMessage(payload=>{
+    const n=payload.notification||{},d=payload.data||{},title=n.title||d.title||'ONIT';
+    const options={body:n.body||d.body||d.message||'You have a new ONIT update.',icon:'./icons/icon-192.png',badge:'./icons/favicon-32.png',data:{url:d.url||'./'}};
+    self.registration.showNotification(title,options);
+  });
+}catch(e){}
+self.addEventListener('notificationclick',event=>{
+  event.notification.close();
+  const url=(event.notification.data&&event.notification.data.url)||'./';
+  event.waitUntil(clients.matchAll({type:'window',includeUncontrolled:true}).then(list=>{
+    for(const c of list){if('focus'in c){try{c.navigate(url)}catch(e){}return c.focus()}}
+    return clients.openWindow?clients.openWindow(url):null;
+  }));
+});
+
+const STATIC=['./offline.html','./manifest.webmanifest','./icons/icon-192.png','./icons/icon-512.png','./icons/apple-touch-icon.png','./assets/onit-logo-horizontal.png','./assets/onit-logo-full.png','./icons/favicon-32.png','./cases-module.css','./cases-module.js','./pulse-module.css','./pulse-module.js','./assist-traffic-module.css','./assist-traffic-module.js'];
 
 self.addEventListener('install',event=>{
   event.waitUntil(caches.open(CACHE).then(c=>c.addAll(STATIC)).then(()=>self.skipWaiting()));
