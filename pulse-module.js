@@ -1,4 +1,4 @@
-/* ONIT Digital Pulse v0.21.1 — always-on digital operations */
+/* ONIT Digital Pulse v0.30.3 — resilient all-active-user access */
 (function(){
 'use strict';
 const state={cap:null,tab:'today',data:null,candidates:null,lastAt:0,lastCapAt:0,busy:false};
@@ -7,10 +7,13 @@ const val=(o,...ks)=>{for(const k of ks){if(o&&o[k]!==undefined&&o[k]!==null&&o[
 const api=(action,data={})=>apiPost(action,data,true).then(r=>r.data||r);
 const root=()=>document.getElementById('pulseRoot');
 const nav=()=>document.getElementById('navPulse');
-const allowed=()=>!!state.cap?.canUse;
+const currentUserObj=()=>typeof currentUser!=='undefined'&&currentUser?currentUser:null;
+const currentDepartment=()=>{const u=currentUserObj();return String((u&&((typeof rowVal==='function'&&rowVal(u,'Department'))||u['Department']||u.department))||'')};
+const fallbackCap=()=>{const active=typeof SESSION_TOKEN!=='undefined'&&!!SESSION_TOKEN&&typeof CURRENT_USER_ID!=='undefined'&&!!CURRENT_USER_ID;const digital=/digital/i.test(currentDepartment());return{canUse:active,canWrite:active&&digital,canPromoteToCases:active&&digital,isOwner:false,isDigital:digital,department:currentDepartment(),fallback:true}};
+const allowed=()=>state.cap?state.cap.canUse!==false:!!fallbackCap().canUse;
 const owner=()=>!!state.cap?.isOwner;
-const canWrite=()=>!!state.cap?.canWrite;
-const canPromote=()=>!!state.cap?.canPromoteToCases;
+const canWrite=()=>state.cap?!!state.cap.canWrite:!!fallbackCap().canWrite;
+const canPromote=()=>state.cap?!!state.cap.canPromoteToCases:!!fallbackCap().canPromoteToCases;
 function setNav(){const n=nav();if(n)n.classList.toggle('hiddenByRole',!allowed())}
 function fmtDate(v){if(!v)return '—';try{return new Date(v).toLocaleString([], {day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})}catch(e){return String(v)}}
 function num(v){v=Number(v);return Number.isFinite(v)?v:0}
@@ -20,7 +23,7 @@ function shell(body,title='Digital Pulse',sub='Always-on digital operations, lis
  return `<div class='dpShell'><div class='dpTop'><div><div class='dpEyebrow'>ONIT • DIGITAL</div><h1>${esc(title)}</h1><p class='muted'>${esc(sub)}</p></div><div class='actions'>${mode}<span class='dpLive'><i></i> LIVE</span><button class='secondary' onclick='DigitalPulse.refresh()'>REFRESH</button></div></div>${tabbar()}${body}</div>`;
 }
 function loading(label='Digital Pulse'){const r=root();if(r)r.innerHTML=shell(`<div class='dpLoading'><span class='dpSpinner'></span><div><b>Loading ${esc(label)}…</b><div class='tiny'>Your click registered. ONIT is refreshing Pulse.</div></div></div>`,label)}
-async function refreshCapabilities(force=false){if(typeof SESSION_TOKEN==='undefined'||!SESSION_TOKEN||typeof CURRENT_USER_ID==='undefined'||!CURRENT_USER_ID){state.cap=null;setNav();return null}if(!force&&state.cap&&Date.now()-state.lastCapAt<30000)return state.cap;try{state.cap=await api('PULSE_CAPABILITIES');state.lastCapAt=Date.now();setNav();return state.cap}catch(e){state.cap=null;setNav();return null}}
+async function refreshCapabilities(force=false){if(typeof SESSION_TOKEN==='undefined'||!SESSION_TOKEN||typeof CURRENT_USER_ID==='undefined'||!CURRENT_USER_ID){state.cap=null;setNav();return null}if(!force&&state.cap&&Date.now()-state.lastCapAt<30000)return state.cap;try{state.cap=await api('PULSE_CAPABILITIES');state.lastCapAt=Date.now();setNav();return state.cap}catch(e){state.cap=fallbackCap();state.cap.capabilityError=String(e&&e.message||e||'Pulse capability check failed');state.lastCapAt=Date.now();setNav();return state.cap}}
 async function load(force=false){if(!force&&state.data)return state.data;state.data=await api('PULSE_DASHBOARD');state.lastAt=Date.now();return state.data}
 function metric(label,value,hint=''){return `<div class='dpMetric'><span>${esc(label)}</span><b>${esc(value)}</b>${hint?`<small>${esc(hint)}</small>`:''}</div>`}
 function userName(id){const u=(state.data?.digitalUsers||[]).find(x=>val(x,'User ID','userId')===id);return u?val(u,'Full Name','fullName'):id||'Unassigned'}
@@ -53,7 +56,7 @@ function resolveEscalation(escalationId){if(!confirm('Mark this escalation as re
 function addMetric(){return mutate('PULSE_ADD_METRIC',{brand:text('pmBrand'),campaign:text('pmCampaign'),name:text('pmName'),value:text('pmValue'),unit:text('pmUnit'),platform:text('pmPlatform'),period:text('pmPeriod'),briefCode:text('pmBrief'),source:text('pmSource'),caseCandidate:checked('pmCase')},'Performance metric saved.')}
 async function sendToCases(sourceType,sourceId){if(!canPromote()){showToast('Digital Pulse','You do not have permission to send Pulse evidence to Cases.');return}const caseId=(prompt('Enter the ONIT Case ID to receive this evidence:','')||'').trim();if(!caseId)return;try{await api('PULSE_SEND_TO_CASES',{sourceType,sourceId,caseId});state.candidates=null;state.lastAt=0;showToast('Digital Pulse','Evidence sent to Cases Data Vault.');await render()}catch(e){alert(e.message)}}
 const originalApply=window.applyPermissions;if(typeof originalApply==='function')window.applyPermissions=function(){const r=originalApply.apply(this,arguments);setTimeout(()=>refreshCapabilities(true),0);return r};
-const originalShow=window.show;if(typeof originalShow==='function')window.show=function(id,btn){if(id==='pulse'&&!allowed()){refreshCapabilities(true).then(()=>{if(allowed())originalShow.call(window,id,btn);else showToast('Digital Pulse','Digital Pulse is available to active ONIT users.')});return}const r=originalShow.apply(this,arguments);if(id==='pulse')render();return r};
+const originalShow=window.show;if(typeof originalShow==='function')window.show=function(id,btn){const r=originalShow.apply(this,arguments);if(id==='pulse'){loading();render()}return r};
 const originalLoad=window.loadFromGoogle;if(typeof originalLoad==='function')window.loadFromGoogle=async function(){const r=await originalLoad.apply(this,arguments);if(!document.getElementById('pulse')?.classList.contains('hidden')){state.lastAt=0;render()}return r};
 window.addEventListener('focus',()=>{if(allowed()&&!document.getElementById('pulse')?.classList.contains('hidden'))refresh()});
 setInterval(()=>{if(allowed()&&!document.getElementById('pulse')?.classList.contains('hidden')&&!state.busy)refresh()},30000);
