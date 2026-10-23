@@ -4,7 +4,7 @@ importScripts('https://www.gstatic.com/firebasejs/13.0.0/firebase-messaging-comp
 const FIREBASE_CONFIG={apiKey:'AIzaSyAmpqFDMfo6zAorD-f14hTQnSNFDFU6VHM',authDomain:'onit-backend-api.firebaseapp.com',projectId:'onit-backend-api',storageBucket:'onit-backend-api.firebasestorage.app',messagingSenderId:'1052909191157',appId:'1:1052909191157:web:392c4a50b453deb5ebeabc'};
 try{firebase.initializeApp(FIREBASE_CONFIG);firebase.messaging();}catch(e){}
 
-const CACHE='onit-v0.30.7-pulse-quiet-sync';
+const CACHE='onit-v0.30.8-pulse-report-one-page-case';
 try{
   const messaging=firebase.messaging();
   messaging.onBackgroundMessage(payload=>{
