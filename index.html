@@ -1191,7 +1191,7 @@ html.onitReduceMotion *,html.onitReduceMotion *::before,html.onitReduceMotion *:
 <script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-messaging-compat.js"></script>
-<script>const APP_VERSION='0.30.5';
+<script>const APP_VERSION='0.30.6';
 const BACKEND_DATASETS=['USERS','CLIENTS','BRIEFS','ASSIGNMENTS','ITERATIONS','ACTIVITY_LOG','NOTIFICATIONS','REPORTS'];
 const API_URL='https://script.google.com/macros/s/AKfycbyLVpsQLFCpQWRIvRndw66sghmu5rtK31cuthS7hXjJ--lf703mJPIbJ2zpLDIlH76b/exec';
 let ORG_ID=localStorage.getItem('onit-org')||'';
@@ -1209,6 +1209,7 @@ let firebaseApp=null,firebaseDb=null,firebaseRealtimeHealthy=false,firebaseStart
 let currentBuzzer=null,buzzerQueue=[];
 let audioReady=false,onitAudioContext=null,pendingBriefSoundIds=new Set(),currentDetailTab='brief';
 const uiDirtySections=new Set();
+window.uiDirtySections=uiDirtySections;
 function uiSectionId(el){const s=el&&el.closest?el.closest('main>section'):null;return s?s.id:''}
 function markUiDirty(el){const id=uiSectionId(el);if(id)uiDirtySections.add(id)}
 function clearUiDirty(id){if(id)uiDirtySections.delete(id)}
@@ -2505,7 +2506,7 @@ async function fetchFrontendRelease(){
   return r.json();
 }
 function safeToReloadForUpdate(){
-  return !mutationBusy && (!window.uiDirtySections || uiDirtySections.size===0);
+  return !mutationBusy && uiDirtySections.size===0;
 }
 async function performFrontendRefresh(targetVersion,force){
   if(!force && !safeToReloadForUpdate()){
@@ -2542,7 +2543,7 @@ async function checkFrontendRelease(force=false){
   }catch(e){console.warn('Frontend version check:',e)}
 }
 async function forceFrontendUpdate(){
-  if(window.uiDirtySections && uiDirtySections.size){
+  if(uiDirtySections.size){
     if(!confirm('You have an unfinished form. Reload ONIT and discard those unsaved changes?'))return;
   }
   try{
@@ -2628,9 +2629,9 @@ setInterval(()=>{const now=Date.now(),gap=firebaseRealtimeHealthy?60000:15000;if
 async function boot(){if(SESSION_TOKEN){document.getElementById('authGate').classList.add('hidden');document.getElementById('appShell').classList.remove('hidden');await loadFromGoogle(false);if(SESSION_TOKEN)return}document.getElementById('appShell').classList.add('hidden');document.getElementById('authGate').classList.remove('hidden');showAuthMode('signin')}
 boot();
 </script>
-<script src="./cases-module.js?v=0.30.5"></script>
-<script src="./pulse-module.js?v=0.30.5"></script>
-<script src="./assist-traffic-module.js?v=0.30.5"></script>
+<script src="./cases-module.js?v=0.30.6"></script>
+<script src="./pulse-module.js?v=0.30.6"></script>
+<script src="./assist-traffic-module.js?v=0.30.6"></script>
 </body>
 </html>
 
