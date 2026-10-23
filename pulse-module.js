@@ -1,7 +1,7 @@
-/* ONIT Digital Pulse v0.30.3 — resilient all-active-user access */
+/* ONIT Digital Pulse v0.30.5 — draft-safe live refresh */
 (function(){
 'use strict';
-const state={cap:null,tab:'today',data:null,candidates:null,lastAt:0,lastCapAt:0,busy:false};
+const state={cap:null,tab:'today',data:null,candidates:null,lastAt:0,lastCapAt:0,busy:false,dirty:false,dirtyGroups:new Set()};
 const esc=v=>typeof escapeHTML==='function'?escapeHTML(String(v==null?'':v)):String(v==null?'':v).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 const val=(o,...ks)=>{for(const k of ks){if(o&&o[k]!==undefined&&o[k]!==null&&o[k]!=='')return o[k]}return ''};
 const api=(action,data={})=>apiPost(action,data,true).then(r=>r.data||r);
@@ -14,6 +14,52 @@ const allowed=()=>state.cap?state.cap.canUse!==false:!!fallbackCap().canUse;
 const owner=()=>!!state.cap?.isOwner;
 const canWrite=()=>state.cap?!!state.cap.canWrite:!!fallbackCap().canWrite;
 const canPromote=()=>state.cap?!!state.cap.canPromoteToCases:!!fallbackCap().canPromoteToCases;
+
+const DRAFT_GROUPS={
+ readiness:['pulseInbox','pulseOvernight','pulseUrgent','pulseScheduled','pulseHealth','pulseReadinessNote'],
+ engagement:['peBrand','peCampaign','pePlatform','peBrief','peComments','peDms','peWelcomes','peTopics','peNotes','peCase'],
+ content:['pcTitle','pcBrand','pcCampaign','pcPlatform','pcType','pcStatus','pcSchedule','pcBrief','pcUrl','pcNotes','pcCase'],
+ insight:['piBrand','piCampaign','piSource','piType','piSentiment','piBrief','piInsight','piCase'],
+ escalation:['pxBrand','pxCampaign','pxSource','pxSeverity','pxType','pxBrief','pxSummary','pxCase'],
+ metric:['pmBrand','pmCampaign','pmName','pmValue','pmUnit','pmPlatform','pmPeriod','pmBrief','pmSource','pmCase']
+};
+const ACTION_GROUP={PULSE_SAVE_READINESS:'readiness',PULSE_LOG_ENGAGEMENT:'engagement',PULSE_ADD_CONTENT:'content',PULSE_ADD_INSIGHT:'insight',PULSE_ADD_ESCALATION:'escalation',PULSE_ADD_METRIC:'metric'};
+function groupForId(id){return Object.keys(DRAFT_GROUPS).find(g=>DRAFT_GROUPS[g].includes(id))||''}
+function draftKey(){const org=typeof ORG_ID!=='undefined'?ORG_ID:'org',uid=typeof CURRENT_USER_ID!=='undefined'?CURRENT_USER_ID:'user';return `onit-pulse-draft:${org}:${uid}:${state.tab}`}
+function readDraft(){try{return JSON.parse(localStorage.getItem(draftKey())||'null')||{values:{},groups:[]}}catch(e){return{values:{},groups:[]}}}
+function writeDraft(d){try{if(!d||!d.groups||!d.groups.length)localStorage.removeItem(draftKey());else localStorage.setItem(draftKey(),JSON.stringify(d))}catch(e){}}
+function saveDraftNow(){
+ if(!canWrite()||!state.dirtyGroups.size)return;
+ const r=root();if(!r)return;
+ const values={};
+ state.dirtyGroups.forEach(g=>(DRAFT_GROUPS[g]||[]).forEach(id=>{
+   const el=document.getElementById(id);if(!el)return;
+   values[id]=el.type==='checkbox'?!!el.checked:el.value;
+ }));
+ writeDraft({values,groups:[...state.dirtyGroups],savedAt:Date.now()});
+}
+function restoreDraft(){
+ if(!canWrite())return;
+ const d=readDraft();if(!d.groups||!d.groups.length)return;
+ state.dirtyGroups=new Set(d.groups);state.dirty=true;
+ Object.entries(d.values||{}).forEach(([id,v])=>{
+   const el=document.getElementById(id);if(!el)return;
+   if(el.type==='checkbox')el.checked=!!v;else el.value=v==null?'':v;
+ });
+}
+function clearDraftGroup(action){
+ const g=ACTION_GROUP[action];if(!g)return;
+ const d=readDraft();d.groups=(d.groups||[]).filter(x=>x!==g);(DRAFT_GROUPS[g]||[]).forEach(id=>{if(d.values)delete d.values[id]});
+ writeDraft(d);state.dirtyGroups=new Set(d.groups||[]);state.dirty=state.dirtyGroups.size>0;
+}
+function markDraftFromEvent(e){
+ const el=e.target;if(!el||!root()?.contains(el)||!['INPUT','TEXTAREA','SELECT'].includes(el.tagName)||!el.id)return;
+ const g=groupForId(el.id);if(!g)return;
+ state.dirtyGroups.add(g);state.dirty=true;saveDraftNow();
+}
+document.addEventListener('input',markDraftFromEvent,true);
+document.addEventListener('change',markDraftFromEvent,true);
+window.addEventListener('beforeunload',saveDraftNow);
 function setNav(){const n=nav();if(n)n.classList.toggle('hiddenByRole',!allowed())}
 function fmtDate(v){if(!v)return '—';try{return new Date(v).toLocaleString([], {day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})}catch(e){return String(v)}}
 function num(v){v=Number(v);return Number.isFinite(v)?v:0}
@@ -39,10 +85,10 @@ function listening(){const d=state.data||{},open=(d.escalations||[]).filter(x=>S
 function reports(){const d=state.data||{},s=d.summary||{},sent=s.sentiment||{},gate=canWrite()?'':' hidden';root().innerHTML=shell(`<div class='dpMetrics'>${metric('COMMENTS',s.comments||0,'Today')}${metric('DMs',s.dms||0,'Today')}${metric('INSIGHTS',s.insightsToday||0,'Today')}${metric('OPEN ISSUES',s.openEscalations||0)}</div><div class='dpGrid'><div class='dpCard'><h3>SENTIMENT TODAY</h3><div class='dpSentiment'><div><b>${num(sent.positive)}</b><span>Positive</span></div><div><b>${num(sent.neutral)}</b><span>Neutral</span></div><div><b>${num(sent.negative)}</b><span>Negative</span></div></div></div><div class='dpCard${gate}'><h3>ADD PERFORMANCE METRIC</h3><div class='dpFormGrid'><div class='field'><label>BRAND</label><input id='pmBrand'></div><div class='field'><label>CAMPAIGN</label><input id='pmCampaign'></div><div class='field'><label>METRIC</label><input id='pmName' placeholder='Engagement rate'></div><div class='field'><label>VALUE</label><input id='pmValue'></div><div class='field'><label>UNIT</label><input id='pmUnit' placeholder='%, views, members'></div><div class='field'><label>PLATFORM</label><input id='pmPlatform'></div><div class='field'><label>PERIOD</label><input id='pmPeriod' placeholder='22 Oct 2026 / campaign period'></div><div class='field'><label>BRIEF CODE</label><input id='pmBrief'></div><div class='field wide'><label>SOURCE</label><input id='pmSource' placeholder='Platform analytics / client report / URL'></div></div><label class='dpCandidate'><input id='pmCase' type='checkbox'> Flag metric for Cases</label><button class='new' onclick='DigitalPulse.addMetric()'>SAVE METRIC</button></div></div><div class='dpCard'><h3>RECENT METRICS</h3>${(d.metrics||[]).length?(d.metrics||[]).map(x=>`<div class='dpRow'><div><b>${esc(val(x,'Name'))}: ${esc(val(x,'Value'))} ${esc(val(x,'Unit'))}</b><small>${esc(val(x,'Brand'))} • ${esc(val(x,'Platform'))} • ${esc(val(x,'Period'))} • ${esc(val(x,'Source'))}</small></div>${String(val(x,'Case Candidate')).toLowerCase()==='true'?`<span class='dpCaseFlag'>CASE</span>`:''}</div>`).join(''):`<div class='empty'>No performance metrics logged yet.</div>`}</div>`,'Reports','Pulse builds the daily digital report from work the team already logs.')}
 function candidateSummary(x){const r=x.row||{},t=x.sourceType;if(t==='metric')return `${val(r,'Name')}: ${val(r,'Value')} ${val(r,'Unit')}`;if(t==='insight')return val(r,'Insight');if(t==='escalation')return val(r,'Summary');if(t==='content')return `${val(r,'Platform')} — ${val(r,'Title')} (${val(r,'Status')})`;return `${val(r,'Platform')} — ${val(r,'Comments Handled')} comments, ${val(r,'DMs Answered')} DMs`}
 async function cases(){if(!state.candidates)state.candidates=await api('PULSE_CASE_CANDIDATES');const list=state.candidates.candidates||[];root().innerHTML=shell(`<div class='dpCard'><div class='dpCardHead'><div><h3>CASE SIGNALS</h3><p>Strong digital moments are flagged while the campaign is still alive.</p></div><span class='pill'>${list.length} SIGNAL${list.length===1?'':'S'}</span></div>${list.length?list.map(x=>`<div class='dpRow'><div><b>${esc(x.brand||x.campaign||x.sourceType)}</b><small>${esc(x.sourceType.toUpperCase())} • ${esc(candidateSummary(x))}</small></div>${canPromote()?`<button class='secondary' onclick="DigitalPulse.sendToCases('${esc(x.sourceType)}','${esc(x.sourceId)}')">SEND TO CASES</button>`:`<span class='dpCaseFlag'>READY</span>`}</div>`).join(''):`<div class='empty'>No items have been flagged for Cases yet.</div>`}</div><div class='dpCard'><h3>HOW THIS CONNECTS</h3><p class='muted'>Digital logs the work once. Pulse keeps the operational record. Strong insights, content moments and sourced metrics can then move into the Cases Data Vault with their original campaign context.</p></div>`,'Case Signals','Identify potential case-study evidence while the work is happening.')}
-async function render(){const r=root();if(!r)return;await refreshCapabilities(false);if(!allowed()){r.innerHTML=shell(`<div class='dpLock'><b>Digital Pulse is not available for this account.</b><div class='muted'>Digital Pulse is available to active ONIT users.</div></div>`);return}try{await load();if(state.tab==='today')today();else if(state.tab==='engagement')engagement();else if(state.tab==='content')content();else if(state.tab==='listening')listening();else if(state.tab==='reports')reports();else if(state.tab==='cases')await cases();}catch(e){r.innerHTML=shell(`<div class='dpLock'><b>Pulse could not load.</b><div class='muted'>${esc(e.message)}</div></div>`)} }
-async function openTab(tab){state.tab=tab;loading(({today:'Today',engagement:'Engagement',content:'Content',listening:'Listening',reports:'Reports',cases:'Case Signals'})[tab]||'Digital Pulse');await render()}
-async function refresh(){state.lastAt=0;state.candidates=null;loading();await render()}
-async function mutate(action,payload,msg){if(!canWrite()){showToast('Digital Pulse','View only. Only users in the Digital department can update Pulse.');return}if(state.busy)return;state.busy=true;try{await api(action,payload);state.lastAt=0;state.candidates=null;await load(true);showToast('Digital Pulse',msg);await render()}catch(e){alert(e.message)}finally{state.busy=false}}
+async function render(){const r=root();if(!r)return;await refreshCapabilities(false);if(!allowed()){r.innerHTML=shell(`<div class='dpLock'><b>Digital Pulse is not available for this account.</b><div class='muted'>Digital Pulse is available to active ONIT users.</div></div>`);return}try{await load();if(state.tab==='today')today();else if(state.tab==='engagement')engagement();else if(state.tab==='content')content();else if(state.tab==='listening')listening();else if(state.tab==='reports')reports();else if(state.tab==='cases')await cases();restoreDraft();}catch(e){r.innerHTML=shell(`<div class='dpLock'><b>Pulse could not load.</b><div class='muted'>${esc(e.message)}</div></div>`)} }
+async function openTab(tab){saveDraftNow();state.tab=tab;state.dirty=false;state.dirtyGroups=new Set();loading(({today:'Today',engagement:'Engagement',content:'Content',listening:'Listening',reports:'Reports',cases:'Case Signals'})[tab]||'Digital Pulse');await render()}
+async function refresh(){saveDraftNow();state.lastAt=0;state.candidates=null;if(!state.dirty)loading();await load(true);await render()}
+async function mutate(action,payload,msg){if(!canWrite()){showToast('Digital Pulse','View only. Only users in the Digital department can update Pulse.');return}if(state.busy)return;state.busy=true;saveDraftNow();try{await api(action,payload);clearDraftGroup(action);state.lastAt=0;state.candidates=null;await load(true);showToast('Digital Pulse',msg);await render()}catch(e){saveDraftNow();alert(e.message)}finally{state.busy=false}}
 function byId(id){return document.getElementById(id)}
 function checked(id){return !!byId(id)?.checked}
 function text(id){return byId(id)?.value||''}
@@ -56,10 +102,10 @@ function resolveEscalation(escalationId){if(!confirm('Mark this escalation as re
 function addMetric(){return mutate('PULSE_ADD_METRIC',{brand:text('pmBrand'),campaign:text('pmCampaign'),name:text('pmName'),value:text('pmValue'),unit:text('pmUnit'),platform:text('pmPlatform'),period:text('pmPeriod'),briefCode:text('pmBrief'),source:text('pmSource'),caseCandidate:checked('pmCase')},'Performance metric saved.')}
 async function sendToCases(sourceType,sourceId){if(!canPromote()){showToast('Digital Pulse','You do not have permission to send Pulse evidence to Cases.');return}const caseId=(prompt('Enter the ONIT Case ID to receive this evidence:','')||'').trim();if(!caseId)return;try{await api('PULSE_SEND_TO_CASES',{sourceType,sourceId,caseId});state.candidates=null;state.lastAt=0;showToast('Digital Pulse','Evidence sent to Cases Data Vault.');await render()}catch(e){alert(e.message)}}
 const originalApply=window.applyPermissions;if(typeof originalApply==='function')window.applyPermissions=function(){const r=originalApply.apply(this,arguments);setTimeout(()=>refreshCapabilities(true),0);return r};
-const originalShow=window.show;if(typeof originalShow==='function')window.show=function(id,btn){const r=originalShow.apply(this,arguments);if(id==='pulse'){loading();render()}return r};
-const originalLoad=window.loadFromGoogle;if(typeof originalLoad==='function')window.loadFromGoogle=async function(){const r=await originalLoad.apply(this,arguments);if(!document.getElementById('pulse')?.classList.contains('hidden')){state.lastAt=0;render()}return r};
-window.addEventListener('focus',()=>{if(allowed()&&!document.getElementById('pulse')?.classList.contains('hidden'))refresh()});
-setInterval(()=>{if(allowed()&&!document.getElementById('pulse')?.classList.contains('hidden')&&!state.busy)refresh()},30000);
+const originalShow=window.show;if(typeof originalShow==='function')window.show=function(id,btn){const r=originalShow.apply(this,arguments);if(id==='pulse'){state.dirty=false;state.dirtyGroups=new Set();loading();render()}return r};
+const originalLoad=window.loadFromGoogle;if(typeof originalLoad==='function')window.loadFromGoogle=async function(){const r=await originalLoad.apply(this,arguments);if(!document.getElementById('pulse')?.classList.contains('hidden')){state.lastAt=0;if(!state.dirty)render()}return r};
+window.addEventListener('focus',()=>{if(allowed()&&!state.dirty&&!document.getElementById('pulse')?.classList.contains('hidden'))refresh()});
+setInterval(()=>{if(allowed()&&!state.dirty&&!document.getElementById('pulse')?.classList.contains('hidden')&&!state.busy)refresh()},30000);
 window.DigitalPulse={render,refresh,openTab,saveReadiness,logEngagement,addContent,updateContent,addInsight,addEscalation,resolveEscalation,addMetric,sendToCases,refreshCapabilities};
 setTimeout(()=>refreshCapabilities(true),450);
 })();
