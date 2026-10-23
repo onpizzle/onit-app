@@ -1,5 +1,6 @@
 {
-  "version": "0.29.2",
-  "build": "0.29.2",
-  "name": "System Owner mobile Cases access"
+  "version": "0.29.3",
+  "build": "0.29.3",
+  "name": "ONIT v0.29.3 — Refresh Loop Hotfix",
+  "privatePilot": true
 }
