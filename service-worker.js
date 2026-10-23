@@ -4,12 +4,13 @@ importScripts('https://www.gstatic.com/firebasejs/13.0.0/firebase-messaging-comp
 const FIREBASE_CONFIG={apiKey:'AIzaSyAmpqFDMfo6zAorD-f14hTQnSNFDFU6VHM',authDomain:'onit-backend-api.firebaseapp.com',projectId:'onit-backend-api',storageBucket:'onit-backend-api.firebasestorage.app',messagingSenderId:'1052909191157',appId:'1:1052909191157:web:392c4a50b453deb5ebeabc'};
 try{firebase.initializeApp(FIREBASE_CONFIG);firebase.messaging();}catch(e){}
 
-const CACHE='onit-v0.30.0-traffic-assist';
+const CACHE='onit-v0.30.2-brief-alert';
 try{
   const messaging=firebase.messaging();
   messaging.onBackgroundMessage(payload=>{
     const n=payload.notification||{},d=payload.data||{},title=n.title||d.title||'ONIT';
-    const options={body:n.body||d.body||d.message||'You have a new ONIT update.',icon:'./icons/icon-192.png',badge:'./icons/favicon-32.png',data:{url:d.url||'./'}};
+    const isBrief=d.type==='BRIEF_ALERT';
+    const options={body:n.body||d.body||d.message||'You have a new ONIT update.',icon:'./icons/icon-192.png',badge:'./icons/favicon-32.png',tag:isBrief?'onit-new-brief-'+(d.briefCode||'new'):'onit-update',renotify:isBrief,requireInteraction:isBrief,vibrate:isBrief?[180,80,180,80,320]:undefined,data:{url:d.url||'./',type:d.type||'',briefCode:d.briefCode||''}};
     self.registration.showNotification(title,options);
   });
 }catch(e){}

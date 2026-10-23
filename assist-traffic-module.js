@@ -1,4 +1,4 @@
-/* ONIT v0.30.0 — Traffic Command + ONIT Assist */
+/* ONIT v0.30.2 — Traffic Command + ONIT Assist */
 let v030Data={available:false,canManageTraffic:false,jobBag:[],handovers:[],pendingForMe:[],handoverToComplete:[]};
 let v030TrafficTab='jobbag';
 let v030Assist={active:false,sessionId:'',targetUserId:'',targetName:'',target:null,tab:'dashboard'};

@@ -1002,7 +1002,7 @@ html.onitReduceMotion *,html.onitReduceMotion *::before,html.onitReduceMotion *:
   *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
 }
 </style>
-<link rel="stylesheet" href="./assist-traffic-module.css?v=0.30.0">
+<link rel="stylesheet" href="./assist-traffic-module.css?v=0.30.2">
 </head>
 <body>
 <a class="onitSkipLink" href="#mainContent">Skip to main content</a>
@@ -1191,7 +1191,7 @@ html.onitReduceMotion *,html.onitReduceMotion *::before,html.onitReduceMotion *:
 <script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-messaging-compat.js"></script>
-<script>const APP_VERSION='0.30.0';
+<script>const APP_VERSION='0.30.2';
 const BACKEND_DATASETS=['USERS','CLIENTS','BRIEFS','ASSIGNMENTS','ITERATIONS','ACTIVITY_LOG','NOTIFICATIONS','REPORTS'];
 const API_URL='https://script.google.com/macros/s/AKfycbyLVpsQLFCpQWRIvRndw66sghmu5rtK31cuthS7hXjJ--lf703mJPIbJ2zpLDIlH76b/exec';
 let ORG_ID=localStorage.getItem('onit-org')||'';
@@ -2137,10 +2137,10 @@ function renderNotifications(){
   document.getElementById('notifPanel').innerHTML=`<b>Notifications</b>${items}`;
   const fresh=unread.filter(n=>!announcedNotifications.has(rowVal(n,'Notification ID')));
   if(fresh.length){
-    const newest=fresh[0];
-    const ntype=rowVal(newest,'Type');
+    const newest=fresh[0],briefFresh=fresh.filter(n=>isBriefAlertType(rowVal(n,'Type'))),ntype=rowVal(newest,'Type');
     if(ntype!=='OWNER_BROADCAST'&&ntype!=='BUZZER')showToast(rowVal(newest,'Title'),rowVal(newest,'Message'));
-    if(ntype!=='BUZZER'){playNotificationSound();showSystemNotification(rowVal(newest,'Title'),rowVal(newest,'Message'));}
+    if(briefFresh.length){const b=briefFresh[0];playBriefAlertSound();showSystemNotification('ONIT • NEW BRIEF',rowVal(b,'Message'));}
+    else if(ntype!=='BUZZER'){playNotificationSound();showSystemNotification(rowVal(newest,'Title'),rowVal(newest,'Message'));}
     fresh.forEach(n=>announcedNotifications.add(rowVal(n,'Notification ID')));
     localStorage.setItem(announcedKey(CURRENT_USER_ID),JSON.stringify([...announcedNotifications]));
   }
@@ -2190,6 +2190,26 @@ function notificationSoundEnabled(){
   if(raw===undefined||raw===null||String(raw).trim()==='')return true;
   return truthy(raw);
 }
+function isBriefAlertType(type){return ['NEW_BRIEF','BRIEF_COPY'].includes(String(type||''));}
+function playBriefAlertSound(force=false){
+  if(!force&&(!audioReady||!notificationSoundEnabled()))return;
+  try{
+    const C=window.AudioContext||window.webkitAudioContext;if(!C)return;
+    const ctx=new C(),master=ctx.createGain(),compressor=ctx.createDynamicsCompressor();
+    master.gain.setValueAtTime(.96,ctx.currentTime);
+    compressor.threshold.setValueAtTime(-16,ctx.currentTime);compressor.knee.setValueAtTime(10,ctx.currentTime);compressor.ratio.setValueAtTime(10,ctx.currentTime);compressor.attack.setValueAtTime(.002,ctx.currentTime);compressor.release.setValueAtTime(.20,ctx.currentTime);
+    master.connect(compressor);compressor.connect(ctx.destination);
+    // Signature ONIT brief call: two rising hits + a longer arrival tone.
+    const notes=[[392,0,.17],[587,.14,.20],[784,.34,.36],[587,.78,.16],[988,.93,.42]];
+    notes.forEach(([freq,delay,dur],i)=>{
+      const o1=ctx.createOscillator(),o2=ctx.createOscillator(),g=ctx.createGain(),t=ctx.currentTime+delay;
+      o1.type=i<2?'square':'triangle';o2.type='sine';o1.frequency.setValueAtTime(freq,t);o2.frequency.setValueAtTime(freq*2,t);
+      g.gain.setValueAtTime(.001,t);g.gain.exponentialRampToValueAtTime(i===2||i===4?.74:.58,t+.012);g.gain.exponentialRampToValueAtTime(.001,t+dur);
+      o1.connect(g);o2.connect(g);g.connect(master);o1.start(t);o2.start(t);o1.stop(t+dur+.03);o2.stop(t+dur+.03);
+    });
+    setTimeout(()=>ctx.close(),1800);
+  }catch(e){console.warn('ONIT brief alert sound:',e)}
+}
 function playNotificationSound(force=false){
   if(!force&&(!audioReady||!notificationSoundEnabled()))return;
   try{
@@ -2216,11 +2236,11 @@ function playNotificationSound(force=false){
     setTimeout(()=>ctx.close(),1400);
   }catch(e){console.warn('ONIT notification sound:',e)}
 }
-function testNotificationSound(){enableAudio();playNotificationSound(true);showToast('Notification sound','This is the ONIT alert sound. Device volume still controls the final loudness.')}
+function testNotificationSound(){enableAudio();playBriefAlertSound(true);showToast('ONIT brief alert','This is the signature sound for a new brief. Device volume still controls the final loudness.')}
 function showToast(title,message){const el=document.getElementById('toast');if(!el)return;clearTimeout(onitToastTimer);el.innerHTML=`<b>${escapeHTML(title)}</b><span class='muted'>${escapeHTML(message||'')}</span>`;el.classList.remove('hidden');onitToastTimer=setTimeout(()=>el.classList.add('hidden'),5200)}
 function showSystemNotification(title,message){try{if('Notification'in window&&Notification.permission==='granted')new Notification(title,{body:message})}catch(e){}}
 async function enableBrowserNotifications(){if(!('Notification'in window))return alert('Browser notifications are not supported here.');const result=await Notification.requestPermission();alert(result==='granted'?'Browser notifications enabled.':'Browser notifications were not enabled.')}
-async function toggleSoundPreference(box){const desired=!!box.checked;try{await apiPost('updateUserPreference',{organisationId:ORG_ID,userId:CURRENT_USER_ID,notificationSound:desired});await loadFromGoogle(true);showToast('Notification sound',desired?'Sound is on. New alerts will use the louder ONIT chime.':'Sound is off.')}catch(e){box.checked=!desired;alert('Could not update notification setting. '+e.message)}}
+async function toggleSoundPreference(box){const desired=!!box.checked;try{await apiPost('updateUserPreference',{organisationId:ORG_ID,userId:CURRENT_USER_ID,notificationSound:desired});await loadFromGoogle(true);showToast('Notification sound',desired?'Sound is on. New briefs will use the signature ONIT brief alert.':'Sound is off.')}catch(e){box.checked=!desired;alert('Could not update notification setting. '+e.message)}}
 
 function renderDataPage(){const datasets=backendAccess(),admin=document.getElementById('dataAdmin'),toolbar=document.getElementById('dataToolbar'),viewer=document.getElementById('dataViewer');admin.innerHTML=isOwner()?ownerAccessAdminMarkup():'';toolbar.innerHTML=datasets.map(n=>`<button class='${activeBackendDataset===n?'active':''}' onclick="loadBackendDataset('${n}')">${escapeHTML(n.replaceAll('_',' '))}</button>`).join('');hydrateProfilePhotos();if(!datasets.length){viewer.innerHTML=`<div class='empty'>No backend data access has been granted to this account.</div>`;return}if(activeBackendDataset&&!datasets.includes(activeBackendDataset))activeBackendDataset='';if(!activeBackendDataset)viewer.innerHTML=`<div class='empty'>Choose a data area above. Access is read-only. CD, DCD and MD can download directly; other staff need one approval from any one of them.</div>`}
 function ownerAccessAdminMarkup(){return `<div class='morecard' style='margin-bottom:14px'><h3>DATA ACCESS CONTROL <span class='ownerBadge'>OWNER ONLY</span></h3><div class='bigTiny'>Enter a staff email, then tick only the backend data areas that person genuinely needs. Seniority does not automatically grant backend data access.</div><div class='searchbar'><input id='accessEmail' type='email' placeholder='staff@email.com' value='${escapeHTML(selectedAccessEmail)}'><button class='secondary' onclick='loadAccessTarget()'>LOAD STAFF</button></div><div id='accessTargetPanel'>${selectedAccessEmail?renderAccessTargetMarkup(selectedAccessEmail):`<div class='empty'>No staff member selected.</div>`}</div></div><div class='morecard' style='margin-bottom:14px'><h3>TEAM LEAD CONTROL <span class='ownerBadge'>OWNER ONLY</span></h3><div class='bigTiny'>Team Lead status is operational only. It does not appear as a title on the member’s profile. A Team Lead reviews work from their own department before CD/DCD final approval.</div><div class='teamLeadAdmin'>${teamLeadAdminMarkup()}</div></div>`}
@@ -2294,7 +2314,7 @@ async function approveDataExportRequest(id){if(!confirm('Approve this ONIT data 
 async function downloadDataExport(id){
   try{setBusy(true);const res=await apiPost('getDataExportPdf',{exportId:decodeURIComponent(id)}),d=res.data||res;if(!d.base64)throw new Error('No PDF was returned.');const url=URL.createObjectURL(base64ToBlob(d.base64,d.mimeType||'application/pdf')),a=document.createElement('a');a.href=url;a.download=d.fileName||'ONIT-data-export.pdf';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),5000)}catch(e){alert('Could not download PDF. '+e.message)}finally{setBusy(false)}
 }
-function renderMore(){if(!currentUser)return;const names=backendAccess();let html=`<div class='moregrid'><div class='morecard'><h3>MY PROFILE</h3><div class='profileRow'><div class='avatar large' data-avatar-user='${escapeHTML(CURRENT_USER_ID)}'>${escapeHTML(initials(currentUserName()))}</div><div><b>${escapeHTML(currentUserName())}${isOwner()?` <span class='ownerBadge'>SYSTEM OWNER</span>`:''}</b><div class='bigTiny'>${escapeHTML(positionOf(currentUser)||'Position not set')}<br>${escapeHTML(departmentOf(currentUser)||'Department not set')}<br>${escapeHTML(rowVal(currentUser,'Email')||'Email not added yet')}</div></div></div><div class='field'><label>PROFILE PICTURE</label><input type='file' accept='image/jpeg,image/png,image/webp' onchange='uploadProfilePhoto(this)'><div class='tiny'>JPG, PNG or WebP • ONIT optimises the image automatically</div></div><button class='secondary linkbtn' onclick='handleSignOut()'>SIGN OUT</button></div><div class='morecard'><h3>NOTIFICATIONS</h3><div class='switchrow'><div><b>Notification sound</b><div class='bigTiny'>A louder ONIT chime plays for new alerts while ONIT is open. Sound is ON by default unless you switch it off.</div></div><input type='checkbox' ${notificationSoundEnabled()?'checked':''} onchange='toggleSoundPreference(this)'></div><div class='actions'><button class='secondary linkbtn' onclick='testNotificationSound()'>TEST SOUND</button><button class='secondary linkbtn' onclick='enablePushNotifications()'>ENABLE OUTSIDE-ONIT ALERTS</button></div><div class='pushStatus ${pushNotificationStatus_()==='ON'?'on':'off'}'>Outside-ONIT alerts: ${pushNotificationStatus_()}</div><div class='bigTiny' style='margin-top:6px'>Desktop/Android web push works after permission is granted. On iPhone/iPad, install ONIT to the Home Screen first.</div></div><div class='morecard onitA11yCard'><h3>ACCESSIBILITY</h3><div class='switchrow'><div><b>Reduce motion</b><div class='bigTiny'>Minimises interface transitions and animated feedback. ONIT also respects your device Reduce Motion setting.</div></div><input type='checkbox' aria-label='Reduce motion' ${onitReducedMotionEnabled()?'checked':''} onchange='toggleOnitReducedMotion(this)'></div><div class='onitA11yStatus'>Keyboard focus, larger mobile tap targets and screen-reader status updates are always on.</div></div><div class='morecard'><h3>ORGANISATION</h3><b>${escapeHTML(rowVal(organisations[0],'Organisation Name')||'Organisation')}</b><div class='bigTiny'>Creative • Account Management • Strategy • Digital • Activation • HR • Accounts</div></div><div class='morecard'><h3>ACCESS</h3><div class='bigTiny'>Create briefs: <b>${canCreateBrief()?'YES':'NO'}</b><br>Review work: <b>${canReview()?'YES':'NO'}</b><br>Final approval: <b>${canApprove()?'YES':'NO'}</b><br>Backend datasets: <b>${isOwner()?'ALL':names.length}</b></div></div>`;
+function renderMore(){if(!currentUser)return;const names=backendAccess();let html=`<div class='moregrid'><div class='morecard'><h3>MY PROFILE</h3><div class='profileRow'><div class='avatar large' data-avatar-user='${escapeHTML(CURRENT_USER_ID)}'>${escapeHTML(initials(currentUserName()))}</div><div><b>${escapeHTML(currentUserName())}${isOwner()?` <span class='ownerBadge'>SYSTEM OWNER</span>`:''}</b><div class='bigTiny'>${escapeHTML(positionOf(currentUser)||'Position not set')}<br>${escapeHTML(departmentOf(currentUser)||'Department not set')}<br>${escapeHTML(rowVal(currentUser,'Email')||'Email not added yet')}</div></div></div><div class='field'><label>PROFILE PICTURE</label><input type='file' accept='image/jpeg,image/png,image/webp' onchange='uploadProfilePhoto(this)'><div class='tiny'>JPG, PNG or WebP • ONIT optimises the image automatically</div></div><button class='secondary linkbtn' onclick='handleSignOut()'>SIGN OUT</button></div><div class='morecard'><h3>NOTIFICATIONS</h3><div class='switchrow'><div><b>Notification sound</b><div class='bigTiny'>A distinct, louder ONIT brief alert plays whenever a new brief lands. Other alerts use the standard chime. Sound is ON by default unless you switch it off.</div></div><input type='checkbox' ${notificationSoundEnabled()?'checked':''} onchange='toggleSoundPreference(this)'></div><div class='actions'><button class='secondary linkbtn' onclick='testNotificationSound()'>TEST SOUND</button><button class='secondary linkbtn' onclick='enablePushNotifications()'>ENABLE OUTSIDE-ONIT ALERTS</button></div><div class='pushStatus ${pushNotificationStatus_()==='ON'?'on':'off'}'>Outside-ONIT alerts: ${pushNotificationStatus_()}</div><div class='bigTiny' style='margin-top:6px'>Desktop/Android web push works after permission is granted. On iPhone/iPad, install ONIT to the Home Screen first.</div></div><div class='morecard onitA11yCard'><h3>ACCESSIBILITY</h3><div class='switchrow'><div><b>Reduce motion</b><div class='bigTiny'>Minimises interface transitions and animated feedback. ONIT also respects your device Reduce Motion setting.</div></div><input type='checkbox' aria-label='Reduce motion' ${onitReducedMotionEnabled()?'checked':''} onchange='toggleOnitReducedMotion(this)'></div><div class='onitA11yStatus'>Keyboard focus, larger mobile tap targets and screen-reader status updates are always on.</div></div><div class='morecard'><h3>ORGANISATION</h3><b>${escapeHTML(rowVal(organisations[0],'Organisation Name')||'Organisation')}</b><div class='bigTiny'>Creative • Account Management • Strategy • Digital • Activation • HR • Accounts</div></div><div class='morecard'><h3>ACCESS</h3><div class='bigTiny'>Create briefs: <b>${canCreateBrief()?'YES':'NO'}</b><br>Review work: <b>${canReview()?'YES':'NO'}</b><br>Final approval: <b>${canApprove()?'YES':'NO'}</b><br>Backend datasets: <b>${isOwner()?'ALL':names.length}</b></div></div>`;
   if(isOwner()&&securityInfo){html+=`<div class='morecard' style='grid-column:1/-1'><h3>ORGANISATION SECURITY <span class='ownerBadge'>OWNER ONLY</span></h3><div class='bigTiny'>Share the Join Code only with authorised staff. Backend data is never granted automatically by this code.</div><div class='securityCode'>${escapeHTML(securityInfo.inviteCode||'—')}</div><div class='actions'><button class='secondary' onclick='regenerateJoinCode()'>REGENERATE JOIN CODE</button><button class='secondary' onclick='toggleSignupAccess()'>${securityInfo.signupsEnabled?'DISABLE':'ENABLE'} SIGNUPS</button></div></div>`}
   if(isOwner()){html+=ownerBroadcastMarkup()}
   if(isOwner()){
@@ -2578,9 +2598,9 @@ setInterval(()=>{const now=Date.now(),gap=firebaseRealtimeHealthy?60000:15000;if
 async function boot(){if(SESSION_TOKEN){document.getElementById('authGate').classList.add('hidden');document.getElementById('appShell').classList.remove('hidden');await loadFromGoogle(false);if(SESSION_TOKEN)return}document.getElementById('appShell').classList.add('hidden');document.getElementById('authGate').classList.remove('hidden');showAuthMode('signin')}
 boot();
 </script>
-<script src="./cases-module.js?v=0.30.0"></script>
-<script src="./pulse-module.js?v=0.30.0"></script>
-<script src="./assist-traffic-module.js?v=0.30.0"></script>
+<script src="./cases-module.js?v=0.30.2"></script>
+<script src="./pulse-module.js?v=0.30.2"></script>
+<script src="./assist-traffic-module.js?v=0.30.2"></script>
 </body>
 </html>
 
