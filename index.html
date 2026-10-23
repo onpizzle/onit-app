@@ -1031,16 +1031,10 @@ button:not(:disabled):active{transform:scale(.985)}
 </div>
 <div class="workspace">
 <header class="top">
-  <div class="topSearch">
-    <span class="topSearchIcon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="m16 16 4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span>
-    <input id="globalSearch" type="search" placeholder="Search briefs, projects, people..." onkeydown="globalSearchKey(event)">
-  </div>
   <div class="userwrap">
-    <button id="installBtn" class="secondary installBtn hidden" onclick="installOnit()">Install</button>
     <button class="bell" id="notifBell" onclick="toggleNotifications()" title="Notifications"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 17h12l-1.5-2V10a4.5 4.5 0 0 0-9 0v5zM10 20h4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="badge hidden" id="notifBadge">0</span></button>
     <div class="avatar" id="topAvatar" data-avatar-user=""></div>
     <div class="user"><b id="orgLabel">ONIT</b><span class="muted" id="userRoleLabel"></span><div class="userMeta" id="userEmailLabel"></div></div>
-    <button class="iconButton signout" onclick="handleSignOut()" title="Sign out"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 5H5v14h5M14 8l4 4-4 4M8 12h10" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
   </div>
 </header>
 <main class="main">
@@ -1051,17 +1045,14 @@ button:not(:disabled):active{transform:scale(.985)}
       <p class="muted" id="homeSub">Here’s what’s happening today.</p>
     </div>
       <div class="dashboardHeadingRight">
-      <div class="dashboardActions"><button id="buzzerBtn" class="secondary buzzerBtn hiddenByRole" onclick="openBuzzerComposer()">BUZZER</button><button id="addAccountBtn" class="secondary hidden" onclick="quickAddAccount()">+ New Account</button><button class="new createBriefBtn hiddenByRole" onclick="openNew()">+ New Brief</button></div>
+      <div class="dashboardActions"><button id="buzzerBtn" class="secondary buzzerBtn hiddenByRole" onclick="openBuzzerComposer()">BUZZER</button></div>
       <div class="dashboardDate" id="todayLabel"></div>
     </div>
   </div>
 
-  <div id="morningBrief" aria-live="polite"></div>
-
   <div id="onitRadar" aria-live="polite"></div>
 
   <div id="homeAnalytics" class="homeAnalytics"></div>
-  <div class="stats dashboardStats" id="homeStats"></div>
 
   <div class="section hidden" id="accountPortfolioSection"><div class="sectionHeading"><div><h2>MY ACCOUNTS</h2><p class="muted">Every account you manage, with live briefs underneath.</p></div><button class="secondary" onclick="quickAddAccount()">+ ADD ACCOUNT</button></div><div id="accountPortfolioBoard" class="accountPortfolioBoard"></div></div>
 
@@ -1076,11 +1067,9 @@ button:not(:disabled):active{transform:scale(.985)}
     </div>
   </div>
 
-  <div id="pulseSummary"></div>
 
   <div class="section hidden" id="homeQueueSection"><div class="sectionHeading"><div><h2 id="homeQueueTitle">WAITING FOR REVIEW</h2><p class="muted" id="homeQueueCopy"></p></div></div><div class="card" id="homeQueueList"></div></div>
   <div class="section" id="homePrimarySection"><div class="sectionHeading"><div><h2 id="homePrimaryTitle">MY WORK</h2><p class="muted" id="homePrimaryCopy"></p></div></div><div class="card" id="homeBriefList"></div></div>
-  <div class="section" id="homeTeamSection"><div class="sectionHeading"><div><h2 id="homeTeamTitle">TEAM RIGHT NOW</h2></div></div><div class="teamgrid" id="homeTeam"></div></div>
 </section>
 
 <section id="briefs" class="hidden">
@@ -1092,7 +1081,7 @@ button:not(:disabled):active{transform:scale(.985)}
 
 <section id="team" class="hidden"><h1>Team</h1><p class="muted">Live workload across the organisation.</p><div class="teamgrid" id="teamGrid"></div></section>
 
-<section id="archive" class="hidden"><h1>Archive</h1><p class="muted">Search every closed brief, iteration and final asset.</p><div class="field"><input id="archiveSearch" placeholder="Search brief code, client, project or team member" oninput="renderArchive()"></div><div class="card" id="archiveList"></div></section>
+<section id="archive" class="hidden"><h1>Archive</h1><p class="muted">Completed and closed work, newest first. Use Memory when you need to search across ONIT.</p><div class="card" id="archiveList"></div></section>
 
 <section id="memory" class="hidden"><div id="memoryRoot"></div></section>
 
@@ -1124,7 +1113,7 @@ button:not(:disabled):active{transform:scale(.985)}
   <div class="statusbar"><span class="statuspill" id="dstatus"></span><span class="statuspill" id="diter"></span><span class="statuspill hidden" id="dclientsent"></span></div>
   <div id="approvalNotice" class="approvalWarning hidden"></div>
   <div id="approvalQuickActions" class="approvalQuickActions hidden"></div>
-  <div class="card"><div class="muted">TIME STATUS</div><div class="num" id="dtimer"></div><p id="ddeadline"></p><div class="actions"><button class="new" id="startBtn" onclick="startWork(this)">START WORKING</button><button class="secondary" id="pauseBtn" onclick="pauseBrief(this)">PAUSE / RESUME</button><button class="secondary" id="deadlineBtn" onclick="changeDeadline(this)">CHANGE DEADLINE</button><button class="secondary" id="queuePriorityBtn" onclick="changeQueuedPriority(this)">CHANGE PRIORITY</button><button class="secondary" id="handoverBtn" onclick="openHandover()">HANDOVER</button><button class="secondary hidden" id="replayJobBtn" onclick="openWorkReplay()">REPLAY JOB</button></div></div>
+  <div class="card"><div class="muted">TIME STATUS</div><div class="num" id="dtimer"></div><p id="ddeadline"></p><div class="actions"><button class="new" id="startBtn" onclick="startWork(this)">START WORKING</button><button class="secondary" id="pauseBtn" onclick="pauseBrief(this)">PAUSE / RESUME</button><button class="secondary" id="deadlineBtn" onclick="changeDeadline(this)">CHANGE DEADLINE</button><button class="secondary" id="queuePriorityBtn" onclick="changeQueuedPriority(this)">CHANGE PRIORITY</button><button class="secondary" id="handoverBtn" onclick="openHandover()">HANDOVER</button></div></div>
   <div class="tabs" id="detailTabs"><button class="active" onclick="setDetailTab('brief',this)">BRIEF</button><button onclick="setDetailTab('work',this)">WORK</button><button onclick="setDetailTab('activity',this)">REPLAY</button></div>
   <div class="card">
     <div id="briefPanel" class="detailPanel"></div>
@@ -1150,7 +1139,7 @@ button:not(:disabled):active{transform:scale(.985)}
 <script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-messaging-compat.js"></script>
-<script>const APP_VERSION='0.27.0';
+<script>const APP_VERSION='0.28.0';
 const BACKEND_DATASETS=['USERS','CLIENTS','BRIEFS','ASSIGNMENTS','ITERATIONS','ACTIVITY_LOG','NOTIFICATIONS','REPORTS'];
 const API_URL='https://script.google.com/macros/s/AKfycbyLVpsQLFCpQWRIvRndw66sghmu5rtK31cuthS7hXjJ--lf703mJPIbJ2zpLDIlH76b/exec';
 let ORG_ID=localStorage.getItem('onit-org')||'';
@@ -1418,12 +1407,6 @@ function riskForBrief(b){
   score=Math.min(100,score);return{score,level:score>=60?'HIGH':score>=35?'WATCH':'LOW',reasons:[...new Set(reasons)].slice(0,3)}
 }
 function riskMarkup(b){const r=riskForBrief(b),code=encodeURIComponent(b.code).replace(/'/g,'%27');return `<div class='riskCard' onclick="detail(decodeURIComponent('${code}'))"><div class='riskScore ${r.level.toLowerCase()}'>${r.score}</div><div><span class='code'>${escapeHTML(b.code)}</span><b>${escapeHTML(b.client)} — ${escapeHTML(b.project)}</b><div class='riskReasons'>${escapeHTML(r.reasons.join(' • ')||'No immediate risk signal')}</div></div><div><span class='riskLabel ${r.level==='HIGH'?'high':''}'>${r.level}</span></div></div>`}
-function renderPulse(active,risks){
-  const awaiting=active.filter(b=>['Team Lead Review','In Review'].includes(b.status)&&!b.finalApproved).length,paused=active.filter(b=>b.paused||b.status==='Paused').length,high=risks.filter(x=>x.r.level==='HIGH').length,watch=risks.filter(x=>x.r.level==='WATCH').length;
-  const busiest=teamWorkload.slice().sort((a,b)=>teamOpenCount(b)-teamOpenCount(a))[0];
-  const busiestOpen=teamOpenCount(busiest);const pressure=busiest&&busiestOpen>0?`${busiest.fullName} carries the highest load (${busiestOpen} open)`:'Team capacity looks clear';
-  document.getElementById('pulseSummary').innerHTML=`<div class='pulseCard'><div class='pulseTop'><div><div class='pulseTitle'>ONIT PULSE</div><div class='pulseSentence'>${high?`${high} high-risk brief${high===1?'':'s'} need attention.`:watch?`${watch} brief${watch===1?'':'s'} need watching.`:'Operations look stable right now.'}</div><div class='muted'>${escapeHTML(pressure)}</div></div><span class='pill'>LIVE OPERATIONAL VIEW</span></div><div class='pulseMini'><div><span class='muted'>MOVING</span><b>${active.length}</b></div><div><span class='muted'>AT RISK</span><b>${high+watch}</b></div><div><span class='muted'>AWAITING APPROVAL</span><b>${awaiting}</b></div><div><span class='muted'>PAUSED</span><b>${paused}</b></div></div></div>`
-}
 function dashboardMode(){const serverMode=String(permissions.dashboardMode||'').toUpperCase();if(['OWNER','ACCOUNT','TRAFFIC','LEADERSHIP','TEAM_LEAD','STAFF'].includes(serverMode))return serverMode;if(isOwner())return 'OWNER';if(canApprove())return 'LEADERSHIP';if(isTrafficManagerUser())return 'TRAFFIC';if(canCreateBrief())return 'ACCOUNT';if(isTeamLeadUser())return 'TEAM_LEAD';return 'STAFF'}
 function isAssignedToCurrent(b){return allAssignments.some(a=>sameBrief(a,b.code)&&rowVal(a,'User ID','userId')===CURRENT_USER_ID&&String(rowVal(a,'Assignment Type','assignmentType')).toUpperCase()==='TO'&&String(rowVal(a,'Active','active')).toLowerCase()!=='false')}
 function myAssignedBriefs(){return briefs.filter(isAssignedToCurrent)}
@@ -1455,19 +1438,10 @@ function renderDashboardDeadlines(scope){
     return `<button class='deadlineRow' onclick="detail('${escapeHTML(b.code).replace(/'/g,'&#39;')}')"><span class='deadlineDot ${dot}'></span><span class='feedCopy'><b>${escapeHTML(b.client||b.project)}</b><small>${escapeHTML(b.project||b.status)}</small></span><span class='deadlineWhen ${dot}'>${escapeHTML(t.cls==='red'?'Overdue':date)}</span><span class='rowArrow'>›</span></button>`
   }).join(''):`<div class='empty compactEmpty'>No upcoming deadlines.</div>`;
 }
-function globalSearchKey(e){
-  if(e.key!=='Enter')return;
-  const q=String(e.currentTarget.value||'').trim().toLowerCase();if(!q)return;
-  const hit=briefs.find(b=>[b.code,b.client,b.project,b.assignee,b.status].join(' ').toLowerCase().includes(q));
-  if(hit){e.currentTarget.blur();detail(hit.code);return}
-  const person=teamWorkload.find(w=>[w.fullName,w.position,w.department].join(' ').toLowerCase().includes(q));
-  if(person){show('team');e.currentTarget.blur();return}
-  showToast('No matching brief or team member was found.');
-}
 function approvalClockInfo(b){if(!b||b.status!=='In Review'||b.finalApproved||!b.approvalDueAt)return null;const due=new Date(b.approvalDueAt).getTime(),ms=due-(Date.now()+serverOffset);if(!Number.isFinite(due))return null;return{ms,text:ms>=0?'APPROVE '+duration(ms):'APPROVAL OVERDUE '+duration(ms),cls:ms<0?'overdue':''}}
 function renderApprovalClocks(){document.querySelectorAll('[data-approval-due]').forEach(el=>{const due=new Date(el.dataset.approvalDue).getTime(),ms=due-(Date.now()+serverOffset);if(!Number.isFinite(due))return;el.textContent=ms>=0?'APPROVE '+duration(ms):'APPROVAL OVERDUE '+duration(ms);el.classList.toggle('overdue',ms<0)})}
 function accountBriefMarkup(b){const code=encodeURIComponent(b.code).replace(/'/g,'%27'),clock=approvalClockInfo(b),t=timeInfo(b);return `<button class='accountBrief' onclick="detail(decodeURIComponent('${code}'))"><b>${escapeHTML(b.project)}</b><div class='accountBriefMeta'><span>${escapeHTML(b.assignee||'Unassigned')}</span><span>${escapeHTML(b.status)}</span></div><div class='accountBriefMeta' style='margin-top:7px'><span>${escapeHTML(b.code)}</span><span class='${t.cls}'>${escapeHTML(t.text)}</span></div>${clock?`<div style='margin-top:7px'><span class='approvalClock ${clock.cls}' data-approval-due='${escapeHTML(b.approvalDueAt)}'>${escapeHTML(clock.text)}</span></div>`:''}</button>`}
-function renderAccountPortfolio(){const sec=document.getElementById('accountPortfolioSection'),board=document.getElementById('accountPortfolioBoard');if(!sec||!board)return;const accountMode=dashboardMode()==='ACCOUNT';sec.classList.toggle('hidden',!accountMode);document.getElementById('addAccountBtn')?.classList.toggle('hidden',!accountMode);if(!accountMode)return;const accounts=myAccounts();board.innerHTML=accounts.length?accounts.map(c=>{const jobs=briefsForAccount(c).filter(b=>b.status!=='Closed').sort((a,z)=>new Date(z.createdAt||0)-new Date(a.createdAt||0));const id=encodeURIComponent(rowVal(c,'Client ID'));return `<div class='accountColumn'><div class='accountColumnHead'><div><h3>${escapeHTML(rowVal(c,'Brand')||rowVal(c,'Client Name')||'Account')}</h3><div class='tiny'>${jobs.length} active / recent brief${jobs.length===1?'':'s'}</div></div><button class='mini' onclick="openNewForAccount('${id}')">+ BRIEF</button></div>${jobs.length?jobs.map(accountBriefMarkup).join(''):`<div class='accountEmpty'>No briefs yet.<br>Send the first brief for this account.</div>`}</div>`}).join(''):`<div class='accountColumn'><div class='accountColumnHead'><h3>Start your portfolio</h3></div><div class='accountEmpty'>Create your first account / brand. Every brief you send for it will appear here automatically.</div><button class='new' style='width:100%' onclick='quickAddAccount()'>+ ADD ACCOUNT</button></div>`;renderApprovalClocks()}
+function renderAccountPortfolio(){const sec=document.getElementById('accountPortfolioSection'),board=document.getElementById('accountPortfolioBoard');if(!sec||!board)return;const accountMode=dashboardMode()==='ACCOUNT';sec.classList.toggle('hidden',!accountMode);if(!accountMode)return;const accounts=myAccounts();board.innerHTML=accounts.length?accounts.map(c=>{const jobs=briefsForAccount(c).filter(b=>b.status!=='Closed').sort((a,z)=>new Date(z.createdAt||0)-new Date(a.createdAt||0));const id=encodeURIComponent(rowVal(c,'Client ID'));return `<div class='accountColumn'><div class='accountColumnHead'><div><h3>${escapeHTML(rowVal(c,'Brand')||rowVal(c,'Client Name')||'Account')}</h3><div class='tiny'>${jobs.length} active / recent brief${jobs.length===1?'':'s'}</div></div><button class='mini' onclick="openNewForAccount('${id}')">+ BRIEF</button></div>${jobs.length?jobs.map(accountBriefMarkup).join(''):`<div class='accountEmpty'>No briefs yet.<br>Send the first brief for this account.</div>`}</div>`}).join(''):`<div class='accountColumn'><div class='accountColumnHead'><h3>Start your portfolio</h3></div><div class='accountEmpty'>Create your first account / brand. Every brief you send for it will appear here automatically.</div><button class='new' style='width:100%' onclick='quickAddAccount()'>+ ADD ACCOUNT</button></div>`;renderApprovalClocks()}
 async function quickAddAccount(){if(!isAccountTeamUser())return alert('Accounts / brands are created by Account Management or the Traffic Manager.');const name=prompt('Account / brand name:');if(!name?.trim())return;try{setBusy(true);await apiPost('createClient',{clientName:name.trim(),brand:name.trim()});await loadFromGoogle(true);renderAccountPortfolio();showToast('Account created',name.trim())}catch(e){alert('Could not create account. '+e.message)}finally{setBusy(false)}}
 function openNewForAccount(encodedId){openNew();const id=decodeURIComponent(encodedId||'');const i=(window.clientChoices||[]).findIndex(c=>String(c.id)===String(id));if(i>=0)document.getElementById('client').value=String(i)}
 function setUtilisationMode(mode){
@@ -1566,13 +1540,16 @@ function buildRadarItems(mode){
   return items.slice(0,3)
 }
 function renderOnitRadar(mode){
-  const host=document.getElementById('onitRadar');if(!host||!currentUser)return;const items=buildRadarItems(mode),role=radarRoleName(mode),high=items.filter(i=>i.level==='high').length;
+  const host=document.getElementById('onitRadar');if(!host||!currentUser)return;
+  const items=buildRadarItems(mode),role=radarRoleName(mode),high=items.filter(i=>i.level==='high').length,metrics=morningMetrics(mode),first=items[0],firstName=currentUserName().split(' ')[0]||'there';
   const headline=items.length?(mode==='OWNER'?`${items.length} admin item${items.length===1?'':'s'} need${items.length===1?'s':''} your attention`:`${items.length} thing${items.length===1?'':'s'} need${items.length===1?'s':''} your attention`):'All clear right now';
-  const sub=mode==='OWNER'?'System Owner view • ONIT is watching platform access and administration, not agency workload.':mode==='LEADERSHIP'?'Creative Leadership view • Agency-wide operational attention; ONIT prioritises work, not people.':items.length?`${role} view • ONIT is prioritising the work, not scoring people.`:`${role} view • Radar is still watching deadlines, reviews and workflow pressure.`;
+  const sub=mode==='OWNER'?'Your 30-second platform check • Access, sign-ups and administration.':mode==='LEADERSHIP'?`Your 30-second agency check, ${firstName} • Work health, reviews and deadline pressure.`:items.length?`Your 30-second ${role.toLowerCase()} check • ONIT prioritises work, not people.`:`Your 30-second ${role.toLowerCase()} check • Radar is still watching the day.`;
   const clearCopy=mode==='OWNER'?'No platform or access action needs you right now.':mode==='LEADERSHIP'?'No agency-wide deadline, review or workflow condition needs leadership attention right now.':'No urgent action detected.';
   const clearDetail=mode==='OWNER'?'ONIT will surface pending sign-ups, staff setup and organisation configuration issues here.':'ONIT will surface something here when a deadline, review or workflow condition genuinely needs you.';
+  const metricsHtml=`<div class='radarMorningGrid'>${metrics.map(m=>`<div class='morningMetric ${m.tone||''}'><b>${escapeHTML(m.value)}</b><span>${escapeHTML(m.label)}</span></div>`).join('')}</div>`;
+  const start=first?`<div class='radarMorningStart'><div class='morningStartCopy'><small>START HERE</small><b>${escapeHTML(first.title)}</b><span>${escapeHTML(first.copy)}</span></div><button class='morningStartBtn' onclick="${first.onclick}">${escapeHTML(first.actionLabel)}</button></div>`:'';
   const cards=items.length?`<div class='radarItems'>${items.map(i=>`<article class='radarCard'><div class='radarCardTop'><span class='radarLevel ${i.level}'>${i.level==='high'?'Needs action':i.level==='watch'?'Watch':'Next'}</span><span class='radarCode'>${escapeHTML(i.code||'ONIT')}</span></div><h3>${escapeHTML(i.title)}</h3><p>${escapeHTML(i.copy)}</p><div class='radarActions'><button class='radarAction' onclick="${i.onclick}">${escapeHTML(i.actionLabel)}</button><button class='radarIgnore' onclick="ignoreRadarItem('${escapeHTML(i.key).replace(/'/g,'&#39;')}')">IGNORE TODAY</button></div></article>`).join('')}</div>`:`<div class='radarClear'><div class='radarClearIcon'>✓</div><div><b>${escapeHTML(clearCopy)}</b><span>${escapeHTML(clearDetail)}</span></div></div>`;
-  host.innerHTML=`<section class='radarShell'><div class='radarTop'><div><div class='radarEyebrow'>ONIT RADAR</div><div class='radarHeadline'>${escapeHTML(headline)}</div><div class='radarSub'>${escapeHTML(sub)}</div></div><div class='radarLive'>${high?high+' HIGH':'LIVE'}</div></div>${cards}</section>`
+  host.innerHTML=`<section class='radarShell'><div class='radarTop'><div><div class='radarEyebrow'>ONIT RADAR • YOUR 30-SECOND MORNING</div><div class='radarHeadline'>${escapeHTML(headline)}</div><div class='radarSub'>${escapeHTML(sub)}</div></div><div class='radarLive'>${high?high+' HIGH':'LIVE'}</div></div>${metricsHtml}${start}${cards}</section>`
 }
 
 
@@ -1593,15 +1570,6 @@ function morningMetrics(mode){
   if(mode==='TEAM_LEAD'){const mine=myAssignedBriefs().filter(b=>!['Closed','Approved'].includes(String(b.status||'')));return[{value:radar.length,label:'Need attention',tone:radar.length?'urgent':'good'},{value:myTeamLeadQueue().length,label:'My reviews',tone:myTeamLeadQueue().length?'watch':'good'},{value:mine.length,label:'My active work',tone:'good'},{value:morningDueSoon(mine),label:'Due 24 hours',tone:morningDueSoon(mine)?'watch':'good'}]}
   const mine=myAssignedBriefs().filter(b=>!['Closed','Approved'].includes(String(b.status||''))),revisions=mine.filter(b=>String(b.status)==='Revision').length;return[{value:radar.length,label:'Need attention',tone:radar.length?'urgent':'good'},{value:mine.length,label:'Active work',tone:'good'},{value:revisions,label:'Revisions',tone:revisions?'watch':'good'},{value:morningDueSoon(mine),label:'Due 24 hours',tone:morningDueSoon(mine)?'watch':'good'}]
 }
-function renderMorningBrief(mode){
-  const host=document.getElementById('morningBrief');if(!host||!currentUser)return;
-  const items=buildRadarItems(mode),metrics=morningMetrics(mode),first=items[0],firstName=currentUserName().split(' ')[0]||'there';
-  const role=radarRoleName(mode),summary=mode==='OWNER'?'Your platform check before the day starts.':`Your ${role.toLowerCase()} check before the day gets busy.`;
-  const metricHtml=metrics.map(m=>`<div class='morningMetric ${m.tone||''}'><b>${escapeHTML(m.value)}</b><span>${escapeHTML(m.label)}</span></div>`).join('');
-  const start=first?`<div class='morningStart'><div class='morningStartCopy'><small>Start here</small><b>${escapeHTML(first.title)}</b><span>${escapeHTML(first.copy)}</span></div><button class='morningStartBtn' onclick="${first.onclick}">${escapeHTML(first.actionLabel)}</button></div>`:`<div class='morningStart'><div class='morningStartCopy'><small class='morningClear'>You're clear</small><b>No immediate action needs you.</b><span>Keep your current plan. ONIT Radar is still watching the day.</span></div></div>`;
-  host.innerHTML=`<section class='morningShell'><div class='morningTop'><div><div class='morningEyebrow'>30-SECOND MORNING</div><div class='morningTitle'>${escapeHTML(firstName)}, here’s your day at a glance.</div><div class='morningCopy'>${escapeHTML(summary)}</div></div><div class='morningTime'>30 SEC</div></div><div class='morningGrid'>${metricHtml}</div>${start}</section>`
-}
-
 function renderHome(){
   if(!currentUser)return;
   const orgName=rowVal(organisations[0],'Organisation Name')||'your organisation';
@@ -1637,39 +1605,21 @@ function renderHome(){
     scope=briefs;queue=briefs.filter(b=>['Team Lead Review','In Review'].includes(String(b.status||''))&&!b.finalApproved);
     document.getElementById('homeSub').textContent=`Here’s what’s happening across ${orgName} today.`;
     primaryTitle.textContent='ORGANISATION RISK RADAR';primaryCopy.textContent='Early warning across active briefs — not a staff performance score.';
-    queueTitle.textContent='WORK IN REVIEW';queueCopy.textContent='Current work moving through the review and approval system.';queueSection.classList.remove('hidden');
+    queueTitle.textContent='WORK IN REVIEW';queueCopy.textContent='Current work moving through the review and approval system.';
   }else{
     scope=myAssignedBriefs();
     document.getElementById('homeSub').textContent=`Here’s what’s happening in your ONIT workspace today.`;
     primaryTitle.textContent='MY BRIEFS / INBOX';primaryCopy.textContent='Open a brief to read it, start the job, and reply with your completed work.';
   }
-  renderMorningBrief(mode);
   renderOnitRadar(mode);
   renderAccountPortfolio();
-  document.getElementById('homePrimarySection').classList.toggle('hidden',mode==='ACCOUNT');
+  document.getElementById('homePrimarySection').classList.toggle('hidden',['ACCOUNT','LEADERSHIP','OWNER'].includes(mode));
   const active=scope.filter(b=>!['Closed','Approved'].includes(b.status));
   const productionActive=mode==='TRAFFIC'?active.filter(b=>!isTrafficQueuedBrief(b)):active;
-  const review=active.filter(b=>['Team Lead Review','In Review','Revision'].includes(b.status)).length;
-  const projects=mode==='ACCOUNT'?myAccounts().length:new Set(active.map(b=>String(b.project||'').trim()).filter(Boolean)).size;
-  const weekEnd=Date.now()+7*86400000,dueWeek=active.filter(b=>{const t=new Date(b.deadline).getTime();return Number.isFinite(t)&&t>=Date.now()-86400000&&t<=weekEnd}).length;
-  const trafficQueued=mode==='TRAFFIC'?queue.length:0,trafficScheduled=mode==='TRAFFIC'?queue.filter(b=>b.status==='Scheduled').length:0;
-  document.getElementById('homeStats').innerHTML=mode==='TRAFFIC'?`
-    <div class='statCard'><span class='statIcon orange'>▣</span><div><b>${trafficQueued}</b><small>Awaiting Traffic</small></div></div>
-    <div class='statCard'><span class='statIcon green'>◫</span><div><b>${productionActive.length}</b><small>In Production</small></div></div>
-    <div class='statCard'><span class='statIcon amber'>◷</span><div><b>${trafficScheduled}</b><small>Scheduled</small></div></div>
-    <div class='statCard'><span class='statIcon coral'>◉</span><div><b>${review}</b><small>In Review</small></div></div>`:`
-    <div class='statCard'><span class='statIcon orange'>▣</span><div><b>${active.length}</b><small>Active Briefs</small></div></div>
-    <div class='statCard'><span class='statIcon green'>◫</span><div><b>${projects}</b><small>${mode==='ACCOUNT'?'Accounts':'Projects'}</small></div></div>
-    <div class='statCard'><span class='statIcon amber'>◷</span><div><b>${review}</b><small>In Review</small></div></div>
-    <div class='statCard'><span class='statIcon coral'>◉</span><div><b>${dueWeek}</b><small>Due This Week</small></div></div>`;
   renderDashboardActivity(scope.length?scope:briefs);
   renderDashboardDeadlines(active.length?active:briefs);
-  const pulseActive=mode==='TRAFFIC'?productionActive:active;
-  const risks=pulseActive.map(b=>({b,r:riskForBrief(b)})).sort((a,z)=>z.r.score-a.r.score);renderPulse(pulseActive,risks);
-  if(mode==='OWNER'){const attention=risks.filter(x=>x.r.score>=35).slice(0,8).map(x=>x.b);document.getElementById('homeBriefList').innerHTML=attention.length?attention.map(riskMarkup).join(''):`<div class='empty'>No immediate risk detected.</div>`}
-  else document.getElementById('homeBriefList').innerHTML=homeCardList(productionActive,mode==='TRAFFIC'?'No briefs are in production right now.':(mode==='ACCOUNT'?'No briefs currently being managed by you.':'No active briefs assigned to you.'));
-  if(!queueSection.classList.contains('hidden')){if(mode==='TRAFFIC')renderTrafficQueue(queue);else{queueList.classList.remove('trafficQueueHost');queueList.innerHTML=homeCardList(queue,'Nothing is waiting for your review right now.')}}
-  document.getElementById('homeTeam').innerHTML=teamWorkload.slice().sort((a,b)=>(b.overdueCount-a.overdueCount)||(teamOpenCount(b)-teamOpenCount(a))).slice(0,6).map(teamMarkup).join('')||`<div class='empty'>No team data yet.</div>`;
+  document.getElementById('homeBriefList').innerHTML=homeCardList(productionActive,mode==='TRAFFIC'?'No briefs are in production right now.':(mode==='ACCOUNT'?'No briefs currently being managed by you.':'No active briefs assigned to you.'));
+  if(!queueSection.classList.contains('hidden')){if(mode==='TRAFFIC')renderTrafficQueue(queue);else{queueList.classList.remove('trafficQueueHost');const sorted=queue.slice().sort((a,b)=>attentionRank(a)-attentionRank(b)),top=sorted.slice(0,3);queueList.innerHTML=(top.length?top.map(briefMarkup).join(''):`<div class='empty'>Nothing is waiting for your review right now.</div>`)+(sorted.length>3?`<div class='compactQueueFooter'><button class='secondary' onclick="show('briefs')">VIEW ALL IN WORK</button></div>`:'')}}
   hydrateProfilePhotos();
 }
 function attentionRank(b){return -riskForBrief(b).score}
@@ -1680,7 +1630,7 @@ function filteredBriefs(){const q=(document.getElementById('briefSearch')?.value
 function renderBriefs(){const list=filteredBriefs();document.getElementById('briefList').innerHTML=list.length?list.map(briefMarkup).join(''):`<div class='empty'>No matching briefs.</div>`}
 function briefMarkup(b){const t=timeInfo(b),r=riskForBrief(b),clock=approvalClockInfo(b),code=encodeURIComponent(b.code).replace(/'/g,'%27'),s=String(b.status||''),statusClass=/Approved|Closed/i.test(s)?'ok':/Review/i.test(s)?'review':/Revision|Paused/i.test(s)?'warn':'active';return `<div class='brief' onclick="detail(decodeURIComponent('${code}'))"><div class='briefIdentity'><span class='briefThumb'>${escapeHTML((b.client||'O').charAt(0).toUpperCase())}</span><span class='briefCopy'><b>${escapeHTML(b.client)} — ${escapeHTML(b.project)}</b><small>${escapeHTML(b.code)} • ${escapeHTML(b.assignee||'Unassigned')}</small></span></div><div class='briefTags'><span class='statusChip ${statusClass}'>${escapeHTML(b.status)}</span>${b.iteration?`<span class='miniChip'>V${b.iteration}</span>`:`<span class='miniChip'>NEW</span>`}${clock?`<span class='approvalClock ${clock.cls}' data-approval-due='${escapeHTML(b.approvalDueAt)}'>${escapeHTML(clock.text)}</span>`:''}${r.score>=35?`<span class='miniChip risk ${r.level==='HIGH'?'high':''}'>Risk ${r.score}</span>`:''}</div><div class='timer ${t.cls}'>${escapeHTML(t.text)}</div><span class='rowArrow'>›</span></div>`}
 
-// ===== ONIT Memory v0.27.0 =====
+// ===== ONIT Experience Streamline v0.28.0 =====
 const memoryState={filter:'all',cases:[],pulse:null,externalLoaded:false,loading:false,lastExternalAt:0,errors:[]};
 function memoryVal(o,...keys){for(const k of keys){const v=rowVal(o,k);if(v!==undefined&&v!==null&&String(v).trim()!=='')return v}return ''}
 function memoryText(v){if(Array.isArray(v))return v.map(memoryText).join(' ');if(v&&typeof v==='object')return Object.values(v).map(memoryText).join(' ');return String(v==null?'':v)}
@@ -1726,9 +1676,7 @@ function refreshMemory(){memoryState.externalLoaded=false;memoryState.cases=[];m
 function memoryResultMarkup(d,q){const icon=d.source==='work'?'WORK':d.source==='case'?'CASE':'PULSE',date=memoryFormatDate(d.date),why=(d._why||[]).slice(0,3),link=memorySafeUrl(d.link);return `<article class='memoryResult' onclick="memoryOpen('${escapeHTML(d.id)}')"><div class='memorySourceIcon ${escapeHTML(d.source)}'>${icon}</div><div><h3>${escapeHTML(d.title)}</h3><div class='memoryMeta'>${escapeHTML([d.sourceLabel,d.subtitle,date].filter(Boolean).join(' • '))}</div><div class='memorySnippet'>${escapeHTML(memorySnippet(d,q))}</div>${why.length?`<div class='memoryWhy'>${why.map(x=>`<span>MATCHED ${escapeHTML(x)}</span>`).join('')}</div>`:''}</div><div class='memoryActions'><button class='memoryOpen' onclick="event.stopPropagation();memoryOpen('${escapeHTML(d.id)}')">OPEN ORIGINAL</button>${link?`<a class='memoryExternal' href='${escapeHTML(link)}' target='_blank' rel='noopener' onclick='event.stopPropagation()' title='Open linked work'>↗</a>`:''}</div></article>`}
 function renderMemory(loadExternal=true){const root=document.getElementById('memoryRoot');if(!root)return;const previous=memoryQuery(),docs=memoryFilteredDocs(),counts={work:memoryBriefDocs().length,case:memoryCaseDocs().length,digital:memoryPulseDocs().length},q=previous;root.innerHTML=`<div class='memoryShell'><div class='memoryHero'><div class='memoryHeroTop'><div><div class='memoryEyebrow'>ONIT • ORGANISATIONAL MEMORY</div><h1>Memory</h1><p>Find work, decisions, evidence and digital learning the organisation has already captured. ONIT only searches records this account is already authorised to see.</p></div><button class='memoryRefresh' onclick='refreshMemory()'>REFRESH MEMORY</button></div><div class='memorySearchWrap'><input id='memorySearch' value='${escapeHTML(q)}' placeholder='Search a brand, campaign, person, insight, revision or phrase…' oninput='renderMemory(false)' onkeydown="if(event.key==='Enter'){event.preventDefault();renderMemory(false)}"><button class='memorySearchBtn' onclick='renderMemory(false)'>SEARCH</button></div><div class='memoryPrompt'><button onclick="memorySetExample('Christmas campaign')">Christmas campaign</button><button onclick="memorySetExample('client revision')">Client revision</button><button onclick="memorySetExample('Gen Z')">Gen Z</button><button onclick="memorySetExample('approved')">Approved work</button></div></div><div class='memorySourceSummary'><div class='memorySourceStat'><b>${counts.work}</b><span>VISIBLE WORK RECORDS</span></div><div class='memorySourceStat'><b>${counts.case}</b><span>VISIBLE CASES</span></div><div class='memorySourceStat'><b>${counts.digital}</b><span>DIGITAL SIGNALS</span></div></div><div class='memoryToolbar'><div class='memoryFilters'>${[['all','ALL'],['work','WORK'],['case','CASES'],['digital','DIGITAL']].map(([id,l])=>`<button class='${memoryState.filter===id?'active':''}' onclick="memorySetFilter('${id}')">${l}</button>`).join('')}</div><div class='memoryStatus' id='memoryStatus'>${memoryState.loading?`<span class='memoryLoading'><i class='memoryDot'></i> Checking sources…</span>`:memoryState.errors.length?`Some sources unavailable: ${escapeHTML(memoryState.errors.join(', '))}`:`${docs.length} ${q?'match'+(docs.length===1?'':'es'):'recent record'+(docs.length===1?'':'s')}`}</div></div><div class='memoryResults'>${docs.length?docs.slice(0,60).map(d=>memoryResultMarkup(d,q)).join(''):`<div class='memoryEmpty'><b>${q?'Nothing matched that search.':'No organisational memory is available to this account yet.'}</b>${q?'Try a brand, project, person, brief code or phrase from the work.':'As ONIT captures work, Cases and Digital signals, they will become searchable here.'}</div>`}</div></div>`;if(loadExternal&&!memoryState.externalLoaded&&!memoryState.loading)setTimeout(()=>loadMemoryExternal(false),0)}
 
-function renderArchive(){const q=(document.getElementById('archiveSearch')?.value||'').toLowerCase();const closed=briefs.filter(b=>b.status==='Closed'&&[b.code,b.client,b.project,b.assignee].join(' ').toLowerCase().includes(q));document.getElementById('archiveList').innerHTML=closed.length?closed.map(briefMarkup).join(''):`<div class='empty'>No matching closed briefs.</div>`}
-
-function teamMarkup(w){const open=teamOpenCount(w),working=Number(w.activeCount||0),assigned=Number(w.assignedCount||0),review=Number(w.reviewCount||0);const cls=w.overdueCount?'redbg':working?'':open?'orangebg':'gray';let right='AVAILABLE',rightCls='';if(w.overdueCount){right=`${w.overdueCount} overdue`;rightCls='red'}else if(w.nextDeadline){const ms=new Date(w.nextDeadline)-Date.now();right=ms<0?'OVERDUE':duration(ms);rightCls=ms<0?'red':ms<3600000?'orange':'green'}const labels=[];if(working)labels.push(`${working} ONIT`);if(assigned)labels.push(`${assigned} ASSIGNED`);if(review)labels.push(`${review} IN REVIEW`);if(!labels.length)labels.push('AVAILABLE');if(w.timelineClash)labels.push('CLASH');return `<div class='card person ${open>0?'workingPerson':''}'><div class='personInfo'><div class='avatar' data-avatar-user='${escapeHTML(w.userId||'')}'>${escapeHTML(initials(w.fullName||'Member'))}</div><div><b><span class='dot ${cls}'></span>${escapeHTML(w.fullName||'Member')}</b><div class='muted'>${escapeHTML(w.position||'')} ${w.department?'• '+escapeHTML(w.department):''}</div><span class='pill'>${labels.join(' • ')}</span></div></div><b class='${rightCls}'>${escapeHTML(right)}</b></div>`}
+function renderArchive(){const closed=briefs.filter(b=>b.status==='Closed').slice().sort((a,z)=>new Date(z.closedAt||z.updatedAt||z.createdAt||0)-new Date(a.closedAt||a.updatedAt||a.createdAt||0));document.getElementById('archiveList').innerHTML=closed.length?closed.map(briefMarkup).join(''):`<div class='empty'>No closed briefs yet.</div>`}
 function renderTeam(){document.getElementById('teamGrid').innerHTML=teamWorkload.length?teamWorkload.map(teamMarkup).join(''):`<div class='empty'>No team data yet.</div>`;hydrateProfilePhotos()}
 
 function populateClients(){const known=new Map(),source=clients.filter(c=>String(rowVal(c,'Status')||'Active').toLowerCase()!=='inactive');source.forEach(c=>{const name=rowVal(c,'Client Name')||rowVal(c,'Brand');if(name)known.set(String(rowVal(c,'Client ID')||name).toLowerCase(),{id:rowVal(c,'Client ID'),name,brand:rowVal(c,'Brand')||name})});briefs.forEach(b=>{if(b.client&&!known.has(String(b.clientId||b.client).toLowerCase()))known.set(String(b.clientId||b.client).toLowerCase(),{id:b.clientId||'',name:b.client,brand:b.brand||b.client})});window.clientChoices=[...known.values()];const el=document.getElementById('client');el.innerHTML=window.clientChoices.length?window.clientChoices.map((c,i)=>`<option value='${i}'>${escapeHTML(c.name)}${c.brand!==c.name?' — '+escapeHTML(c.brand):''}</option>`).join(''):`<option value=''>No account / brand has been created yet</option>`}
@@ -2264,12 +2212,11 @@ function renderMore(){if(!currentUser)return;const names=backendAccess();let htm
     html+=`<div class='morecard' style='grid-column:1/-1'><h3>STAFF ACCOUNT MANAGEMENT <span class='ownerBadge'>OWNER ONLY</span></h3><div class='bigTiny'>Correct a staff email, send a reset code, or offboard someone without deleting their work history. Deactivated staff cannot sign in or receive new assignments, but their old briefs, approvals, comments and files remain intact.</div><div class='field' style='margin-top:12px'><label>SELECT STAFF MEMBER</label><select id='ownerRecoveryUser' onchange='populateRecoveryEmail()'><option value=''>Choose staff member…</option>${staffAccounts.map(u=>`<option value='${escapeHTML(rowVal(u,'User ID'))}'>${escapeHTML(rowVal(u,'Full Name'))} — ${escapeHTML(rowVal(u,'Position')||rowVal(u,'Department')||'Staff')} — ${escapeHTML(rowVal(u,'Email')||'No email')} — ${escapeHTML(rowVal(u,'Status')||'Unknown')}</option>`).join('')}</select></div><div id='ownerStaffAccountPanel'><div class='empty'>Choose a staff member to manage the account.</div></div></div>`;
   }
   if(canManagePeople()){html+=`<div class='morecard' style='grid-column:1/-1'><h3>PENDING SIGNUPS</h3>${pendingUsers.length?pendingUsers.map(u=>`<div class='pendingRow'><div><b>${escapeHTML(rowVal(u,'Full Name'))}</b><div class='bigTiny'>${escapeHTML(rowVal(u,'Email'))} • ${escapeHTML(departmentOf(u))} • ${escapeHTML(positionOf(u))}</div></div><div class='actions'><button class='secondary' onclick="approvePending('${encodeURIComponent(rowVal(u,'User ID'))}')">APPROVE</button><button class='secondary' onclick="rejectPending('${encodeURIComponent(rowVal(u,'User ID'))}')">REJECT</button></div></div>`).join(''):`<div class='empty'>No pending signup requests.</div>`}</div>`}
-  if(canManageClients()||canManagePeople()){html+=`<div class='morecard' style='grid-column:1/-1'><h3>MANAGE</h3>${canManageClients()?`<button class='secondary linkbtn' onclick='addClient()'>+ ADD ACCOUNT</button>`:''}${canManagePeople()?`<button class='secondary linkbtn' onclick='addMember()'>+ ADD MEMBER PROFILE</button>`:''}${isOwner()?`<button class='secondary linkbtn' onclick="show('data')">MANAGE DATA ACCESS</button>`:''}</div>`}
-  if(canSeeReports()&&reportSummary){html+=`<div class='morecard' style='grid-column:1/-1'><h3>REPORTS — LIVE SUMMARY</h3>${reportSummaryTable()}<button class='secondary linkbtn' onclick='refreshReportsNow()'>REFRESH REPORTS</button><button class='secondary linkbtn' onclick="activeBackendDataset='REPORTS';show('data')">OPEN REPORTS DATA</button></div>`}
-  if(names.length){html+=`<div class='morecard' style='grid-column:1/-1'><h3>BACKEND DATA</h3><div class='bigTiny'>Read-only data access is enforced inside ONIT. Raw Google Sheet access is not granted to staff. CD, DCD and MD can download directly. Other staff need one approval from any one of them.</div><div class='bigTiny'>${escapeHTML(names.join(' • '))}</div><button class='secondary linkbtn' onclick="show('data')">OPEN DATA CONSOLE</button></div>`}
+  if(canManagePeople()){html+=`<div class='morecard' style='grid-column:1/-1'><h3>MANAGE</h3><button class='secondary linkbtn' onclick='addMember()'>+ ADD MEMBER PROFILE</button></div>`}
+  if(names.length||canSeeReports()){html+=`<div class='morecard' style='grid-column:1/-1'><h3>DATA & ACCESS</h3><div class='bigTiny'>Reports, governed exports and authorised backend datasets live in one place.</div><button class='secondary linkbtn' onclick="show('data')">OPEN DATA & ACCESS</button></div>`}
   html+=dataExportRequestsMarkup();
   html+=`<div class='morecard' style='grid-column:1/-1'><h3>INSTALL / UPDATE ONIT</h3><div class='bigTiny'>Install ONIT on this device for quick access. ONIT now checks the hosted frontend version automatically and repairs stale installed copies without requiring a reinstall.</div><div class='actions'><button class='secondary linkbtn' onclick='installOnit()'>INSTALL ON THIS DEVICE</button><button class='secondary linkbtn' onclick='forceFrontendUpdate()'>CHECK / REPAIR UPDATE</button></div></div>`;
-  html+=`<div class='morecard' style='grid-column:1/-1'><h3>HELP / ABOUT</h3><div class='bigTiny'>ONIT Frontend v${APP_VERSION} • Backend ${backendVersion||'checking…'} • Time + People + Status<br>Every brief has an owner, deadline, status and visible history.<br>Live Brief Overview, Daily/Weekly Team Work Utilisation, Buzzer, ONIT Pulse, Digital Pulse, ONIT Radar, Risk Radar, ONIT Memory, Brief Replay and Handover Mode are active.<br>Profile photos, governed PDF data exports, Owner Broadcasts, Staff Account Management and approved-job staff archives are active.<br>Account Managers capture briefs into the Traffic Queue; the Traffic Manager prioritises, schedules and releases them into production. The Traffic Manager, Dr. Kunbi, Creative Director, Deputy Creative Director and Managing Director can still create/send operational briefs directly. Account Management + Traffic share one organisation-wide account / brand pool, and a brief can be assigned to multiple team members at once. Work submissions can contain multiple files, links and text blocks without bypassing approval. Review-state work is surfaced directly on the dashboard and opens into the submitted work for faster review. Brief visibility is private by workflow: sender, assigned/CC users, relevant Team Lead review, final approver stage and System Owner only.<br>Owner-assigned Team Leads provide first-stage approval before CD/DCD final approval.<br>Installed HTTPS/PWA copies check automatically for frontend updates; backend changes are live immediately.<br>The System Owner account administers data access separately from operational staff roles and can correct staff emails, send password-reset codes, deactivate/reactivate staff and preserve historical work.</div></div></div>`;document.getElementById('moreContent').innerHTML=html;hydrateProfilePhotos()}
+  html+=`<div class='morecard' style='grid-column:1/-1'><div class='streamlineAbout'><div><h3>ABOUT ONIT</h3><div class='bigTiny'>Frontend v${APP_VERSION} • Backend ${backendVersion||'checking…'}</div></div><button class='secondary linkbtn' onclick="showToast('ONIT','Work. People. Attention. Proof.')">VIEW DETAILS</button></div></div></div>`;document.getElementById('moreContent').innerHTML=html;hydrateProfilePhotos()}
 async function approvePending(id){
   const targetUserId=decodeURIComponent(id),target=pendingUsers.find(u=>String(rowVal(u,'User ID'))===String(targetUserId)),name=target?rowVal(target,'Full Name'):'The member';
   try{
@@ -2543,3 +2490,23 @@ boot();
 <script src="./pulse-module.js?v=0.22.0"></script>
 </body>
 </html>
+
+<style id="experience-streamline-v028">
+/* ONIT v0.28.0 — Experience Streamline */
+.top{justify-content:flex-end!important}
+.radarMorningGrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:14px 0 12px;position:relative;z-index:1}
+.radarMorningGrid .morningMetric{background:rgba(255,255,255,.075);border-color:rgba(255,255,255,.1);color:#fff}
+.radarMorningGrid .morningMetric span{color:rgba(255,255,255,.62)}
+.radarMorningGrid .morningMetric.urgent{background:rgba(255,91,46,.14);border-color:rgba(255,91,46,.3)}
+.radarMorningGrid .morningMetric.watch{background:rgba(244,185,66,.10);border-color:rgba(244,185,66,.22)}
+.radarMorningStart{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:11px 12px;margin:0 0 12px;border-radius:13px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);position:relative;z-index:1}
+.radarMorningStart .morningStartCopy{min-width:0}
+.radarMorningStart .morningStartCopy small{color:#ff9d82}
+.radarMorningStart .morningStartCopy b{color:#fff}
+.radarMorningStart .morningStartCopy span{color:rgba(255,255,255,.66)}
+.radarMorningStart .morningStartBtn{background:#fff;color:#171717;border-color:#fff}
+.compactQueueFooter{display:flex;justify-content:flex-end;padding-top:10px;border-top:1px solid #eee;margin-top:4px}
+.compactQueueFooter button{min-height:36px}
+.streamlineAbout{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap}
+@media(max-width:820px){.radarMorningGrid{grid-template-columns:repeat(2,minmax(0,1fr))}.radarMorningStart{align-items:flex-end}.top{justify-content:flex-end!important}}
+</style>
