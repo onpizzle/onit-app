@@ -953,8 +953,58 @@ button:not(:disabled):active{transform:scale(.985)}
 @media(max-width:820px){.onitSyncChip{top:72px;right:12px}}
 @media(prefers-reduced-motion:reduce){button:not(:disabled),.onitSyncChip{transition:none}.loadbar{animation:none!important;width:70%}}
 </style>
+
+<style id="onit-polish-v0290">
+/* ONIT v0.29.0 — polish, motion and accessibility */
+:root{--focus-ring:rgba(255,91,46,.32);--focus-solid:#ff5b2e}
+html{scroll-behavior:smooth}
+body{-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+button,input,select,textarea,a,[role="button"]{outline:none}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,a:focus-visible,[role="button"]:focus-visible{
+  outline:3px solid var(--focus-ring)!important;outline-offset:2px!important;box-shadow:0 0 0 1px var(--focus-solid)!important
+}
+.nav button:focus-visible{outline-offset:-1px!important}
+.new,.secondary,.mini,.memorySearchBtn,.memoryOpen,.memoryExternal,.bell,.back,.tabs button,.filterRow button,.mobileMoreGrid>button{
+  transition:transform .12s ease,box-shadow .16s ease,background-color .16s ease,border-color .16s ease,color .16s ease,opacity .16s ease!important
+}
+.new:not(:disabled):hover{box-shadow:0 8px 20px rgba(23,23,22,.13);transform:translateY(-1px)}
+.secondary:not(:disabled):hover,.mini:not(:disabled):hover{box-shadow:0 6px 16px rgba(31,26,21,.07);transform:translateY(-1px)}
+.new:not(:disabled):active,.secondary:not(:disabled):active,.mini:not(:disabled):active,.memorySearchBtn:active,.memoryOpen:active,.bell:active{transform:translateY(0) scale(.98)!important}
+.card,.morecard,.memoryResult,.trafficQueueCard,.analyticsCard,.briefCard{transition:box-shadow .18s ease,border-color .18s ease,transform .18s ease}
+@media(hover:hover) and (pointer:fine){
+  .morecard:hover,.memoryResult:hover{box-shadow:0 10px 28px rgba(31,26,21,.055)}
+}
+.main>section.onitSectionEnter{animation:onitSectionEnter .24s cubic-bezier(.2,.72,.2,1) both}
+@keyframes onitSectionEnter{from{opacity:.72;transform:translateY(5px)}to{opacity:1;transform:none}}
+.toast:not(.hidden){animation:onitToastIn .22s cubic-bezier(.2,.78,.2,1) both}
+@keyframes onitToastIn{from{opacity:0;transform:translateY(-7px) scale(.985)}to{opacity:1;transform:none}}
+.modal:not(.hidden){animation:onitBackdropIn .16s ease both}.modal:not(.hidden) .modalBox{animation:onitModalIn .22s cubic-bezier(.2,.76,.2,1) both}
+@keyframes onitBackdropIn{from{background:rgba(0,0,0,0)}to{background:rgba(0,0,0,.72)}}
+@keyframes onitModalIn{from{opacity:.65;transform:translateY(10px) scale(.985)}to{opacity:1;transform:none}}
+.onitSaved{animation:onitSavedPulse .42s ease both!important}
+@keyframes onitSavedPulse{0%{box-shadow:0 0 0 0 rgba(39,174,112,.3)}50%{box-shadow:0 0 0 5px rgba(39,174,112,.11)}100%{box-shadow:0 0 0 0 rgba(39,174,112,0)}}
+.onitA11yCard{background:linear-gradient(180deg,#fff,#fbfaf8)}
+.onitA11yStatus{display:inline-flex;align-items:center;gap:7px;margin-top:8px;font-size:10px;font-weight:850;color:#77716a}
+.onitA11yStatus:before{content:"";width:7px;height:7px;border-radius:50%;background:#27ae70;box-shadow:0 0 0 3px #eaf8f0}
+.onitSkipLink{position:fixed;left:14px;top:10px;z-index:999;background:#171716;color:#fff;padding:10px 13px;border-radius:9px;font-size:11px;font-weight:850;transform:translateY(-150%);transition:transform .16s ease}
+.onitSkipLink:focus{transform:translateY(0)}
+.onitSrOnly{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}
+@media(max-width:820px){
+  button,.new,.secondary,.mini,.bell,.tabs button,.filterRow button,.memorySearchBtn,.memoryOpen,.mobileMoreClose{min-height:44px}
+  .nav button.mobilePrimaryNav{min-height:64px!important}
+  input:not([type="checkbox"]):not([type="radio"]),select,textarea{min-height:44px}
+  .toast{left:12px!important;right:12px!important;top:max(74px,calc(env(safe-area-inset-top) + 58px))!important;width:auto!important}
+}
+html.onitReduceMotion{scroll-behavior:auto}
+html.onitReduceMotion *,html.onitReduceMotion *::before,html.onitReduceMotion *::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
+@media(prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
+}
+</style>
 </head>
 <body>
+<a class="onitSkipLink" href="#mainContent">Skip to main content</a>
 <div id="loadbar" class="loadbar hidden"></div><div id="onitSyncChip" class="onitSyncChip" aria-live="polite">SYNCING</div>
 <div id="authGate" class="authGate">
   <aside class="authHero" aria-hidden="true">
@@ -1037,7 +1087,7 @@ button:not(:disabled):active{transform:scale(.985)}
     <div class="user"><b id="orgLabel">ONIT</b><span class="muted" id="userRoleLabel"></span><div class="userMeta" id="userEmailLabel"></div></div>
   </div>
 </header>
-<main class="main">
+<main class="main" id="mainContent" tabindex="-1">
 <section id="home">
   <div class="dashboardHeading">
     <div>
@@ -1126,7 +1176,7 @@ button:not(:disabled):active{transform:scale(.985)}
 </div>
 </div>
 </div>
-<div id="notifPanel" class="notifPanel hidden"></div><div id="toast" class="toast hidden"></div>
+<div id="notifPanel" class="notifPanel hidden"></div><div id="toast" class="toast hidden" role="status" aria-live="polite" aria-atomic="true"></div>
 
 <div id="handoverModal" class="modal hidden" onclick="if(event.target===this)closeHandover()"><div class="modalBox" style="height:auto;max-width:560px"><div class="modalTop"><b>HANDOVER BRIEF</b><button class="secondary" onclick="closeHandover()">CLOSE</button></div><div class="handoverHint">The brief history, files, versions and deadline stay intact. The current TO assignment is closed and the new assignee must press START WORKING.</div><div class="field"><label>HAND OVER TO</label><select id="handoverUser"></select></div><div class="field"><label>REASON</label><textarea id="handoverReason" placeholder="e.g. Annual leave, unavailable, workload shift"></textarea></div><div id="handoverClash" class="notice hidden"></div><div class="actions"><button class="new" onclick="confirmHandover(this)">CONFIRM HANDOVER</button></div></div></div>
 <div id="trafficManageModal" class="modal hidden" onclick="if(event.target===this)closeTrafficManager()"><div class="modalBox trafficManageBox"><div class="modalTop"><div><b>TRAFFIC CONTROL</b><div class="tiny" id="trafficModalBrief"></div></div><button class="secondary" onclick="closeTrafficManager()">CLOSE</button></div><div class="trafficManageGrid"><div class="field"><label>ASSIGNEE(S)</label><div id="trafficAssigneeList" class="trafficAssigneeList"></div></div><div><div class="field"><label>PRIORITY</label><select id="trafficPriority"><option>Low</option><option>Normal</option><option>High</option><option>Urgent</option></select></div><div class="field"><label>SCHEDULED START</label><input id="trafficScheduledStart" type="datetime-local"></div><div class="field"><label>INTERNAL DEADLINE</label><input id="trafficInternalDeadline" type="datetime-local"><div class="tiny">Client deadline stays recorded separately.</div></div><label class="trafficHoldToggle"><input id="trafficHold" type="checkbox"> Put this brief on hold</label><div class="field"><label>HOLD REASON / TRAFFIC NOTE</label><textarea id="trafficNote" placeholder="e.g. Waiting for current urgent job to clear"></textarea></div></div></div><div id="trafficConflictNote" class="notice hidden"></div><div class="actions"><button class="secondary" onclick="saveTrafficSchedule(this,false)">SAVE / SCHEDULE</button><button class="new" onclick="saveTrafficSchedule(this,true)">RELEASE NOW</button></div></div></div>
@@ -1140,7 +1190,7 @@ button:not(:disabled):active{transform:scale(.985)}
 <script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-messaging-compat.js"></script>
-<script>const APP_VERSION='0.28.1';
+<script>const APP_VERSION='0.29.0';
 const BACKEND_DATASETS=['USERS','CLIENTS','BRIEFS','ASSIGNMENTS','ITERATIONS','ACTIVITY_LOG','NOTIFICATIONS','REPORTS'];
 const API_URL='https://script.google.com/macros/s/AKfycbyLVpsQLFCpQWRIvRndw66sghmu5rtK31cuthS7hXjJ--lf703mJPIbJ2zpLDIlH76b/exec';
 let ORG_ID=localStorage.getItem('onit-org')||'';
@@ -1221,6 +1271,32 @@ function sameBrief(r,code){return String(rowVal(r,'Brief Code','briefCode','code
 function parseJsonArray(v){try{const a=JSON.parse(v||'[]');return Array.isArray(a)?a:[]}catch(e){return []}}
 function versionAtLeast(actual,min){const a=String(actual||'').split('.').map(Number),b=String(min).split('.').map(Number);for(let i=0;i<3;i++){const x=a[i]||0,y=b[i]||0;if(x>y)return true;if(x<y)return false}return true}
 let busyDepth=0,busyShowTimer=null,syncChipTimer=null;
+const ONIT_REDUCE_MOTION_KEY='onit-reduce-motion';
+let onitToastTimer=null,onitLastModalFocus=null;
+function onitSystemPrefersReducedMotion(){return !!window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches}
+function onitReducedMotionEnabled(){const saved=localStorage.getItem(ONIT_REDUCE_MOTION_KEY);return saved===null?onitSystemPrefersReducedMotion():saved==='1'}
+function applyOnitMotionPreference(){document.documentElement.classList.toggle('onitReduceMotion',onitReducedMotionEnabled())}
+function toggleOnitReducedMotion(box){localStorage.setItem(ONIT_REDUCE_MOTION_KEY,box.checked?'1':'0');applyOnitMotionPreference();showToast('Motion preference',box.checked?'Reduced motion is on. ONIT will keep transitions minimal.':'Reduced motion is off. Subtle interface motion is enabled.');renderMore()}
+function updateNavAccessibility(sectionId){document.querySelectorAll('.nav button[data-section]').forEach(btn=>{const active=btn.classList.contains('active')||btn.dataset.section===sectionId&&(!mobileNavMode()||!['archive','memory','data','cases','more'].includes(sectionId));if(active)btn.setAttribute('aria-current','page');else btn.removeAttribute('aria-current')})}
+function animateOnitSection(section){if(!section||onitReducedMotionEnabled())return;section.classList.remove('onitSectionEnter');void section.offsetWidth;section.classList.add('onitSectionEnter');setTimeout(()=>section.classList.remove('onitSectionEnter'),320)}
+function decorateOnitInteractiveRegions(root=document){root.querySelectorAll?.('.brief[onclick],.memoryResult[onclick],.trafficQueueCard[onclick],.resourceCard[onclick]').forEach(el=>{if(!el.hasAttribute('tabindex'))el.tabIndex=0;if(!el.hasAttribute('role'))el.setAttribute('role','button')})}
+function onitOpenModal(){return [...document.querySelectorAll('.modal:not(.hidden)')].pop()||null}
+function focusOnitModal(modal){if(!modal)return;onitLastModalFocus=document.activeElement;modal.setAttribute('role',modal.getAttribute('role')||'dialog');modal.setAttribute('aria-modal','true');const target=modal.querySelector('button:not(:disabled),input:not(:disabled),select:not(:disabled),textarea:not(:disabled),[tabindex]:not([tabindex="-1"])');setTimeout(()=>target?.focus(),0)}
+function closeOnitModalByEscape(modal){if(!modal)return false;const id=modal.id;if(id==='previewModal'){closePreview();return true}if(id==='trafficManageModal'){closeTrafficManager();return true}if(id==='handoverModal'){closeHandover();return true}if(id==='buzzerComposeModal'){closeBuzzerComposer();return true}if(id==='broadcastModal'){ackBroadcast();return true}return false}
+function initialiseOnitPolish(){
+  applyOnitMotionPreference();
+  const bell=document.querySelector('.bell');if(bell&&!bell.getAttribute('aria-label'))bell.setAttribute('aria-label','Open notifications');
+  decorateOnitInteractiveRegions();updateNavAccessibility('home');
+  const obs=new MutationObserver(muts=>{for(const m of muts){if(m.type==='childList')m.addedNodes.forEach(n=>{if(n.nodeType===1){decorateOnitInteractiveRegions(n);if(n.matches?.('.modal:not(.hidden)'))focusOnitModal(n)}});if(m.type==='attributes'&&m.target.classList?.contains('modal')&&!m.target.classList.contains('hidden'))focusOnitModal(m.target)}});obs.observe(document.body,{subtree:true,childList:true,attributes:true,attributeFilter:['class']});
+}
+document.addEventListener('keydown',e=>{
+  const interactive=e.target.closest?.('.brief[onclick],.memoryResult[onclick],.trafficQueueCard[onclick],.resourceCard[onclick]');
+  if(interactive&&(e.key==='Enter'||e.key===' ')){e.preventDefault();interactive.click();return}
+  const modal=onitOpenModal();
+  if(e.key==='Escape'){const more=document.getElementById('mobileMoreBackdrop');if(more?.classList.contains('open')){closeMobileMore();return}const panel=document.getElementById('notifPanel');if(panel&&!panel.classList.contains('hidden')){panel.classList.add('hidden');return}if(closeOnitModalByEscape(modal)){setTimeout(()=>onitLastModalFocus?.focus?.(),0);return}}
+  if(e.key==='Tab'&&modal){const focusables=[...modal.querySelectorAll('button:not(:disabled),a[href],input:not(:disabled),select:not(:disabled),textarea:not(:disabled),[tabindex]:not([tabindex="-1"])')].filter(x=>x.offsetParent!==null);if(focusables.length){const first=focusables[0],last=focusables[focusables.length-1];if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus()}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus()}}}
+});
+
 function setBusy(on){
   const bar=document.getElementById('loadbar');if(!bar)return;
   if(on){
@@ -1381,7 +1457,7 @@ function handleMoreNavigation(btn){if(!mobileNavMode())return show('more',btn);s
 function closeMobileMore(restore=true){const back=document.getElementById('mobileMoreBackdrop');if(back){back.classList.remove('open');back.setAttribute('aria-hidden','true')}document.body.classList.remove('mobileMoreOpen');if(restore)syncMobileNavActive(currentVisibleSection())}
 function openMobileMoreSection(id){closeMobileMore(false);show(id)}
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&document.getElementById('mobileMoreBackdrop')?.classList.contains('open'))closeMobileMore()});
-function show(id,btn){document.querySelectorAll('main>section').forEach(x=>x.classList.add('hidden'));document.getElementById(id).classList.remove('hidden');if(['home','briefs','team','archive','memory','data','more'].includes(id))lastListSection=id;const keep=uiSectionIsDirty(id);if(id==='home'&&!keep)renderHome();if(id==='briefs'&&!keep)renderBriefs();if(id==='team'&&!keep)renderTeam();if(id==='archive'&&!keep)renderArchive();if(id==='memory'&&!keep)renderMemory();if(id==='data'&&!keep)renderDataPage();if(id==='more'&&!keep)renderMore();if(mobileNavMode())syncMobileNavActive(id);else if(btn){document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active'));btn.classList.add('active')}else{document.querySelectorAll('.nav button').forEach(x=>x.classList.toggle('active',x.dataset.section===id))}}
+function show(id,btn){document.querySelectorAll('main>section').forEach(x=>x.classList.add('hidden'));const section=document.getElementById(id);section.classList.remove('hidden');if(['home','briefs','team','archive','memory','data','more'].includes(id))lastListSection=id;const keep=uiSectionIsDirty(id);if(id==='home'&&!keep)renderHome();if(id==='briefs'&&!keep)renderBriefs();if(id==='team'&&!keep)renderTeam();if(id==='archive'&&!keep)renderArchive();if(id==='memory'&&!keep)renderMemory();if(id==='data'&&!keep)renderDataPage();if(id==='more'&&!keep)renderMore();if(mobileNavMode())syncMobileNavActive(id);else if(btn){document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active'));btn.classList.add('active')}else{document.querySelectorAll('.nav button').forEach(x=>x.classList.toggle('active',x.dataset.section===id))}updateNavAccessibility(id);animateOnitSection(section);decorateOnitInteractiveRegions(section)}
 function applyPermissions(){
   if(!currentUser)return;
   const org=organisations[0],mode=dashboardMode();
@@ -1895,7 +1971,7 @@ function closeHandover(){document.getElementById('handoverModal').classList.add(
 function updateHandoverClash(){const id=document.getElementById('handoverUser')?.value,w=teamWorkload.find(x=>x.userId===id),el=document.getElementById('handoverClash');if(!el)return;if(w&&(teamOpenCount(w)>=2||w.timelineClash)){el.textContent=`Heads-up: ${w.fullName} already has ${teamOpenCount(w)} open brief(s)${w.nextDeadline?' • next deadline '+formatDateTime(w.nextDeadline):''}. Handover is still allowed.`;el.classList.remove('hidden')}else el.classList.add('hidden')}
 async function confirmHandover(button){const toUserId=document.getElementById('handoverUser').value,reason=document.getElementById('handoverReason').value.trim();if(!reason)return alert('Please add a short handover reason.');if(!confirm('Hand this brief over now? The new assignee will need to press START WORKING.'))return;const old=button.textContent;button.disabled=true;button.textContent='HANDING OVER…';try{await apiPost('handoverBrief',{briefCode:current.code,toUserId,reason});closeHandover();await loadFromGoogle(true);showToast('Handover complete','The brief history is intact and the new assignee has been notified.')}catch(e){alert('ONIT could not complete the handover. '+e.message)}finally{button.disabled=false;button.textContent=old}}
 
-async function runAction(button,action,payload,ok){if(!current||mutationBusy)return false;if(!apiOnline){alert('Refresh ONIT before making changes.');return false}if(!versionAtLeast(backendVersion,'0.14.0')){alert('Deploy ONIT Backend V0.14.0 before using this frontend.');return false}const snapshot=current,old=button?.textContent;mutationBusy=true;setBusy(true);if(button){button.disabled=true;button.textContent='WORKING…'}let saved=false,busyReleased=false;try{await apiPost(action,{briefCode:snapshot.code,organisationId:ORG_ID,userId:CURRENT_USER_ID,userName:currentUserName(),...payload});saved=true;if(button)button.textContent='SAVED ✓';if(ok)showToast('ONIT',ok);showSyncChip('UPDATING');setBusy(false);busyReleased=true;await loadFromGoogle(true,true);return true}catch(e){console.error(e);alert(saved?'Saved, but the refreshed data could not be confirmed. Refresh before trying again.':'ONIT could not complete this action. '+e.message);return false}finally{mutationBusy=false;if(!busyReleased)setBusy(false);if(button){button.disabled=false;button.textContent=old}}}
+async function runAction(button,action,payload,ok){if(!current||mutationBusy)return false;if(!apiOnline){alert('Refresh ONIT before making changes.');return false}if(!versionAtLeast(backendVersion,'0.14.0')){alert('Deploy ONIT Backend V0.14.0 before using this frontend.');return false}const snapshot=current,old=button?.textContent;mutationBusy=true;setBusy(true);if(button){button.disabled=true;button.textContent='WORKING…'}let saved=false,busyReleased=false;try{await apiPost(action,{briefCode:snapshot.code,organisationId:ORG_ID,userId:CURRENT_USER_ID,userName:currentUserName(),...payload});saved=true;if(button){button.textContent='SAVED ✓';button.classList.add('onitSaved');setTimeout(()=>button.classList.remove('onitSaved'),520)}if(ok)showToast('ONIT',ok);showSyncChip('UPDATING');setBusy(false);busyReleased=true;await loadFromGoogle(true,true);return true}catch(e){console.error(e);alert(saved?'Saved, but the refreshed data could not be confirmed. Refresh before trying again.':'ONIT could not complete this action. '+e.message);return false}finally{mutationBusy=false;if(!busyReleased)setBusy(false);if(button){button.disabled=false;button.textContent=old}}}
 async function acknowledgeTask(button){if(!current)return;const ok=await runAction(button,'acknowledgeTask',{},'Task receipt confirmed. The sender has been notified.');if(ok)renderDetail()}
 async function startWork(button){if(!current)return;const mine=currentUserAssignment(current.code,'TO');if(!mine)return alert('Only a person assigned TO this brief can start the work.');if(!taskAcknowledged(current.code))return alert('Acknowledge receipt of the task before starting work.');await runAction(button,'startWork',{},'Work started. Account Management and management visibility have been updated.')}
 async function pauseBrief(button){const mine=!!currentUserAssignment(current.code,'TO');if(!mine)return alert('Only the person assigned TO this brief can pause or resume their work.');if(current.status==='Closed')return;const action=current.paused?'resumeBrief':'pauseBrief';await runAction(button,action,{},current.paused?'Work resumed. The deadline and timeline have been adjusted.':'Work paused. Account Management and senior management have been notified.')}
@@ -2139,7 +2215,7 @@ function playNotificationSound(force=false){
   }catch(e){console.warn('ONIT notification sound:',e)}
 }
 function testNotificationSound(){enableAudio();playNotificationSound(true);showToast('Notification sound','This is the ONIT alert sound. Device volume still controls the final loudness.')}
-function showToast(title,message){const el=document.getElementById('toast');el.innerHTML=`<b>${escapeHTML(title)}</b><span class='muted'>${escapeHTML(message||'')}</span>`;el.classList.remove('hidden');setTimeout(()=>el.classList.add('hidden'),5200)}
+function showToast(title,message){const el=document.getElementById('toast');if(!el)return;clearTimeout(onitToastTimer);el.innerHTML=`<b>${escapeHTML(title)}</b><span class='muted'>${escapeHTML(message||'')}</span>`;el.classList.remove('hidden');onitToastTimer=setTimeout(()=>el.classList.add('hidden'),5200)}
 function showSystemNotification(title,message){try{if('Notification'in window&&Notification.permission==='granted')new Notification(title,{body:message})}catch(e){}}
 async function enableBrowserNotifications(){if(!('Notification'in window))return alert('Browser notifications are not supported here.');const result=await Notification.requestPermission();alert(result==='granted'?'Browser notifications enabled.':'Browser notifications were not enabled.')}
 async function toggleSoundPreference(box){const desired=!!box.checked;try{await apiPost('updateUserPreference',{organisationId:ORG_ID,userId:CURRENT_USER_ID,notificationSound:desired});await loadFromGoogle(true);showToast('Notification sound',desired?'Sound is on. New alerts will use the louder ONIT chime.':'Sound is off.')}catch(e){box.checked=!desired;alert('Could not update notification setting. '+e.message)}}
@@ -2216,7 +2292,7 @@ async function approveDataExportRequest(id){if(!confirm('Approve this ONIT data 
 async function downloadDataExport(id){
   try{setBusy(true);const res=await apiPost('getDataExportPdf',{exportId:decodeURIComponent(id)}),d=res.data||res;if(!d.base64)throw new Error('No PDF was returned.');const url=URL.createObjectURL(base64ToBlob(d.base64,d.mimeType||'application/pdf')),a=document.createElement('a');a.href=url;a.download=d.fileName||'ONIT-data-export.pdf';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),5000)}catch(e){alert('Could not download PDF. '+e.message)}finally{setBusy(false)}
 }
-function renderMore(){if(!currentUser)return;const names=backendAccess();let html=`<div class='moregrid'><div class='morecard'><h3>MY PROFILE</h3><div class='profileRow'><div class='avatar large' data-avatar-user='${escapeHTML(CURRENT_USER_ID)}'>${escapeHTML(initials(currentUserName()))}</div><div><b>${escapeHTML(currentUserName())}${isOwner()?` <span class='ownerBadge'>SYSTEM OWNER</span>`:''}</b><div class='bigTiny'>${escapeHTML(positionOf(currentUser)||'Position not set')}<br>${escapeHTML(departmentOf(currentUser)||'Department not set')}<br>${escapeHTML(rowVal(currentUser,'Email')||'Email not added yet')}</div></div></div><div class='field'><label>PROFILE PICTURE</label><input type='file' accept='image/jpeg,image/png,image/webp' onchange='uploadProfilePhoto(this)'><div class='tiny'>JPG, PNG or WebP • ONIT optimises the image automatically</div></div><button class='secondary linkbtn' onclick='handleSignOut()'>SIGN OUT</button></div><div class='morecard'><h3>NOTIFICATIONS</h3><div class='switchrow'><div><b>Notification sound</b><div class='bigTiny'>A louder ONIT chime plays for new alerts while ONIT is open. Sound is ON by default unless you switch it off.</div></div><input type='checkbox' ${notificationSoundEnabled()?'checked':''} onchange='toggleSoundPreference(this)'></div><div class='actions'><button class='secondary linkbtn' onclick='testNotificationSound()'>TEST SOUND</button><button class='secondary linkbtn' onclick='enablePushNotifications()'>ENABLE OUTSIDE-ONIT ALERTS</button></div><div class='pushStatus ${pushNotificationStatus_()==='ON'?'on':'off'}'>Outside-ONIT alerts: ${pushNotificationStatus_()}</div><div class='bigTiny' style='margin-top:6px'>Desktop/Android web push works after permission is granted. On iPhone/iPad, install ONIT to the Home Screen first.</div></div><div class='morecard'><h3>ORGANISATION</h3><b>${escapeHTML(rowVal(organisations[0],'Organisation Name')||'Organisation')}</b><div class='bigTiny'>Creative • Account Management • Strategy • Digital • Activation • HR • Accounts</div></div><div class='morecard'><h3>ACCESS</h3><div class='bigTiny'>Create briefs: <b>${canCreateBrief()?'YES':'NO'}</b><br>Review work: <b>${canReview()?'YES':'NO'}</b><br>Final approval: <b>${canApprove()?'YES':'NO'}</b><br>Backend datasets: <b>${isOwner()?'ALL':names.length}</b></div></div>`;
+function renderMore(){if(!currentUser)return;const names=backendAccess();let html=`<div class='moregrid'><div class='morecard'><h3>MY PROFILE</h3><div class='profileRow'><div class='avatar large' data-avatar-user='${escapeHTML(CURRENT_USER_ID)}'>${escapeHTML(initials(currentUserName()))}</div><div><b>${escapeHTML(currentUserName())}${isOwner()?` <span class='ownerBadge'>SYSTEM OWNER</span>`:''}</b><div class='bigTiny'>${escapeHTML(positionOf(currentUser)||'Position not set')}<br>${escapeHTML(departmentOf(currentUser)||'Department not set')}<br>${escapeHTML(rowVal(currentUser,'Email')||'Email not added yet')}</div></div></div><div class='field'><label>PROFILE PICTURE</label><input type='file' accept='image/jpeg,image/png,image/webp' onchange='uploadProfilePhoto(this)'><div class='tiny'>JPG, PNG or WebP • ONIT optimises the image automatically</div></div><button class='secondary linkbtn' onclick='handleSignOut()'>SIGN OUT</button></div><div class='morecard'><h3>NOTIFICATIONS</h3><div class='switchrow'><div><b>Notification sound</b><div class='bigTiny'>A louder ONIT chime plays for new alerts while ONIT is open. Sound is ON by default unless you switch it off.</div></div><input type='checkbox' ${notificationSoundEnabled()?'checked':''} onchange='toggleSoundPreference(this)'></div><div class='actions'><button class='secondary linkbtn' onclick='testNotificationSound()'>TEST SOUND</button><button class='secondary linkbtn' onclick='enablePushNotifications()'>ENABLE OUTSIDE-ONIT ALERTS</button></div><div class='pushStatus ${pushNotificationStatus_()==='ON'?'on':'off'}'>Outside-ONIT alerts: ${pushNotificationStatus_()}</div><div class='bigTiny' style='margin-top:6px'>Desktop/Android web push works after permission is granted. On iPhone/iPad, install ONIT to the Home Screen first.</div></div><div class='morecard onitA11yCard'><h3>ACCESSIBILITY</h3><div class='switchrow'><div><b>Reduce motion</b><div class='bigTiny'>Minimises interface transitions and animated feedback. ONIT also respects your device Reduce Motion setting.</div></div><input type='checkbox' aria-label='Reduce motion' ${onitReducedMotionEnabled()?'checked':''} onchange='toggleOnitReducedMotion(this)'></div><div class='onitA11yStatus'>Keyboard focus, larger mobile tap targets and screen-reader status updates are always on.</div></div><div class='morecard'><h3>ORGANISATION</h3><b>${escapeHTML(rowVal(organisations[0],'Organisation Name')||'Organisation')}</b><div class='bigTiny'>Creative • Account Management • Strategy • Digital • Activation • HR • Accounts</div></div><div class='morecard'><h3>ACCESS</h3><div class='bigTiny'>Create briefs: <b>${canCreateBrief()?'YES':'NO'}</b><br>Review work: <b>${canReview()?'YES':'NO'}</b><br>Final approval: <b>${canApprove()?'YES':'NO'}</b><br>Backend datasets: <b>${isOwner()?'ALL':names.length}</b></div></div>`;
   if(isOwner()&&securityInfo){html+=`<div class='morecard' style='grid-column:1/-1'><h3>ORGANISATION SECURITY <span class='ownerBadge'>OWNER ONLY</span></h3><div class='bigTiny'>Share the Join Code only with authorised staff. Backend data is never granted automatically by this code.</div><div class='securityCode'>${escapeHTML(securityInfo.inviteCode||'—')}</div><div class='actions'><button class='secondary' onclick='regenerateJoinCode()'>REGENERATE JOIN CODE</button><button class='secondary' onclick='toggleSignupAccess()'>${securityInfo.signupsEnabled?'DISABLE':'ENABLE'} SIGNUPS</button></div></div>`}
   if(isOwner()){html+=ownerBroadcastMarkup()}
   if(isOwner()){
@@ -2437,6 +2513,7 @@ function isIOS(){return /iphone|ipad|ipod/i.test(navigator.userAgent)}
 function isHttpsApp(){return location.protocol==='https:'||['localhost','127.0.0.1'].includes(location.hostname)}
 function refreshInstallButton(){const b=document.getElementById('installBtn');if(!b)return;const show=!isStandalone();b.classList.toggle('hidden',!show);b.textContent=isIOS()?'ADD TO HOME':'INSTALL'}
 window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredInstallPrompt=e;refreshInstallButton()});
+document.addEventListener('DOMContentLoaded',initialiseOnitPolish,{once:true});
 window.addEventListener('appinstalled',()=>{deferredInstallPrompt=null;refreshInstallButton();showToast('ONIT installed','ONIT is now available like an app on this device and will receive updates automatically.')});
 async function installOnit(){
   if(isStandalone())return showToast('ONIT','Already installed on this device.');
