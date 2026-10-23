@@ -4,7 +4,7 @@ importScripts('https://www.gstatic.com/firebasejs/13.0.0/firebase-messaging-comp
 const FIREBASE_CONFIG={apiKey:'AIzaSyAmpqFDMfo6zAorD-f14hTQnSNFDFU6VHM',authDomain:'onit-backend-api.firebaseapp.com',projectId:'onit-backend-api',storageBucket:'onit-backend-api.firebasestorage.app',messagingSenderId:'1052909191157',appId:'1:1052909191157:web:392c4a50b453deb5ebeabc'};
 try{firebase.initializeApp(FIREBASE_CONFIG);firebase.messaging();}catch(e){}
 
-const CACHE='onit-v0.29.1';
+const CACHE='onit-v0.29.2-owner-cases-mobile';
 const STATIC=['./offline.html','./manifest.webmanifest','./icons/icon-192.png','./icons/icon-512.png','./icons/apple-touch-icon.png','./assets/onit-logo-horizontal.png','./assets/onit-logo-full.png','./icons/favicon-32.png','./cases-module.css','./cases-module.js','./pulse-module.css','./pulse-module.js'];
 
 self.addEventListener('install',event=>{

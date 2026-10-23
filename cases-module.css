@@ -36,3 +36,12 @@
 @keyframes caseSpin{to{transform:rotate(360deg)}}
 .casesSubnav button{transition:background .12s ease,color .12s ease,border-color .12s ease,transform .12s ease}
 .casesSubnav button:active{transform:scale(.98)}
+
+/* v0.29.2 — System Owner mobile Cases access */
+.casesOwnerAccessQuick{display:none}
+@media(max-width:760px){
+  .casesTop{gap:10px}
+  .casesTop .actions{width:100%;display:flex;gap:8px;flex-wrap:wrap}
+  .casesOwnerAccessQuick{display:inline-flex!important;align-items:center;justify-content:center;background:#171717!important;color:#fff!important;border-color:#171717!important;min-height:44px}
+  .casesSubnav .caseAccessTab{display:none}
+}
