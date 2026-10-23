@@ -1,7 +1,7 @@
-/* ONIT Digital Pulse v0.30.6 — stable editor + leadership live sync */
+/* ONIT Digital Pulse v0.30.7 — stable editor + quiet leadership sync */
 (function(){
 'use strict';
-const state={cap:null,tab:'today',data:null,candidates:null,lastAt:0,lastCapAt:0,busy:false,dirty:false,dirtyGroups:new Set(),draftsLoaded:false,lastSavedAt:0};
+const state={cap:null,tab:'today',data:null,candidates:null,lastAt:0,lastCapAt:0,busy:false,dirty:false,dirtyGroups:new Set(),draftsLoaded:false,lastSavedAt:0,lastQuietSyncAt:0,quietSyncBusy:false,dataFingerprint:''};
 const esc=v=>typeof escapeHTML==='function'?escapeHTML(String(v==null?'':v)):String(v==null?'':v).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 const val=(o,...ks)=>{for(const k of ks){if(o&&o[k]!==undefined&&o[k]!==null&&o[k]!=='')return o[k]}return ''};
 const api=(action,data={})=>apiPost(action,data,true).then(r=>r.data||r);
@@ -101,7 +101,23 @@ function shell(body,title='Digital Pulse',sub='Always-on digital operations, lis
 }
 function loading(label='Digital Pulse'){const r=root();if(r)r.innerHTML=shell(`<div class='dpLoading'><span class='dpSpinner'></span><div><b>Loading ${esc(label)}…</b><div class='tiny'>Your click registered. ONIT is refreshing Pulse.</div></div></div>`,label)}
 async function refreshCapabilities(force=false){if(typeof SESSION_TOKEN==='undefined'||!SESSION_TOKEN||typeof CURRENT_USER_ID==='undefined'||!CURRENT_USER_ID){state.cap=null;setNav();return null}if(!force&&state.cap&&Date.now()-state.lastCapAt<30000)return state.cap;try{state.cap=await api('PULSE_CAPABILITIES');state.lastCapAt=Date.now();setNav();return state.cap}catch(e){state.cap=fallbackCap();state.cap.capabilityError=String(e&&e.message||e||'Pulse capability check failed');state.lastCapAt=Date.now();setNav();return state.cap}}
-async function load(force=false){if(!force&&state.data)return state.data;state.data=await api('PULSE_DASHBOARD');state.lastAt=Date.now();return state.data}
+function pulseFingerprint(d){try{return JSON.stringify({today:d?.today||'',daily:d?.daily||null,teamReadiness:d?.teamReadiness||[],summary:d?.summary||{},engagement:d?.engagement||[],content:d?.content||[],insights:d?.insights||[],escalations:d?.escalations||[],metrics:d?.metrics||[]})}catch(e){return String(Date.now())}}
+async function load(force=false){if(!force&&state.data)return state.data;state.data=await api('PULSE_DASHBOARD');state.lastAt=Date.now();state.dataFingerprint=pulseFingerprint(state.data);return state.data}
+async function quietLeadershipSync(force=false){
+ if(canWrite()||state.quietSyncBusy||!allowed()||document.getElementById('pulse')?.classList.contains('hidden'))return false;
+ const now=Date.now();if(!force&&now-state.lastQuietSyncAt<55000)return false;
+ state.quietSyncBusy=true;state.lastQuietSyncAt=now;
+ try{
+   const fresh=await api('PULSE_DASHBOARD'),fp=pulseFingerprint(fresh);
+   if(fp===state.dataFingerprint)return false;
+   const scrollTop=document.scrollingElement?document.scrollingElement.scrollTop:window.scrollY;
+   state.data=fresh;state.dataFingerprint=fp;state.lastAt=Date.now();state.candidates=null;
+   if(state.tab==='today')today();else if(state.tab==='engagement')engagement();else if(state.tab==='content')content();else if(state.tab==='listening')listening();else if(state.tab==='reports')reports();else if(state.tab==='cases')await cases();
+   requestAnimationFrame(()=>{try{window.scrollTo(0,scrollTop)}catch(e){}});
+   return true;
+ }catch(e){console.warn('Pulse quiet sync:',e&&e.message||e);return false}
+ finally{state.quietSyncBusy=false}
+}
 function metric(label,value,hint=''){return `<div class='dpMetric'><span>${esc(label)}</span><b>${esc(value)}</b>${hint?`<small>${esc(hint)}</small>`:''}</div>`}
 function userName(id){const u=(state.data?.digitalUsers||[]).find(x=>val(x,'User ID','userId')===id);return u?val(u,'Full Name','fullName'):id||'Unassigned'}
 function teamStatus(){const d=state.data||{},rows=(d.digitalUsers||[]).map(u=>{const id=val(u,'User ID'),latestEsc=(d.escalations||[]).find(x=>val(x,'User ID')===id&&String(val(x,'Status')||'Open').toLowerCase()!=='resolved'),latestEng=(d.engagement||[]).find(x=>val(x,'User ID')===id),latestContent=(d.content||[]).find(x=>val(x,'User ID')===id&&['planned','scheduled'].includes(String(val(x,'Status')).toLowerCase()));let tone='available',status='Available',detail='No active Pulse update';if(latestEsc){tone='alert';status='Escalation';detail=`${val(latestEsc,'Brand')} • ${val(latestEsc,'Severity')}`}else if(latestEng){tone='active';status='Community engagement';detail=`${val(latestEng,'Platform')} • ${val(latestEng,'Brand')}`}else if(latestContent){tone='watch';status='Content operations';detail=`${val(latestContent,'Platform')} • ${val(latestContent,'Brand')}`};return `<div class='dpPerson'><span class='dpDot ${tone}'></span><div><b>${esc(val(u,'Full Name'))}</b><small>${esc(status)} · ${esc(detail)}</small></div></div>`}).join('');return rows||`<div class='empty'>No Digital Strategy users found.</div>`}
@@ -160,9 +176,9 @@ function addMetric(){return mutate('PULSE_ADD_METRIC',{brand:text('pmBrand'),cam
 async function sendToCases(sourceType,sourceId){if(!canPromote()){showToast('Digital Pulse','You do not have permission to send Pulse evidence to Cases.');return}const caseId=(prompt('Enter the ONIT Case ID to receive this evidence:','')||'').trim();if(!caseId)return;try{await api('PULSE_SEND_TO_CASES',{sourceType,sourceId,caseId});state.candidates=null;state.lastAt=0;showToast('Digital Pulse','Evidence sent to Cases Data Vault.');await render()}catch(e){alert(e.message)}}
 const originalApply=window.applyPermissions;if(typeof originalApply==='function')window.applyPermissions=function(){const r=originalApply.apply(this,arguments);setTimeout(()=>refreshCapabilities(true),0);return r};
 const originalShow=window.show;if(typeof originalShow==='function')window.show=function(id,btn){const r=originalShow.apply(this,arguments);if(id==='pulse'){restoreLastTab();loading();render()}return r};
-const originalLoad=window.loadFromGoogle;if(typeof originalLoad==='function')window.loadFromGoogle=async function(){const r=await originalLoad.apply(this,arguments);if(!document.getElementById('pulse')?.classList.contains('hidden')&&!canWrite()){state.lastAt=0;render()}return r};
-// Editors never auto-refresh underneath active work. View-only leadership gets a near-live refresh.
-setInterval(()=>{if(allowed()&&!canWrite()&&!document.getElementById('pulse')?.classList.contains('hidden')&&!state.busy)refresh()},7000);
-window.DigitalPulse={render,refresh,openTab,saveReadiness,logEngagement,addContent,updateContent,addInsight,addEscalation,resolveEscalation,addMetric,sendToCases,refreshCapabilities};
+const originalLoad=window.loadFromGoogle;if(typeof originalLoad==='function')window.loadFromGoogle=async function(){return await originalLoad.apply(this,arguments)};
+// Editors never auto-refresh underneath active work. Leadership uses quiet polling: no spinner, no redraw unless saved Pulse data actually changed.
+setInterval(()=>{quietLeadershipSync(false)},60000);
+window.DigitalPulse={render,refresh,openTab,saveReadiness,logEngagement,addContent,updateContent,addInsight,addEscalation,resolveEscalation,addMetric,sendToCases,refreshCapabilities,quietLeadershipSync};
 setTimeout(()=>{refreshCapabilities(true);syncGlobalDirty()},450);
 })();
