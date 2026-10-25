@@ -79,7 +79,7 @@
 .morningMetric{border:1px solid #ece7e0;background:#fff;border-radius:14px;padding:12px 13px;min-width:0}
 .morningMetric b{display:block;font-size:22px;line-height:1;font-weight:900;color:#171716;margin-bottom:5px}
 .morningMetric span{display:block;font-size:9px;font-weight:900;letter-spacing:.07em;text-transform:uppercase;color:#8e877f;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.morningMetric.urgent b{color:#df5148}.morningMetric.watch b{color:#d98e22}.morningMetric.good b{color:#27ae70}
+.morningMetric.urgent b,.morningMetric.watch b,.morningMetric.good b{color:#fff}
 .morningStart{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-top:11px;border-top:1px solid #eee6df;padding-top:12px}
 .morningStartCopy{min-width:0}.morningStartCopy small{display:block;font-size:9px;font-weight:900;letter-spacing:.09em;text-transform:uppercase;color:#ff5b2e;margin-bottom:3px}.morningStartCopy b{display:block;font-size:13px;color:#24221f;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.morningStartCopy span{display:block;font-size:10px;color:#817d76;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .morningStartBtn{border:0;border-radius:10px;background:#171716;color:#fff;padding:9px 12px;font-size:9px;font-weight:900;letter-spacing:.03em;white-space:nowrap;cursor:pointer}.morningStartBtn:hover{background:#2c2925}
@@ -92,11 +92,17 @@
 .radarShell:before{content:"";position:absolute;width:180px;height:180px;border:1px solid rgba(255,86,48,.22);border-radius:50%;right:-55px;top:-95px;box-shadow:0 0 0 28px rgba(255,86,48,.06),0 0 0 58px rgba(255,86,48,.035);pointer-events:none;animation:radarBreathe 3.2s ease-in-out infinite}
 @keyframes radarBreathe{0%,100%{transform:scale(.96);opacity:.72}50%{transform:scale(1.04);opacity:1}}
 .radarTop{position:relative;display:flex;align-items:flex-start;justify-content:space-between;gap:18px;margin-bottom:14px}
-.radarEyebrow{font-size:10px;line-height:1;font-weight:900;letter-spacing:.16em;color:#ff5a34;text-transform:uppercase;margin-bottom:7px}
+.radarEyebrow{font-size:10px;line-height:1;font-weight:900;letter-spacing:.16em;color:#fff;text-transform:uppercase;margin-bottom:7px}
 .radarHeadline{font-size:21px;line-height:1.18;font-weight:900;letter-spacing:-.02em}
 .radarSub{font-size:12px;line-height:1.45;color:#bdbdb7;margin-top:5px;max-width:680px}
 .radarLive{display:inline-flex;align-items:center;gap:7px;white-space:nowrap;border:1px solid #3b3b38;border-radius:999px;padding:7px 10px;font-size:9px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:#dadad5;background:#232321}
 .radarLive:before{content:"";width:7px;height:7px;border-radius:50%;background:#28b97a;box-shadow:0 0 0 4px rgba(40,185,122,.12)}
+.radarMorningGrid .morningMetric b{color:#fff!important}
+.radarMorningGrid .morningMetric span{color:#c9c9c4}
+.radarMorningStart .morningStartCopy small{color:#fff}
+.radarMorningStart .morningStartCopy b{color:#fff}
+.radarMorningStart .morningStartCopy span{color:#bdbdb7}
+
 .radarItems{position:relative;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
 .radarCard{min-width:0;border:1px solid #353532;background:#222220;border-radius:15px;padding:14px;display:flex;flex-direction:column;gap:9px;transition:transform .16s ease,border-color .16s ease,background .16s ease}
 .radarCard:hover{transform:translateY(-1px);border-color:#494945;background:#262624}
@@ -1003,7 +1009,7 @@ html.onitReduceMotion *,html.onitReduceMotion *::before,html.onitReduceMotion *:
 }
 </style>
 <link rel="stylesheet" href="./assist-traffic-module.css?v=0.30.5">
-<link rel="stylesheet" href="./core-intelligence.css?v=0.31.0">
+<link rel="stylesheet" href="./core-intelligence.css?v=0.31.1">
 </head>
 <body>
 <a class="onitSkipLink" href="#mainContent">Skip to main content</a>
@@ -1192,7 +1198,7 @@ html.onitReduceMotion *,html.onitReduceMotion *::before,html.onitReduceMotion *:
 <script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-messaging-compat.js"></script>
-<script>const APP_VERSION='0.31.0';
+<script>const APP_VERSION='0.31.1';
 const BACKEND_DATASETS=['USERS','CLIENTS','BRIEFS','ASSIGNMENTS','ITERATIONS','ACTIVITY_LOG','NOTIFICATIONS','REPORTS'];
 const API_URL='https://script.google.com/macros/s/AKfycbyLVpsQLFCpQWRIvRndw66sghmu5rtK31cuthS7hXjJ--lf703mJPIbJ2zpLDIlH76b/exec';
 let ORG_ID=localStorage.getItem('onit-org')||'';
@@ -1641,7 +1647,7 @@ function renderOnitRadar(mode){
   const metricsHtml=`<div class='radarMorningGrid'>${metrics.map(m=>`<div class='morningMetric ${m.tone||''}'><b>${escapeHTML(m.value)}</b><span>${escapeHTML(m.label)}</span></div>`).join('')}</div>`;
   const start=first?`<div class='radarMorningStart'><div class='morningStartCopy'><small>START HERE</small><b>${escapeHTML(first.title)}</b><span>${escapeHTML(first.copy)}</span></div><button class='morningStartBtn' onclick="${first.onclick}">${escapeHTML(first.actionLabel)}</button></div>`:'';
   const remainingItems=first?items.slice(1):items;
-  const cards=remainingItems.length?`<div class='radarItems'>${remainingItems.map(i=>`<article class='radarCard'><div class='radarCardTop'><span class='radarLevel ${i.level}'>${i.level==='high'?'Needs action':i.level==='watch'?'Watch':'Next'}</span><span class='radarCode'>${escapeHTML(i.code||'ONIT')}</span></div><h3>${escapeHTML(i.title)}</h3><p>${escapeHTML(i.copy)}</p><div class='radarActions'><button class='radarAction' onclick="${i.onclick}">${escapeHTML(i.actionLabel)}</button><button class='radarIgnore' onclick="ignoreRadarItem('${escapeHTML(i.key).replace(/'/g,'&#39;')}')">IGNORE TODAY</button></div></article>`).join('')}</div>`:(items.length?'':`<div class='radarClear'><div class='radarClearIcon'>✓</div><div><b>${escapeHTML(clearCopy)}</b><span>${escapeHTML(clearDetail)}</span></div></div>`);
+  const cards=remainingItems.length?`<div class='radarItems'>${remainingItems.map(i=>`<article class='radarCard'><div class='radarCardTop'><span class='radarLevel ${i.level}'>${i.level==='high'?'Needs action':i.level==='watch'?'Watch':'Next'}</span><span class='radarCode'>${escapeHTML(i.code||'ONIT')}</span></div><h3>${escapeHTML(i.title)}</h3><p>${escapeHTML(i.copy)}</p><div class='radarActions'>${i.actionLabel==='MANAGE SCHEDULE'?'':`<button class='radarAction' onclick="${i.onclick}">${escapeHTML(i.actionLabel)}</button>`}<button class='radarIgnore' onclick="ignoreRadarItem('${escapeHTML(i.key).replace(/'/g,'&#39;')}')">IGNORE TODAY</button></div></article>`).join('')}</div>`:(items.length?'':`<div class='radarClear'><div class='radarClearIcon'>✓</div><div><b>${escapeHTML(clearCopy)}</b><span>${escapeHTML(clearDetail)}</span></div></div>`);
   host.innerHTML=`<section class='radarShell'><div class='radarTop'><div><div class='radarEyebrow'>ONIT RADAR • YOUR 30-SECOND MORNING</div><div class='radarHeadline'>${escapeHTML(headline)}</div><div class='radarSub'>${escapeHTML(sub)}</div></div><div class='radarLive'>${high?high+' HIGH':'LIVE'}</div></div>${metricsHtml}${start}${cards}</section>`
 }
 
@@ -1667,7 +1673,7 @@ function renderHome(){
   if(!currentUser)return;
   const orgName=rowVal(organisations[0],'Organisation Name')||'your organisation';
   document.getElementById('todayLabel').textContent=new Date().toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short',year:'numeric',timeZone:'Africa/Lagos'});updateLastSyncLabel(refreshRecoveryPending||!apiOnline);
-  document.getElementById('greeting').textContent=`${greetingText()}, ${currentUserName().split(' ')[0]} 👋`;
+  document.getElementById('greeting').textContent=`${greetingText()}, ${currentUserName().split(' ')[0]}`;
   const mode=dashboardMode(),queueSection=document.getElementById('homeQueueSection'),queueTitle=document.getElementById('homeQueueTitle'),queueCopy=document.getElementById('homeQueueCopy'),queueList=document.getElementById('homeQueueList'),primaryTitle=document.getElementById('homePrimaryTitle'),primaryCopy=document.getElementById('homePrimaryCopy'),home=document.getElementById('home');
   let scope=[],queue=[];
   renderHomeAnalytics();
@@ -2630,10 +2636,10 @@ setInterval(()=>{const now=Date.now(),gap=firebaseRealtimeHealthy?60000:15000;if
 async function boot(){if(SESSION_TOKEN){document.getElementById('authGate').classList.add('hidden');document.getElementById('appShell').classList.remove('hidden');await loadFromGoogle(false);if(SESSION_TOKEN)return}document.getElementById('appShell').classList.add('hidden');document.getElementById('authGate').classList.remove('hidden');showAuthMode('signin')}
 boot();
 </script>
-<script src="./cases-module.js?v=0.31.0"></script>
-<script src="./pulse-module.js?v=0.31.0"></script>
-<script src="./assist-traffic-module.js?v=0.31.0"></script>
-<script src="./core-intelligence.js?v=0.31.0"></script>
+<script src="./cases-module.js?v=0.31.1"></script>
+<script src="./pulse-module.js?v=0.31.1"></script>
+<script src="./assist-traffic-module.js?v=0.31.1"></script>
+<script src="./core-intelligence.js?v=0.31.1"></script>
 </body>
 </html>
 
