@@ -32,10 +32,10 @@ function markTabActive(tab){const wanted=({library:'campaign library',vault:'dat
 function subnav(){
   const items=[['library','Campaign Library'],['vault','Data Vault'],['intelligence','Intelligence'],['studio','Case Studio'],['approvals','Approvals']];
   if(owner())items.push(['access','Access Control']);
-  return `<div class='casesSubnav'>${items.map(([id,label])=>`<button class='${state.tab===id?'active':''}' onclick="CasesModule.openTab('${id}')">${label}</button>`).join('')}</div>`;
+  return `<div class='casesSubnav'>${items.map(([id,label])=>`<button class='${state.tab===id?'active':''} ${id==='access'?'caseAccessTab':''}' onclick="CasesModule.openTab('${id}')">${label}</button>`).join('')}</div>`;
 }
 function shell(body,title='Cases',sub='Turn completed ONIT work into evidence-backed case studies.'){
-  return `<div class='casesShell'><div class='casesTop'><div><div class='casesTestFlag'>PRIVATE TEST • NOT PUBLIC</div><h1>${esc(title)}</h1><p class='muted'>${esc(sub)}</p></div>${allowed()?`<div class='actions'><button class='secondary' onclick='CasesModule.refresh()'>REFRESH</button>${state.tab==='library'?`<button class='new' onclick='CasesModule.newCase()'>+ NEW CASE</button>`:''}</div>`:''}</div>${subnav()}${body}</div>`;
+  return `<div class='casesShell'><div class='casesTop'><div><div class='casesTestFlag'>PRIVATE TEST • NOT PUBLIC</div><h1>${esc(title)}</h1><p class='muted'>${esc(sub)}</p></div>${allowed()?`<div class='actions'>${owner()&&state.tab!=='access'?`<button class='secondary casesOwnerAccessQuick' onclick="CasesModule.openTab('access')">MANAGE ACCESS</button>`:''}<button class='secondary' onclick='CasesModule.refresh()'>REFRESH</button>${state.tab==='library'?`<button class='new' onclick='CasesModule.newCase()'>+ NEW CASE</button>`:''}</div>`:''}</div>${subnav()}${body}</div>`;
 }
 async function render(){
   const el=root();if(!el)return;

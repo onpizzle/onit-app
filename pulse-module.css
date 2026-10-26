@@ -22,3 +22,15 @@
   .dpTop .actions .secondary{width:auto!important;min-width:0!important;padding:9px 12px!important}
   .dpTop .actions .pill,.dpTop .actions .dpLive{white-space:nowrap}
 }
+
+/* ONIT v0.30.6 — Pulse stable save + leadership live sync */
+.dpSaveState{font-size:10px;font-weight:900;letter-spacing:.06em;padding:8px 10px;border-radius:999px;border:1px solid #dedbd4;background:#f7f5f1;color:#6a665f}
+.dpSaveState.draft{background:#fff2df;border-color:#f3b85c;color:#8a4d00}
+.dpSaveState.saved{background:#eaf8f0;border-color:#9ed8b5;color:#176b3a}
+.dpLive.editor i{background:#f36b3f}
+.dpReadinessRow{display:flex;justify-content:space-between;gap:16px;align-items:center;padding:13px 0;border-bottom:1px solid #ece8e1}
+.dpReadinessRow:last-child{border-bottom:0}
+.dpReadinessRow b{display:block}
+.dpReadinessRow small{display:block;color:#77736c;margin-top:4px;line-height:1.35}
+.dpSaveHint{margin-top:8px;color:#77736c}
+@media(max-width:820px){.dpReadinessRow{align-items:flex-start;flex-direction:column}.dpTop .actions{flex-wrap:wrap}.dpSaveState{order:3}}
