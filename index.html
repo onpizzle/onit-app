@@ -887,8 +887,8 @@ img,video,canvas,svg{max-width:100%}
 .reviewQueueNote{font-size:11px;color:#777;margin-top:6px}
 @media(max-width:760px){.reviewPreviewModal{padding:4px!important}.reviewPreviewModal .modalBox{width:100%!important;height:calc(100dvh - 8px)!important;max-height:none!important;border-radius:12px!important}.previewAssetStage{padding:5px}.previewFooter{padding:7px}.previewNav{justify-content:flex-start;overflow-x:auto;flex-wrap:nowrap}.previewNav .mini{white-space:nowrap}}
 </style>
-<link rel="stylesheet" href="./cases-module.css?v=0.32.2">
-<link rel="stylesheet" href="./pulse-module.css?v=0.32.2">
+<link rel="stylesheet" href="./cases-module.css?v=0.33.0">
+<link rel="stylesheet" href="./pulse-module.css?v=0.33.0">
 
 <style id="onit-mobile-nav-v0212">
 .navLabelMobile{display:none!important}
@@ -1002,8 +1002,8 @@ html.onitReduceMotion *,html.onitReduceMotion *::before,html.onitReduceMotion *:
   *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
 }
 </style>
-<link rel="stylesheet" href="./assist-traffic-module.css?v=0.32.2">
-<link rel="stylesheet" href="./core-intelligence.css?v=0.32.2">
+<link rel="stylesheet" href="./assist-traffic-module.css?v=0.33.0">
+<link rel="stylesheet" href="./core-intelligence.css?v=0.33.0">
 <style id="role-consistency-v0311">
 /* ONIT v0.31.2 — role authority + Digital Pulse access hardening */
 .radarMorningGrid .morningMetric b,
@@ -1016,7 +1016,9 @@ html.onitReduceMotion *,html.onitReduceMotion *::before,html.onitReduceMotion *:
 .radarLevel{color:#f2f2ee!important}
 </style>
 
-<link rel="stylesheet" href="./autocare-module.css?v=0.32.2">
+<link rel="stylesheet" href="./autocare-module.css?v=0.33.0">
+<link rel="stylesheet" href="./command-palette.css?v=0.33.0">
+
 </head>
 <body>
 <a class="onitSkipLink" href="#mainContent">Skip to main content</a>
@@ -1205,10 +1207,11 @@ html.onitReduceMotion *,html.onitReduceMotion *::before,html.onitReduceMotion *:
 <script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-messaging-compat.js"></script>
-<script>const APP_VERSION='0.32.2';
-const UI_REVISION=3202;
-const DASHBOARD_UI_REVISION=32201;
+<script>const APP_VERSION='0.33.0';
+const UI_REVISION=3300;
+const DASHBOARD_UI_REVISION=33001;
 const DASHBOARD_UI_STORAGE_KEY='onit-dashboard-ui-state-v1';
+window.ONIT_RUNTIME={version:APP_VERSION,uiRevision:UI_REVISION,dashboardUiRevision:DASHBOARD_UI_REVISION};
 const BACKEND_DATASETS=['USERS','CLIENTS','BRIEFS','ASSIGNMENTS','ITERATIONS','ACTIVITY_LOG','NOTIFICATIONS','REPORTS'];
 const API_URL='https://script.google.com/macros/s/AKfycbyLVpsQLFCpQWRIvRndw66sghmu5rtK31cuthS7hXjJ--lf703mJPIbJ2zpLDIlH76b/exec';
 const SAFE_RETRY_POST_ACTIONS=new Set(['getFilePreview','getBriefAttachmentPreview','getBriefAttachmentDownload','getBackendDataset','getProfilePhoto','getBroadcastFile','getPushConfig','CASES_CAPABILITIES','CASES_OWNER_GRANTS','CASES_LIST','CASES_GET','CASES_INTELLIGENCE','PULSE_CAPABILITIES','PULSE_DASHBOARD','PULSE_REPORT','trafficCommandData','PULSE_CASE_CANDIDATES']);
@@ -1217,7 +1220,7 @@ const MAX_FILE_BYTES=20*1024*1024;
 const MAX_BROADCAST_BYTES=8*1024*1024;
 let CURRENT_USER_ID=localStorage.getItem('onit-user')||'';
 let SESSION_TOKEN=localStorage.getItem('onit-session')||'';
-let briefs=[],users=[],clients=[],allAssignments=[],notifications=[],buzzers=[],teamWorkload=[],reports=[],reportSummary=null,homeAnalytics=null,organisations=[],pendingUsers=[],securityInfo=null,accessDirectory=[],permissions={},dataExports=[];
+let briefs=[],users=[],clients=[],allAssignments=[],notifications=[],buzzers=[],teamWorkload=[],reports=[],reportSummary=null,homeAnalytics=null,organisations=[],pendingUsers=[],securityInfo=null,accessDirectory=[],permissions={},authority={},dataExports=[];
 let utilisationMode='weekly';
 let selectedAccessEmail='',activeBackendDataset='',currentBroadcast=null;
 const profilePhotoCache=new Map();
@@ -1252,20 +1255,20 @@ function parseJsonArray(value){if(Array.isArray(value))return value;try{const x=
 function positionOf(u){return String(rowVal(u,'Position','position')||rowVal(u,'Role','role')||'').trim()}
 function departmentOf(u){return String(rowVal(u,'Department','department')||'').trim()}
 function permissionProfile(u){return String(rowVal(u,'Permission Profile','permissionProfile')||'').toUpperCase()}
-function isOwner(u=currentUser){return !!u&&(permissionProfile(u)==='ORG_OWNER'||String(rowVal(u,'Role')).toLowerCase()==='system owner')}
+function isOwner(u=currentUser){if(u===currentUser&&window.ONITAuthority&&ONITAuthority.has('owner'))return ONITAuthority.allowed('owner');return !!u&&(permissionProfile(u)==='ORG_OWNER'||String(rowVal(u,'Role')).toLowerCase()==='system owner')}
 function backendAccess(u=currentUser){if(isOwner(u))return BACKEND_DATASETS.slice();const v=String(rowVal(u,'Backend Data Access')||'').trim().toUpperCase();return v?v.split(',').map(x=>x.trim()).filter(x=>BACKEND_DATASETS.includes(x)):[]}
 function isManagingDirector(u=currentUser){const p=positionOf(u).toLowerCase().replace(/\s+/g,' ').trim();return p==='md'||p==='managing director'||/^managing director\s*[-–—,/|()]/.test(p)}
 function isDrKunbiUser(u=currentUser){return !!u&&(String(rowVal(u,'User ID'))==='USR-TIOLUWALOGO-OLAKUN'||String(rowVal(u,'Email')).toLowerCase()==='kunbi@spice360.com.ng'||positionOf(u).toLowerCase()==='group head, brands & accounts management')}
 function isAccountManagerUser(u=currentUser){return !!u&&(permissionProfile(u)==='ACCOUNT_MANAGER'||departmentOf(u).toLowerCase()==='account management')&&!isManagingDirector(u)}
 function isTrafficManagerUser(u=currentUser){if(!u)return false;const p=positionOf(u).toLowerCase(),d=departmentOf(u).toLowerCase();return p==='traffic manager'||p.includes('traffic manager')||d==='traffic'}
 function isCreativeLeadership(u=currentUser){if(!u)return false;const p=positionOf(u).toLowerCase().replace(/\s+/g,' ').trim();return permissionProfile(u)==='CREATIVE_LEADERSHIP'||p==='creative director'||p==='deputy creative director'||p==='cd'||p==='dcd'||/^deputy creative director\s*[-–—,/|()]/.test(p)||/^creative director\s*[-–—,/|()]/.test(p)}
-function canApprove(u=currentUser){if(!u)return false;const p=positionOf(u).toLowerCase().replace(/\s+/g,' ').trim();return truthy(rowVal(u,'Can Approve Final'))||permissionProfile(u)==='CREATIVE_LEADERSHIP'||['creative director','deputy creative director','cd','dcd','md','managing director'].includes(p)}
+function canApprove(u=currentUser){if(u===currentUser&&window.ONITAuthority&&ONITAuthority.has('approveFinal'))return ONITAuthority.allowed('approveFinal');if(!u)return false;const p=positionOf(u).toLowerCase().replace(/\s+/g,' ').trim();return truthy(rowVal(u,'Can Approve Final'))||permissionProfile(u)==='CREATIVE_LEADERSHIP'||['creative director','deputy creative director','cd','dcd','md','managing director'].includes(p)}
 function isAgencyLeadership(u=currentUser){return !!u&&!isOwner(u)&&(isCreativeLeadership(u)||isManagingDirector(u)||isDrKunbiUser(u)||canApprove(u))}
 function isRegularAccountManagerForTraffic(u=currentUser){return !!u&&isAccountManagerUser(u)&&!isTrafficManagerUser(u)&&!isAgencyLeadership(u)}
 function isAccountTeamUser(u=currentUser){return !!u&&(isAccountManagerUser(u)||isTrafficManagerUser(u)||isDrKunbiUser(u))}
-function canCreateBrief(u=currentUser){if(!u||isOwner(u))return false;const roleAllowed=isAccountTeamUser(u)||isAgencyLeadership(u);if(u===currentUser&&permissions&&typeof permissions.createBrief!=='undefined')return !!permissions.createBrief||roleAllowed;return roleAllowed}
-function canUseBuzzer(u=currentUser){if(!u||isOwner(u))return false;const roleAllowed=isAccountManagerUser(u)||isTrafficManagerUser(u)||isAgencyLeadership(u);if(u===currentUser&&permissions&&typeof permissions.buzzerSend!=='undefined')return !!permissions.buzzerSend&&roleAllowed;return roleAllowed}
-function canReview(u=currentUser){return !!u&&(canApprove(u)||['ceo','chief executive officer'].includes(positionOf(u).toLowerCase()))}
+function canCreateBrief(u=currentUser){if(u===currentUser&&window.ONITAuthority&&ONITAuthority.has('createBrief'))return ONITAuthority.allowed('createBrief');if(!u||isOwner(u))return false;const roleAllowed=isAccountTeamUser(u)||isAgencyLeadership(u);if(u===currentUser&&permissions&&typeof permissions.createBrief!=='undefined')return !!permissions.createBrief;return roleAllowed}
+function canUseBuzzer(u=currentUser){if(u===currentUser&&window.ONITAuthority&&ONITAuthority.has('buzzerSend'))return ONITAuthority.allowed('buzzerSend');if(!u||isOwner(u))return false;const roleAllowed=isAccountManagerUser(u)||isTrafficManagerUser(u)||isAgencyLeadership(u);if(u===currentUser&&permissions&&typeof permissions.buzzerSend!=='undefined')return !!permissions.buzzerSend;return roleAllowed}
+function canReview(u=currentUser){if(u===currentUser&&window.ONITAuthority&&ONITAuthority.has('reviewWork'))return ONITAuthority.allowed('reviewWork');return !!u&&(canApprove(u)||['ceo','chief executive officer'].includes(positionOf(u).toLowerCase()))}
 function isTeamLeadUser(u=currentUser){return !!u&&truthy(rowVal(u,'Team Lead'))}
 function userById(id){if(!id)return null;if(currentUser&&rowVal(currentUser,'User ID')===id)return currentUser;return users.find(u=>rowVal(u,'User ID')===id)||null}
 function leadershipAssigneeBrief(b){const mine=currentUserAssignment(b?.code,'TO');return isCreativeLeadership(userById(rowVal(mine,'User ID','userId')||b?.assigneeUserId))}
@@ -1273,9 +1276,9 @@ function exportApprovalRole(){return String(permissions.exportApprovalRole||'')}
 function initials(name){return String(name||'?').trim().split(/\s+/).slice(0,2).map(x=>x[0]||'').join('').toUpperCase()||'?'}
 function isSenior(u=currentUser){return !!u&&['CREATIVE_LEADERSHIP','EXECUTIVE','ORG_ADMIN','ORG_OWNER'].includes(permissionProfile(u))}
 function isHR(u=currentUser){return !!u&&(departmentOf(u).toLowerCase()==='hr'||permissionProfile(u)==='HR_ADMIN')}
-function canManagePeople(u=currentUser){return isOwner(u)||isHR(u)||isSenior(u)}
-function canManageClients(u=currentUser){return !!u&&(isAccountTeamUser(u)||isManagingDirector(u)||isOwner(u))}
-function canSeeReports(u=currentUser){return isOwner(u)||backendAccess(u).includes('REPORTS')}
+function canManagePeople(u=currentUser){if(u===currentUser&&window.ONITAuthority&&ONITAuthority.has('managePeople'))return ONITAuthority.allowed('managePeople');return isOwner(u)||isHR(u)||isSenior(u)}
+function canManageClients(u=currentUser){if(u===currentUser&&window.ONITAuthority&&ONITAuthority.has('manageClients'))return ONITAuthority.allowed('manageClients');return !!u&&(isAccountTeamUser(u)||isManagingDirector(u)||isOwner(u))}
+function canSeeReports(u=currentUser){if(u===currentUser&&window.ONITAuthority&&ONITAuthority.has('reports'))return ONITAuthority.allowed('reports');return isOwner(u)||backendAccess(u).includes('REPORTS')}
 function currentUserName(){return rowVal(currentUser,'Full Name','fullName')||'User'}
 function greetingText(){
   const parts=new Intl.DateTimeFormat('en-GB',{hour:'numeric',hour12:false,timeZone:'Africa/Lagos'}).formatToParts(new Date());
@@ -1380,15 +1383,8 @@ function firebasePlain_(value){if(value&&typeof value.toDate==='function')return
 function stopFirebaseRealtime(){firebaseUnsubs.forEach(fn=>{try{fn()}catch(e){}});firebaseUnsubs=[];firebaseRealtimeHealthy=false;firebaseStarting=false;firebaseActivityRows=new Map();firebaseBuzzerRows=new Map();buzzerQueue=[];currentBuzzer=null;}
 let firebaseRenderQueued=false;
 function firebaseRenderLive_(){
-  if(firebaseRenderQueued)return;firebaseRenderQueued=true;
-  requestAnimationFrame(()=>{
-    firebaseRenderQueued=false;
-    if(!document.getElementById('home').classList.contains('hidden'))renderHome();
-    if(!document.getElementById('briefs').classList.contains('hidden'))renderBriefs();
-    if(!document.getElementById('archive').classList.contains('hidden'))renderArchive();
-    if(!document.getElementById('memory').classList.contains('hidden'))renderMemory(false);
-    if(current&&!document.getElementById('detail').classList.contains('hidden')){current=briefs.find(b=>b.code===current.code)||current;renderDetail();}
-  });
+  if(window.ONITSync){ONITSync.emit('BRIEF_CHANGED');return}
+  if(firebaseRenderQueued)return;firebaseRenderQueued=true;requestAnimationFrame(()=>{firebaseRenderQueued=false;if(!document.getElementById('home').classList.contains('hidden'))renderHome();if(!document.getElementById('briefs').classList.contains('hidden'))renderBriefs();if(!document.getElementById('archive').classList.contains('hidden'))renderArchive();if(!document.getElementById('memory').classList.contains('hidden'))renderMemory(false);if(current&&!document.getElementById('detail').classList.contains('hidden')){current=briefs.find(b=>b.code===current.code)||current;renderDetail();}});
 }
 function applyFirebaseBriefChange_(change){
   const data=firebasePlain_(change.doc.data()||{}),row=data.row||{},code=rowVal(row,'Brief Code')||data.briefCode||change.doc.id;if(!code)return;
@@ -1401,7 +1397,7 @@ function applyFirebaseBriefChange_(change){
 }
 function applyFirebaseActivityChange_(change){const data=firebasePlain_(change.doc.data()||{}),row=data.row||{},id=rowVal(row,'Activity ID')||data.activityId||change.doc.id;if(change.type==='removed')firebaseActivityRows.delete(id);else firebaseActivityRows.set(id,row);briefs.forEach(b=>{const rows=[...firebaseActivityRows.values()].filter(a=>sameBrief(a,b.code)).sort((a,z)=>new Date(rowVal(a,'Timestamp','timestamp')||0)-new Date(rowVal(z,'Timestamp','timestamp')||0));if(rows.length){b.activityRows=rows;b.activity=rows.map(r=>`${formatTime(rowVal(r,'Timestamp','timestamp'))} — ${rowVal(r,'Action','action')}${rowVal(r,'Reason','reason')?' — '+rowVal(r,'Reason','reason'):''}`)}});firebaseRenderLive_();}
 function applyFirebaseNotificationSnapshot_(snap){
-  const live=snap.docs.map(d=>{const x=firebasePlain_(d.data()||{});return x.row||x||{}}),byId=new Map(notifications.map(n=>[rowVal(n,'Notification ID'),n]));live.forEach(n=>byId.set(rowVal(n,'Notification ID'),n));notifications=[...byId.values()];renderNotifications();showNextBroadcast();
+  const live=snap.docs.map(d=>{const x=firebasePlain_(d.data()||{});return x.row||x||{}}),byId=new Map(notifications.map(n=>[rowVal(n,'Notification ID'),n]));live.forEach(n=>byId.set(rowVal(n,'Notification ID'),n));notifications=[...byId.values()];if(window.ONITSync)ONITSync.emit('NOTIFICATIONS_CHANGED');else{renderNotifications();showNextBroadcast();}
 }
 
 function applyFirebaseBuzzerSnapshot_(snap){
@@ -1453,7 +1449,7 @@ async function loadFromGoogle(strict=false,silent=false){
         const data=await apiGet('bootstrap');if(generation!==loadGeneration)return;
         backendVersion=data.version||'';serverOffset=data.serverTime?new Date(data.serverTime).getTime()-Date.now():0;
         if(!versionAtLeast(backendVersion,'0.15.7'))throw new Error('Backend '+backendVersion+' is older than the ONIT V0.15.7 shared-account backend required by this frontend. Deploy backend V0.15.7 first.');
-        lastStateVersion=String(data.stateVersion||lastStateVersion||'');organisations=data.organisations||[];users=table(data,'USERS');pendingUsers=data.pendingUsers||[];accessDirectory=data.accessDirectory||[];securityInfo=data.security||null;permissions=data.permissions||{};clients=table(data,'CLIENTS');allAssignments=table(data,'ASSIGNMENTS');notifications=table(data,'NOTIFICATIONS');buzzers=data.buzzers||[];reports=table(data,'REPORTS');dataExports=data.dataExports||[];teamWorkload=data.teamWorkload||[];reportSummary=data.reportSummary||null;homeAnalytics=data.homeAnalytics||null;currentUser=data.currentUser||users.find(u=>rowVal(u,'User ID','userId')===CURRENT_USER_ID)||null;
+        lastStateVersion=String(data.stateVersion||lastStateVersion||'');organisations=data.organisations||[];users=table(data,'USERS');pendingUsers=data.pendingUsers||[];accessDirectory=data.accessDirectory||[];securityInfo=data.security||null;permissions=data.permissions||{};authority=data.authority||data.permissions||{};if(window.ONITAuthority)ONITAuthority.set(authority);clients=table(data,'CLIENTS');allAssignments=table(data,'ASSIGNMENTS');notifications=table(data,'NOTIFICATIONS');buzzers=data.buzzers||[];reports=table(data,'REPORTS');dataExports=data.dataExports||[];teamWorkload=data.teamWorkload||[];reportSummary=data.reportSummary||null;homeAnalytics=data.homeAnalytics||null;currentUser=data.currentUser||users.find(u=>rowVal(u,'User ID','userId')===CURRENT_USER_ID)||null;
         if(!currentUser)throw new Error('Your signed-in profile is not available.');CURRENT_USER_ID=rowVal(currentUser,'User ID');ORG_ID=rowVal(currentUser,'Organisation ID');localStorage.setItem('onit-user',CURRENT_USER_ID);localStorage.setItem('onit-org',ORG_ID);
         const rows=table(data,'BRIEFS'),iterations=table(data,'ITERATIONS'),activities=table(data,'ACTIVITY_LOG');briefs=rows.map(sheetBriefToUI);briefs.forEach(b=>{const as=allAssignments.filter(r=>sameBrief(r,b.code)&&String(rowVal(r,'Assignment Type','assignmentType')).toUpperCase()==='TO'&&String(rowVal(r,'Active','active')).toLowerCase()!=='false');if(as.length){b.assignee=as.map(r=>rowVal(r,'Full Name','fullName')||'Assigned team').join(' + ');b.assigneeUserId=rowVal(as[0],'User ID','userId');b.assigneeFullName=rowVal(as[0],'Full Name','fullName')||b.assignee}b.iterations=iterations.filter(r=>sameBrief(r,b.code)).sort((a,z)=>Number(rowVal(a,'Version Number','versionNumber')||0)-Number(rowVal(z,'Version Number','versionNumber')||0)).map(r=>{
           let fileIds=parseJsonArray(rowVal(r,'Work File IDs')),fileNames=parseJsonArray(rowVal(r,'Work File Names')),fileTypes=parseJsonArray(rowVal(r,'Work File Types')),fileUrls=parseJsonArray(rowVal(r,'Work File URLs'));
@@ -1534,15 +1530,11 @@ function riskForBrief(b){
 }
 function riskMarkup(b){const r=riskForBrief(b),code=encodeURIComponent(b.code).replace(/'/g,'%27');return `<div class='riskCard' onclick="detail(decodeURIComponent('${code}'))"><div class='riskScore ${r.level.toLowerCase()}'>${r.score}</div><div><span class='code'>${escapeHTML(b.code)}</span><b>${escapeHTML(b.client)} — ${escapeHTML(b.project)}</b><div class='riskReasons'>${escapeHTML(r.reasons.join(' • ')||'No immediate risk signal')}</div></div><div><span class='riskLabel ${r.level==='HIGH'?'high':''}'>${r.level}</span></div></div>`}
 function dashboardMode(){
-  // Privileged roles are resolved from the signed-in user first. A stale backend dashboardMode must never downgrade Owner or leadership views.
-  if(isOwner())return 'OWNER';
-  if(isAgencyLeadership(currentUser))return 'LEADERSHIP';
-  if(isTrafficManagerUser())return 'TRAFFIC';
-  const serverMode=String(permissions.dashboardMode||'').toUpperCase();
-  if(['ACCOUNT','TEAM_LEAD','STAFF'].includes(serverMode))return serverMode;
-  if(canCreateBrief())return 'ACCOUNT';
-  if(isTeamLeadUser())return 'TEAM_LEAD';
-  return 'STAFF';
+  // v0.33: the backend Authority Engine is the source of truth. Local role resolution is fallback-only.
+  if(window.ONITAuthority&&ONITAuthority.has('dashboardMode'))return ONITAuthority.mode('STAFF');
+  const serverMode=String((authority&&authority.dashboardMode)||permissions.dashboardMode||'').toUpperCase();
+  if(['OWNER','LEADERSHIP','TRAFFIC','ACCOUNT','TEAM_LEAD','STAFF'].includes(serverMode))return serverMode;
+  if(isOwner())return 'OWNER';if(isAgencyLeadership(currentUser))return 'LEADERSHIP';if(isTrafficManagerUser())return 'TRAFFIC';if(canCreateBrief())return 'ACCOUNT';if(isTeamLeadUser())return 'TEAM_LEAD';return 'STAFF';
 }
 function dashboardUiRequiredNodes(){return['onitRadar','homeAnalytics','homeRecentActivity','homeUpcomingDeadlines','homePrimarySection','homePrimaryTitle','homeBriefList','homeQueueSection']}
 function dashboardUiHealth(){
@@ -1640,7 +1632,8 @@ async function quickReleaseTraffic(code,button){code=decodeURIComponent(code);co
 
 function radarDayKey(){return new Date(Date.now()+serverOffset).toLocaleDateString('en-CA',{timeZone:'Africa/Lagos'})}
 function radarIgnored(key){try{return localStorage.getItem('onit-radar-ignore:'+key)===radarDayKey()}catch(e){return false}}
-function ignoreRadarItem(key){try{localStorage.setItem('onit-radar-ignore:'+key,radarDayKey())}catch(e){}renderHome()}
+function snoozeRadarItem(key){try{localStorage.setItem('onit-radar-ignore:'+key,radarDayKey())}catch(e){}showToast('Snoozed','ONIT will surface this again tomorrow if it still needs attention.');renderHome()}
+function ignoreRadarItem(key){snoozeRadarItem(key)}
 function radarWaitHours(b){const latest=b?.iterations?.[b.iterations.length-1];return hoursSince(latest?.submittedAt||b?.updatedAt||b?.createdAt)}
 function radarDueCopy(b){const due=effectiveDeadline(b);if(!due)return '';const ms=new Date(due).getTime()-(Date.now()+serverOffset);if(!Number.isFinite(ms))return '';if(ms<0)return ` Deadline is overdue by ${duration(Math.abs(ms))}.`;if(ms<=86400000)return ` Deadline in ${duration(ms)}.`;return ` Due ${new Date(due).toLocaleDateString('en-GB',{day:'numeric',month:'short',timeZone:'Africa/Lagos'})}.`}
 function radarOpenBrief(encoded){detail(decodeURIComponent(encoded||''))}
@@ -1698,10 +1691,10 @@ function renderOnitRadar(mode){
   const clearCopy=mode==='OWNER'?'No platform or access action needs you right now.':mode==='LEADERSHIP'?(leadershipRisk?'No new unignored leadership alert right now. The deadline risks above are still being monitored.':'No agency-wide deadline, review or workflow condition needs leadership attention right now.'):'No urgent action detected.';
   const clearDetail=mode==='OWNER'?'ONIT will surface pending sign-ups, staff setup and organisation configuration issues here.':'ONIT will surface something here when a deadline, review or workflow condition genuinely needs you.';
   const metricsHtml=`<div class='radarMorningGrid'>${metrics.map(m=>`<div class='morningMetric ${m.tone||''}'><b>${escapeHTML(m.value)}</b><span>${escapeHTML(m.label)}</span></div>`).join('')}</div>`;
-  const start=first?`<div class='radarMorningStart'><div class='morningStartCopy'><small>START HERE</small><b>${escapeHTML(first.title)}</b><span>${escapeHTML(first.copy)}</span></div><button class='morningStartBtn' onclick="${first.onclick}">${escapeHTML(first.actionLabel)}</button></div>`:'';
+  const start=first?`<div class='radarMorningStart'><div class='morningStartCopy'><small>START HERE</small><b>${escapeHTML(first.title)}</b><span>${escapeHTML(first.copy)}</span></div><div class='morningStartActions'><button class='morningStartBtn' onclick="${first.onclick}">${escapeHTML(first.actionLabel)}</button><button class='radarIgnore' onclick="snoozeRadarItem('${escapeHTML(first.key).replace(/'/g,'&#39;')}')">SNOOZE TILL TOMORROW</button></div></div>`:'';
   const remainingItems=first?items.slice(1):items;
-  const cards=remainingItems.length?`<div class='radarItems'>${remainingItems.map(i=>{const repeatedTrafficAction=['MANAGE SCHEDULE','VIEW TRAFFIC STATUS'].includes(String(i.actionLabel||'')),label=repeatedTrafficAction?'OPEN BRIEF':i.actionLabel,click=(repeatedTrafficAction&&i.code&&String(i.code).startsWith('JOB-'))?`radarOpenBrief('${encodeURIComponent(i.code)}')`:i.onclick;return `<article class='radarCard'><div class='radarCardTop'><span class='radarLevel ${i.level}'>${i.level==='high'?'Needs action':i.level==='watch'?'Watch':'Next'}</span><span class='radarCode'>${escapeHTML(i.code||'ONIT')}</span></div><h3>${escapeHTML(i.title)}</h3><p>${escapeHTML(i.copy)}</p><div class='radarActions'><button class='radarAction' onclick="${click}">${escapeHTML(label)}</button><button class='radarIgnore' onclick="ignoreRadarItem('${escapeHTML(i.key).replace(/'/g,'&#39;')}')">IGNORE TODAY</button></div></article>`}).join('')}</div>`:(items.length?'':`<div class='radarClear'><div class='radarClearIcon'>✓</div><div><b>${escapeHTML(clearCopy)}</b><span>${escapeHTML(clearDetail)}</span></div></div>`);
-  host.innerHTML=`<section class='radarShell'><div class='radarTop'><div><div class='radarEyebrow'>ONIT RADAR • YOUR 30-SECOND MORNING</div><div class='radarHeadline'>${escapeHTML(headline)}</div><div class='radarSub'>${escapeHTML(sub)}</div></div><div class='radarLive'>${high?high+' HIGH':'LIVE'}</div></div>${metricsHtml}${start}${cards}</section>`
+  const cards=remainingItems.length?`<div class='radarItems'>${remainingItems.map(i=>{const repeatedTrafficAction=['MANAGE SCHEDULE','VIEW TRAFFIC STATUS'].includes(String(i.actionLabel||'')),label=repeatedTrafficAction?'OPEN BRIEF':i.actionLabel,click=(repeatedTrafficAction&&i.code&&String(i.code).startsWith('JOB-'))?`radarOpenBrief('${encodeURIComponent(i.code)}')`:i.onclick;return `<article class='radarCard'><div class='radarCardTop'><span class='radarLevel ${i.level}'>${i.level==='high'?'Needs action':i.level==='watch'?'Watch':'Next'}</span><span class='radarCode'>${escapeHTML(i.code||'ONIT')}</span></div><h3>${escapeHTML(i.title)}</h3><p>${escapeHTML(i.copy)}</p><div class='radarActions'><button class='radarAction' onclick="${click}">${escapeHTML(label)}</button><button class='radarIgnore' onclick="snoozeRadarItem('${escapeHTML(i.key).replace(/'/g,'&#39;')}')">SNOOZE TILL TOMORROW</button></div></article>`}).join('')}</div>`:(items.length?'':`<div class='radarClear'><div class='radarClearIcon'>✓</div><div><b>${escapeHTML(clearCopy)}</b><span>${escapeHTML(clearDetail)}</span></div></div>`);
+  host.innerHTML=`<section class='radarShell'><div class='radarTop'><div><div class='radarEyebrow'>ONIT ACTION CENTRE • YOUR 30-SECOND CHECK</div><div class='radarHeadline'>${escapeHTML(headline)}</div><div class='radarSub'>${escapeHTML(sub)}</div></div><div class='radarLive'>${high?high+' HIGH':'LIVE'}</div></div>${metricsHtml}${start}${cards}</section>`
 }
 
 
@@ -2420,7 +2413,7 @@ function renderMore(){if(!currentUser)return;const names=backendAccess();let htm
   html+=dataExportRequestsMarkup();
   if(typeof autoCareMoreCardMarkup==='function')html+=autoCareMoreCardMarkup();
   html+=`<div class='morecard' style='grid-column:1/-1'><h3>INSTALL / UPDATE ONIT</h3><div class='bigTiny'>Install ONIT on this device for quick access. Global UI Sync keeps browser, mobile and desktop installs on the newest published ONIT interface automatically. AutoCare protects unfinished forms, repairs stale caches and activates the update as soon as the screen is safe.</div><div class='actions'><button class='secondary linkbtn' onclick='installOnit()'>INSTALL ON THIS DEVICE</button><button class='secondary linkbtn' onclick='forceFrontendUpdate()'>CHECK / REPAIR UPDATE</button></div></div>`;
-  html+=`<div class='morecard' style='grid-column:1/-1'><div class='streamlineAbout'><div><h3>ABOUT ONIT</h3><div class='bigTiny'>Frontend v${APP_VERSION} • Dashboard UI r${DASHBOARD_UI_REVISION} • Backend ${backendVersion||'checking…'}</div></div><button class='secondary linkbtn' onclick="showToast('ONIT','Work. People. Attention. Proof.')">VIEW DETAILS</button></div></div></div>`;document.getElementById('moreContent').innerHTML=html;hydrateProfilePhotos()}
+  html+=`<div class='morecard' style='grid-column:1/-1'><div class='streamlineAbout'><div><h3>ABOUT ONIT</h3><div class='bigTiny'>Frontend v${APP_VERSION} • Dashboard UI r${DASHBOARD_UI_REVISION} • Authority v1 • Sync v1 • Backend ${backendVersion||'checking…'}</div></div><button class='secondary linkbtn' onclick="showToast('ONIT','Work. People. Attention. Proof.')">VIEW DETAILS</button></div></div></div>`;document.getElementById('moreContent').innerHTML=html;hydrateProfilePhotos()}
 async function approvePending(id){
   const targetUserId=decodeURIComponent(id),target=pendingUsers.find(u=>String(rowVal(u,'User ID'))===String(targetUserId)),name=target?rowVal(target,'Full Name'):'The member';
   try{
@@ -2682,9 +2675,8 @@ async function checkForUpdates(){
     if(pulse.serverTime)serverOffset=new Date(pulse.serverTime).getTime()-Date.now();
     if(refreshRecoveryPending){connectionNotice('');updateLastSyncLabel(true);await recoverConnectionNow();return}
     const next=String(pulse.stateVersion||'');
-    if(next&&lastStateVersion&&next!==lastStateVersion){await loadFromGoogle(false,true);return}
+    if(next&&lastStateVersion&&next!==lastStateVersion){if(window.ONITSync)ONITSync.emit('STATE_CHANGED',{reason:'backend-state-version'});else await loadFromGoogle(false,true);return}
     if(next&&!lastStateVersion)lastStateVersion=next;
-    if(!document.getElementById('home').classList.contains('hidden'))renderHomeAnalytics();
   }catch(e){
     if(authError(e)){await loadFromGoogle(false,true);return}
     console.warn('ONIT pulse:',e);
@@ -2714,11 +2706,15 @@ setInterval(()=>{const now=Date.now(),gap=firebaseRealtimeHealthy?60000:15000;if
 async function boot(){if(SESSION_TOKEN){document.getElementById('authGate').classList.add('hidden');document.getElementById('appShell').classList.remove('hidden');await loadFromGoogle(false);if(SESSION_TOKEN)return}document.getElementById('appShell').classList.add('hidden');document.getElementById('authGate').classList.remove('hidden');showAuthMode('signin')}
 document.addEventListener('DOMContentLoaded',()=>boot(),{once:true});
 </script>
-<script src="./autocare-module.js?v=0.32.2"></script>
-<script src="./cases-module.js?v=0.32.2"></script>
-<script src="./pulse-module.js?v=0.32.2"></script>
-<script src="./assist-traffic-module.js?v=0.32.2"></script>
-<script src="./core-intelligence.js?v=0.32.2"></script>
+<script src="./authority-engine.js?v=0.33.0"></script>
+<script src="./sync-engine.js?v=0.33.0"></script>
+<script src="./release-guard.js?v=0.33.0"></script>
+<script src="./command-palette.js?v=0.33.0"></script>
+<script src="./autocare-module.js?v=0.33.0"></script>
+<script src="./cases-module.js?v=0.33.0"></script>
+<script src="./pulse-module.js?v=0.33.0"></script>
+<script src="./assist-traffic-module.js?v=0.33.0"></script>
+<script src="./core-intelligence.js?v=0.33.0"></script>
 </body>
 </html>
 
@@ -2735,7 +2731,7 @@ document.addEventListener('DOMContentLoaded',()=>boot(),{once:true});
 .radarMorningStart .morningStartCopy small{color:#ff9d82}
 .radarMorningStart .morningStartCopy b{color:#fff}
 .radarMorningStart .morningStartCopy span{color:rgba(255,255,255,.66)}
-.radarMorningStart .morningStartBtn{background:#fff;color:#171717;border-color:#fff}
+.radarMorningStart .morningStartBtn{background:#fff;color:#171717;border-color:#fff}.morningStartActions{display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
 .compactQueueFooter{display:flex;justify-content:flex-end;padding-top:10px;border-top:1px solid #eee;margin-top:4px}
 .compactQueueFooter button{min-height:36px}
 .streamlineAbout{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap}
