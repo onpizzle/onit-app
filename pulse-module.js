@@ -1,4 +1,4 @@
-/* ONIT Digital Pulse v0.30.8 — simplified leadership controls + report export + 1-page cases */
+/* ONIT Digital Pulse v0.31.2 — signed-in access hardening + role-safe leadership controls */
 (function(){
 'use strict';
 const state={cap:null,tab:'today',data:null,candidates:null,lastAt:0,lastCapAt:0,busy:false,dirty:false,dirtyGroups:new Set(),draftsLoaded:false,lastSavedAt:0,lastQuietSyncAt:0,quietSyncBusy:false,dataFingerprint:''};
@@ -11,13 +11,13 @@ const currentUserObj=()=>typeof currentUser!=='undefined'&&currentUser?currentUs
 const currentDepartment=()=>{const u=currentUserObj();return String((u&&((typeof rowVal==='function'&&rowVal(u,'Department'))||u['Department']||u.department))||'')};
 const currentPosition=()=>{const u=currentUserObj();return String((u&&((typeof rowVal==='function'&&rowVal(u,'Position'))||u['Position']||u.position))||'')};
 const currentIdentity=()=>{const u=currentUserObj();return String((u&&(((typeof rowVal==='function'&&rowVal(u,'Full Name'))||u['Full Name']||u.fullName)||'')+' '+(((typeof rowVal==='function'&&rowVal(u,'Email'))||u['Email']||u.email)||'')))};
-const fallbackCap=()=>{const active=typeof SESSION_TOKEN!=='undefined'&&!!SESSION_TOKEN&&typeof CURRENT_USER_ID!=='undefined'&&!!CURRENT_USER_ID,digital=/digital/i.test(currentDepartment()),leadership=/^(creative director|deputy creative director|md|managing director)$/i.test(currentPosition().trim())||/\b(kunbi|kumbi)\b/i.test(currentIdentity());return{canUse:active,canWrite:active&&digital,canPromoteToCases:active&&(digital||leadership),canBuildOnePageCase:active&&leadership,canDownloadReport:active&&leadership,isOwner:false,isDigital:digital,isLeadership:leadership,department:currentDepartment(),fallback:true}};
-const allowed=()=>state.cap?state.cap.canUse!==false:!!fallbackCap().canUse;
-const owner=()=>!!state.cap?.isOwner;
-const canWrite=()=>state.cap?!!state.cap.canWrite:!!fallbackCap().canWrite;
-const canPromote=()=>state.cap?!!state.cap.canPromoteToCases:!!fallbackCap().canPromoteToCases;
-const canBuildOnePageCase=()=>state.cap?!!state.cap.canBuildOnePageCase:!!fallbackCap().canBuildOnePageCase;
-const canDownloadReport=()=>state.cap?!!state.cap.canDownloadReport:!!fallbackCap().canDownloadReport;
+const fallbackCap=()=>{const active=typeof SESSION_TOKEN!=='undefined'&&!!SESSION_TOKEN&&typeof CURRENT_USER_ID!=='undefined'&&!!CURRENT_USER_ID&&!!currentUserObj(),digital=/digital/i.test(currentDepartment()),ownerFlag=typeof isOwner==='function'?!!isOwner(currentUserObj()):false,leadership=ownerFlag||(typeof isCreativeLeadership==='function'&&isCreativeLeadership(currentUserObj()))||(typeof isManagingDirector==='function'&&isManagingDirector(currentUserObj()))||(typeof isDrKunbiUser==='function'&&isDrKunbiUser(currentUserObj()))||(typeof canApprove==='function'&&canApprove(currentUserObj()))||/^(creative director|deputy creative director|md|managing director)$/i.test(currentPosition().trim())||/\b(kunbi|kumbi)\b/i.test(currentIdentity());return{canUse:active,canWrite:active&&digital,canPromoteToCases:active&&(digital||leadership||ownerFlag),canBuildOnePageCase:active&&(leadership||ownerFlag),canDownloadReport:active&&(leadership||ownerFlag),isOwner:ownerFlag,isDigital:digital,isLeadership:leadership,department:currentDepartment(),fallback:true}};
+const allowed=()=>!!(fallbackCap().canUse||state.cap?.canUse);
+const owner=()=>!!(state.cap?.isOwner||fallbackCap().isOwner);
+const canWrite=()=>!!(state.cap?.canWrite||fallbackCap().canWrite);
+const canPromote=()=>!!(state.cap?.canPromoteToCases||fallbackCap().canPromoteToCases);
+const canBuildOnePageCase=()=>!!(state.cap?.canBuildOnePageCase||fallbackCap().canBuildOnePageCase);
+const canDownloadReport=()=>!!(state.cap?.canDownloadReport||fallbackCap().canDownloadReport);
 
 const DRAFT_GROUPS={
  readiness:['pulseInbox','pulseOvernight','pulseUrgent','pulseScheduled','pulseHealth','pulseReadinessNote'],
@@ -94,7 +94,7 @@ function updateDraftStatus(){
 document.addEventListener('input',markDraftFromEvent,true);
 document.addEventListener('change',markDraftFromEvent,true);
 window.addEventListener('beforeunload',saveDraftNow);
-function setNav(){const n=nav();if(n)n.classList.toggle('hiddenByRole',!allowed())}
+function setNav(){const n=nav();if(!n)return;const signedIn=typeof SESSION_TOKEN!=='undefined'&&!!SESSION_TOKEN&&typeof CURRENT_USER_ID!=='undefined'&&!!CURRENT_USER_ID&&!!currentUserObj();n.classList.toggle('hiddenByRole',!signedIn)}
 function fmtDate(v){if(!v)return '—';try{return new Date(v).toLocaleString([], {day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})}catch(e){return String(v)}}
 function num(v){v=Number(v);return Number.isFinite(v)?v:0}
 function tabbar(){const tabs=[['today','Today'],['engagement','Engagement'],['content','Content'],['listening','Listening'],['reports','Reports'],['cases','Case Signals']];return `<div class='pulseTabs'>${tabs.map(([id,l])=>`<button class='${state.tab===id?'active':''}' onclick="DigitalPulse.openTab('${id}')">${l}</button>`).join('')}</div>`}

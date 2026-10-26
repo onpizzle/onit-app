@@ -79,7 +79,7 @@
 .morningMetric{border:1px solid #ece7e0;background:#fff;border-radius:14px;padding:12px 13px;min-width:0}
 .morningMetric b{display:block;font-size:22px;line-height:1;font-weight:900;color:#171716;margin-bottom:5px}
 .morningMetric span{display:block;font-size:9px;font-weight:900;letter-spacing:.07em;text-transform:uppercase;color:#8e877f;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.morningMetric.urgent b,.morningMetric.watch b,.morningMetric.good b{color:#fff}
+.morningMetric.urgent b{color:#df5148}.morningMetric.watch b{color:#d98e22}.morningMetric.good b{color:#27ae70}
 .morningStart{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-top:11px;border-top:1px solid #eee6df;padding-top:12px}
 .morningStartCopy{min-width:0}.morningStartCopy small{display:block;font-size:9px;font-weight:900;letter-spacing:.09em;text-transform:uppercase;color:#ff5b2e;margin-bottom:3px}.morningStartCopy b{display:block;font-size:13px;color:#24221f;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.morningStartCopy span{display:block;font-size:10px;color:#817d76;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .morningStartBtn{border:0;border-radius:10px;background:#171716;color:#fff;padding:9px 12px;font-size:9px;font-weight:900;letter-spacing:.03em;white-space:nowrap;cursor:pointer}.morningStartBtn:hover{background:#2c2925}
@@ -92,17 +92,11 @@
 .radarShell:before{content:"";position:absolute;width:180px;height:180px;border:1px solid rgba(255,86,48,.22);border-radius:50%;right:-55px;top:-95px;box-shadow:0 0 0 28px rgba(255,86,48,.06),0 0 0 58px rgba(255,86,48,.035);pointer-events:none;animation:radarBreathe 3.2s ease-in-out infinite}
 @keyframes radarBreathe{0%,100%{transform:scale(.96);opacity:.72}50%{transform:scale(1.04);opacity:1}}
 .radarTop{position:relative;display:flex;align-items:flex-start;justify-content:space-between;gap:18px;margin-bottom:14px}
-.radarEyebrow{font-size:10px;line-height:1;font-weight:900;letter-spacing:.16em;color:#fff;text-transform:uppercase;margin-bottom:7px}
+.radarEyebrow{font-size:10px;line-height:1;font-weight:900;letter-spacing:.16em;color:#ff5a34;text-transform:uppercase;margin-bottom:7px}
 .radarHeadline{font-size:21px;line-height:1.18;font-weight:900;letter-spacing:-.02em}
 .radarSub{font-size:12px;line-height:1.45;color:#bdbdb7;margin-top:5px;max-width:680px}
 .radarLive{display:inline-flex;align-items:center;gap:7px;white-space:nowrap;border:1px solid #3b3b38;border-radius:999px;padding:7px 10px;font-size:9px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:#dadad5;background:#232321}
 .radarLive:before{content:"";width:7px;height:7px;border-radius:50%;background:#28b97a;box-shadow:0 0 0 4px rgba(40,185,122,.12)}
-.radarMorningGrid .morningMetric b{color:#fff!important}
-.radarMorningGrid .morningMetric span{color:#c9c9c4}
-.radarMorningStart .morningStartCopy small{color:#fff}
-.radarMorningStart .morningStartCopy b{color:#fff}
-.radarMorningStart .morningStartCopy span{color:#bdbdb7}
-
 .radarItems{position:relative;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
 .radarCard{min-width:0;border:1px solid #353532;background:#222220;border-radius:15px;padding:14px;display:flex;flex-direction:column;gap:9px;transition:transform .16s ease,border-color .16s ease,background .16s ease}
 .radarCard:hover{transform:translateY(-1px);border-color:#494945;background:#262624}
@@ -893,8 +887,8 @@ img,video,canvas,svg{max-width:100%}
 .reviewQueueNote{font-size:11px;color:#777;margin-top:6px}
 @media(max-width:760px){.reviewPreviewModal{padding:4px!important}.reviewPreviewModal .modalBox{width:100%!important;height:calc(100dvh - 8px)!important;max-height:none!important;border-radius:12px!important}.previewAssetStage{padding:5px}.previewFooter{padding:7px}.previewNav{justify-content:flex-start;overflow-x:auto;flex-wrap:nowrap}.previewNav .mini{white-space:nowrap}}
 </style>
-<link rel="stylesheet" href="./cases-module.css?v=0.29.3">
-<link rel="stylesheet" href="./pulse-module.css?v=0.30.8">
+<link rel="stylesheet" href="./cases-module.css?v=0.31.2">
+<link rel="stylesheet" href="./pulse-module.css?v=0.31.2">
 
 <style id="onit-mobile-nav-v0212">
 .navLabelMobile{display:none!important}
@@ -1008,8 +1002,20 @@ html.onitReduceMotion *,html.onitReduceMotion *::before,html.onitReduceMotion *:
   *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
 }
 </style>
-<link rel="stylesheet" href="./assist-traffic-module.css?v=0.30.5">
-<link rel="stylesheet" href="./core-intelligence.css?v=0.31.1">
+<link rel="stylesheet" href="./assist-traffic-module.css?v=0.31.2">
+<link rel="stylesheet" href="./core-intelligence.css?v=0.31.2">
+<style id="role-consistency-v0311">
+/* ONIT v0.31.2 — role authority + Digital Pulse access hardening */
+.radarMorningGrid .morningMetric b,
+.radarMorningGrid .morningMetric.urgent b,
+.radarMorningGrid .morningMetric.watch b,
+.radarMorningGrid .morningMetric.good b{color:#fff!important}
+.radarEyebrow,
+.radarMorningStart .morningStartCopy small{color:#fff!important}
+.radarMorningStart .morningStartCopy b{color:#fff!important}
+.radarLevel{color:#f2f2ee!important}
+</style>
+
 </head>
 <body>
 <a class="onitSkipLink" href="#mainContent">Skip to main content</a>
@@ -1198,7 +1204,7 @@ html.onitReduceMotion *,html.onitReduceMotion *::before,html.onitReduceMotion *:
 <script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-messaging-compat.js"></script>
-<script>const APP_VERSION='0.31.1';
+<script>const APP_VERSION='0.31.2';
 const BACKEND_DATASETS=['USERS','CLIENTS','BRIEFS','ASSIGNMENTS','ITERATIONS','ACTIVITY_LOG','NOTIFICATIONS','REPORTS'];
 const API_URL='https://script.google.com/macros/s/AKfycbyLVpsQLFCpQWRIvRndw66sghmu5rtK31cuthS7hXjJ--lf703mJPIbJ2zpLDIlH76b/exec';
 let ORG_ID=localStorage.getItem('onit-org')||'';
@@ -1481,7 +1487,10 @@ function applyPermissions(){
   document.querySelectorAll('.createBriefBtn').forEach(b=>b.classList.toggle('hiddenByRole',!canCreateBrief()));
   const buzzerBtn=document.getElementById('buzzerBtn');if(buzzerBtn)buzzerBtn.classList.toggle('hiddenByRole',!canUseBuzzer());
   const navBriefs=document.getElementById('navBriefs');navBriefs.classList.toggle('hiddenByRole',isOwner());const navBriefLabel=navBriefs?.querySelector('.navLabelDesktop')||navBriefs?.querySelector('.navLabel');if(navBriefLabel)navBriefLabel.textContent=isTrafficManagerUser()?'Traffic Control':(canApprove()?'Briefs / Approval':(canCreateBrief()?'Briefs':'My Work'));
-  document.getElementById('navData').classList.toggle('hiddenByRole',!(isOwner()||backendAccess().length));syncMobileMorePermissions();
+  document.getElementById('navData').classList.toggle('hiddenByRole',!(isOwner()||backendAccess().length));
+  // Digital Pulse is viewable by every active ONIT user. Digital contributors get edit controls inside the module.
+  const navPulse=document.getElementById('navPulse');if(navPulse)navPulse.classList.remove('hiddenByRole');
+  syncMobileMorePermissions();
   const bt=document.getElementById('briefsTitle'),bs=document.getElementById('briefsSub');if(bt&&bs){if(isTrafficManagerUser()){bt.textContent='Traffic Control';bs.textContent='Manage incoming briefs, production order, scheduling and live work.'}else if(canApprove()){bt.textContent='Briefs / Approval';bs.textContent='Your assigned work, briefs you have sent, and work available for leadership review.'}else if(canCreateBrief()){bt.textContent='Briefs';bs.textContent='Work you have sent into the organisation and its current status.'}else{bt.textContent='My Work';bs.textContent='Briefs assigned to you and work waiting for your action.'}}
   renderMore();hydrateProfilePhotos();
 }
@@ -1503,7 +1512,17 @@ function riskForBrief(b){
   score=Math.min(100,score);return{score,level:score>=60?'HIGH':score>=35?'WATCH':'LOW',reasons:[...new Set(reasons)].slice(0,3)}
 }
 function riskMarkup(b){const r=riskForBrief(b),code=encodeURIComponent(b.code).replace(/'/g,'%27');return `<div class='riskCard' onclick="detail(decodeURIComponent('${code}'))"><div class='riskScore ${r.level.toLowerCase()}'>${r.score}</div><div><span class='code'>${escapeHTML(b.code)}</span><b>${escapeHTML(b.client)} — ${escapeHTML(b.project)}</b><div class='riskReasons'>${escapeHTML(r.reasons.join(' • ')||'No immediate risk signal')}</div></div><div><span class='riskLabel ${r.level==='HIGH'?'high':''}'>${r.level}</span></div></div>`}
-function dashboardMode(){const serverMode=String(permissions.dashboardMode||'').toUpperCase();if(['OWNER','ACCOUNT','TRAFFIC','LEADERSHIP','TEAM_LEAD','STAFF'].includes(serverMode))return serverMode;if(isOwner())return 'OWNER';if(canApprove())return 'LEADERSHIP';if(isTrafficManagerUser())return 'TRAFFIC';if(canCreateBrief())return 'ACCOUNT';if(isTeamLeadUser())return 'TEAM_LEAD';return 'STAFF'}
+function dashboardMode(){
+  // Privileged roles are resolved from the signed-in user first. A stale backend dashboardMode must never downgrade Owner or leadership views.
+  if(isOwner())return 'OWNER';
+  if(isCreativeLeadership(currentUser)||isManagingDirector(currentUser)||isDrKunbiUser(currentUser)||canApprove())return 'LEADERSHIP';
+  if(isTrafficManagerUser())return 'TRAFFIC';
+  const serverMode=String(permissions.dashboardMode||'').toUpperCase();
+  if(['ACCOUNT','TEAM_LEAD','STAFF'].includes(serverMode))return serverMode;
+  if(canCreateBrief())return 'ACCOUNT';
+  if(isTeamLeadUser())return 'TEAM_LEAD';
+  return 'STAFF';
+}
 function isAssignedToCurrent(b){return allAssignments.some(a=>sameBrief(a,b.code)&&rowVal(a,'User ID','userId')===CURRENT_USER_ID&&String(rowVal(a,'Assignment Type','assignmentType')).toUpperCase()==='TO'&&String(rowVal(a,'Active','active')).toLowerCase()!=='false')}
 function myAssignedBriefs(){return briefs.filter(isAssignedToCurrent)}
 function myManagedBriefs(){return briefs.filter(b=>b.createdByUserId===CURRENT_USER_ID)}
@@ -1606,7 +1625,7 @@ function buildRadarItems(mode){
     // Leadership owns agency-wide operational attention, not only briefs personally assigned/created.
     myFinalApprovalQueue().slice().sort((a,z)=>radarWaitHours(z)-radarWaitHours(a)).slice(0,3).forEach(b=>{const h=radarWaitHours(b);push(radarBriefItem('approval',b,`${b.client||b.project} needs your approval`,`${b.project||b.code} has been waiting ${h>=1?Math.round(h)+'h':'less than 1h'} for final review.${radarDueCopy(b)}`,'REVIEW NOW','brief',h>=6?'high':'watch'))});
     riskSort(active).filter(x=>x.r.score>=35).slice(0,8).forEach(({b,r})=>{
-      const traffic=isTrafficQueuedBrief(b),title=traffic?`${b.client||b.project} needs Traffic attention`:`${b.client||b.project} is moving into risk`,actionLabel=traffic?'MANAGE SCHEDULE':'OPEN BRIEF',action=traffic?'traffic':'brief';
+      const traffic=isTrafficQueuedBrief(b),title=traffic?`${b.client||b.project} needs Traffic attention`:`${b.client||b.project} is moving into risk`,actionLabel=traffic?'VIEW TRAFFIC STATUS':'OPEN BRIEF',action='brief';
       push(radarBriefItem('leadership-risk',b,title,`${r.reasons.join(' • ')}.${radarDueCopy(b)}`,actionLabel,action,r.level==='HIGH'?'high':'watch'))
     });
     const backendOverdue=Number(homeAnalytics?.briefOverview?.overdue||0),mappedOverdue=active.filter(isBriefOverdue).length;
@@ -1647,7 +1666,7 @@ function renderOnitRadar(mode){
   const metricsHtml=`<div class='radarMorningGrid'>${metrics.map(m=>`<div class='morningMetric ${m.tone||''}'><b>${escapeHTML(m.value)}</b><span>${escapeHTML(m.label)}</span></div>`).join('')}</div>`;
   const start=first?`<div class='radarMorningStart'><div class='morningStartCopy'><small>START HERE</small><b>${escapeHTML(first.title)}</b><span>${escapeHTML(first.copy)}</span></div><button class='morningStartBtn' onclick="${first.onclick}">${escapeHTML(first.actionLabel)}</button></div>`:'';
   const remainingItems=first?items.slice(1):items;
-  const cards=remainingItems.length?`<div class='radarItems'>${remainingItems.map(i=>`<article class='radarCard'><div class='radarCardTop'><span class='radarLevel ${i.level}'>${i.level==='high'?'Needs action':i.level==='watch'?'Watch':'Next'}</span><span class='radarCode'>${escapeHTML(i.code||'ONIT')}</span></div><h3>${escapeHTML(i.title)}</h3><p>${escapeHTML(i.copy)}</p><div class='radarActions'>${i.actionLabel==='MANAGE SCHEDULE'?'':`<button class='radarAction' onclick="${i.onclick}">${escapeHTML(i.actionLabel)}</button>`}<button class='radarIgnore' onclick="ignoreRadarItem('${escapeHTML(i.key).replace(/'/g,'&#39;')}')">IGNORE TODAY</button></div></article>`).join('')}</div>`:(items.length?'':`<div class='radarClear'><div class='radarClearIcon'>✓</div><div><b>${escapeHTML(clearCopy)}</b><span>${escapeHTML(clearDetail)}</span></div></div>`);
+  const cards=remainingItems.length?`<div class='radarItems'>${remainingItems.map(i=>{const repeatedTrafficAction=['MANAGE SCHEDULE','VIEW TRAFFIC STATUS'].includes(String(i.actionLabel||'')),label=repeatedTrafficAction?'OPEN BRIEF':i.actionLabel,click=(repeatedTrafficAction&&i.code&&String(i.code).startsWith('JOB-'))?`radarOpenBrief('${encodeURIComponent(i.code)}')`:i.onclick;return `<article class='radarCard'><div class='radarCardTop'><span class='radarLevel ${i.level}'>${i.level==='high'?'Needs action':i.level==='watch'?'Watch':'Next'}</span><span class='radarCode'>${escapeHTML(i.code||'ONIT')}</span></div><h3>${escapeHTML(i.title)}</h3><p>${escapeHTML(i.copy)}</p><div class='radarActions'><button class='radarAction' onclick="${click}">${escapeHTML(label)}</button><button class='radarIgnore' onclick="ignoreRadarItem('${escapeHTML(i.key).replace(/'/g,'&#39;')}')">IGNORE TODAY</button></div></article>`}).join('')}</div>`:(items.length?'':`<div class='radarClear'><div class='radarClearIcon'>✓</div><div><b>${escapeHTML(clearCopy)}</b><span>${escapeHTML(clearDetail)}</span></div></div>`);
   host.innerHTML=`<section class='radarShell'><div class='radarTop'><div><div class='radarEyebrow'>ONIT RADAR • YOUR 30-SECOND MORNING</div><div class='radarHeadline'>${escapeHTML(headline)}</div><div class='radarSub'>${escapeHTML(sub)}</div></div><div class='radarLive'>${high?high+' HIGH':'LIVE'}</div></div>${metricsHtml}${start}${cards}</section>`
 }
 
@@ -1691,9 +1710,10 @@ function renderHome(){
     primaryTitle.textContent="WORK I'M MANAGING";primaryCopy.textContent='Your shared account-team briefs, deadlines and approval status.';
     queueTitle.textContent='WORK IN REVIEW';queueCopy.textContent='Submitted work currently moving through Team Lead or final creative review.';queueSection.classList.remove('hidden');
   }else if(mode==='LEADERSHIP'){
-    scope=[...new Map([...myAssignedBriefs(),...myManagedBriefs()].map(b=>[b.code,b])).values()];queue=myFinalApprovalQueue();
-    document.getElementById('homeSub').textContent=`Here’s what needs your attention at ${orgName} today.`;
-    primaryTitle.textContent="MY WORK / BRIEFS I'M MANAGING";primaryCopy.textContent='Briefs assigned to you and briefs you have sent to the team.';
+    // Leadership is an agency-wide operational view. Personal assignment does not limit visibility.
+    scope=briefs.slice();queue=myFinalApprovalQueue();
+    document.getElementById('homeSub').textContent=`Agency-wide operational view for ${orgName}: attention, reviews, workload and deadline pressure.`;
+    primaryTitle.textContent='AGENCY WORKFLOW';primaryCopy.textContent='All active briefs across the organisation, with leadership attention layered on top.';
     queueTitle.textContent='WAITING FOR FINAL APPROVAL';queueCopy.textContent='Team Lead-cleared work waiting for CD/DCD/MD final decision.';queueSection.classList.remove('hidden');
   }else if(mode==='TEAM_LEAD'){
     scope=myAssignedBriefs();queue=myTeamLeadQueue();
@@ -1702,8 +1722,8 @@ function renderHome(){
     queueTitle.textContent='WAITING FOR MY REVIEW';queueCopy.textContent='Review first, then send good work forward for final CD/DCD approval.';queueSection.classList.remove('hidden');
   }else if(mode==='OWNER'){
     scope=briefs;queue=briefs.filter(b=>['Team Lead Review','In Review'].includes(String(b.status||''))&&!b.finalApproved);
-    document.getElementById('homeSub').textContent=`Here’s what’s happening across ${orgName} today.`;
-    primaryTitle.textContent='ORGANISATION RISK RADAR';primaryCopy.textContent='Early warning across active briefs — not a staff performance score.';
+    document.getElementById('homeSub').textContent=`Platform administration and agency work health across ${orgName}.`;
+    primaryTitle.textContent='ORGANISATION OPERATIONS';primaryCopy.textContent='Platform health, access, workflow visibility and agency-wide operational signals.';
     queueTitle.textContent='WORK IN REVIEW';queueCopy.textContent='Current work moving through the review and approval system.';
   }else{
     scope=myAssignedBriefs();
@@ -2636,10 +2656,10 @@ setInterval(()=>{const now=Date.now(),gap=firebaseRealtimeHealthy?60000:15000;if
 async function boot(){if(SESSION_TOKEN){document.getElementById('authGate').classList.add('hidden');document.getElementById('appShell').classList.remove('hidden');await loadFromGoogle(false);if(SESSION_TOKEN)return}document.getElementById('appShell').classList.add('hidden');document.getElementById('authGate').classList.remove('hidden');showAuthMode('signin')}
 boot();
 </script>
-<script src="./cases-module.js?v=0.31.1"></script>
-<script src="./pulse-module.js?v=0.31.1"></script>
-<script src="./assist-traffic-module.js?v=0.31.1"></script>
-<script src="./core-intelligence.js?v=0.31.1"></script>
+<script src="./cases-module.js?v=0.31.2"></script>
+<script src="./pulse-module.js?v=0.31.2"></script>
+<script src="./assist-traffic-module.js?v=0.31.2"></script>
+<script src="./core-intelligence.js?v=0.31.2"></script>
 </body>
 </html>
 
