@@ -887,8 +887,8 @@ img,video,canvas,svg{max-width:100%}
 .reviewQueueNote{font-size:11px;color:#777;margin-top:6px}
 @media(max-width:760px){.reviewPreviewModal{padding:4px!important}.reviewPreviewModal .modalBox{width:100%!important;height:calc(100dvh - 8px)!important;max-height:none!important;border-radius:12px!important}.previewAssetStage{padding:5px}.previewFooter{padding:7px}.previewNav{justify-content:flex-start;overflow-x:auto;flex-wrap:nowrap}.previewNav .mini{white-space:nowrap}}
 </style>
-<link rel="stylesheet" href="./cases-module.css?v=0.32.1">
-<link rel="stylesheet" href="./pulse-module.css?v=0.32.1">
+<link rel="stylesheet" href="./cases-module.css?v=0.32.2">
+<link rel="stylesheet" href="./pulse-module.css?v=0.32.2">
 
 <style id="onit-mobile-nav-v0212">
 .navLabelMobile{display:none!important}
@@ -1002,8 +1002,8 @@ html.onitReduceMotion *,html.onitReduceMotion *::before,html.onitReduceMotion *:
   *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
 }
 </style>
-<link rel="stylesheet" href="./assist-traffic-module.css?v=0.32.1">
-<link rel="stylesheet" href="./core-intelligence.css?v=0.32.1">
+<link rel="stylesheet" href="./assist-traffic-module.css?v=0.32.2">
+<link rel="stylesheet" href="./core-intelligence.css?v=0.32.2">
 <style id="role-consistency-v0311">
 /* ONIT v0.31.2 — role authority + Digital Pulse access hardening */
 .radarMorningGrid .morningMetric b,
@@ -1016,7 +1016,7 @@ html.onitReduceMotion *,html.onitReduceMotion *::before,html.onitReduceMotion *:
 .radarLevel{color:#f2f2ee!important}
 </style>
 
-<link rel="stylesheet" href="./autocare-module.css?v=0.32.1">
+<link rel="stylesheet" href="./autocare-module.css?v=0.32.2">
 </head>
 <body>
 <a class="onitSkipLink" href="#mainContent">Skip to main content</a>
@@ -1205,8 +1205,10 @@ html.onitReduceMotion *,html.onitReduceMotion *::before,html.onitReduceMotion *:
 <script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-messaging-compat.js"></script>
-<script>const APP_VERSION='0.32.1';
-const UI_REVISION=3201;
+<script>const APP_VERSION='0.32.2';
+const UI_REVISION=3202;
+const DASHBOARD_UI_REVISION=32201;
+const DASHBOARD_UI_STORAGE_KEY='onit-dashboard-ui-state-v1';
 const BACKEND_DATASETS=['USERS','CLIENTS','BRIEFS','ASSIGNMENTS','ITERATIONS','ACTIVITY_LOG','NOTIFICATIONS','REPORTS'];
 const API_URL='https://script.google.com/macros/s/AKfycbyLVpsQLFCpQWRIvRndw66sghmu5rtK31cuthS7hXjJ--lf703mJPIbJ2zpLDIlH76b/exec';
 const SAFE_RETRY_POST_ACTIONS=new Set(['getFilePreview','getBriefAttachmentPreview','getBriefAttachmentDownload','getBackendDataset','getProfilePhoto','getBroadcastFile','getPushConfig','CASES_CAPABILITIES','CASES_OWNER_GRANTS','CASES_LIST','CASES_GET','CASES_INTELLIGENCE','PULSE_CAPABILITIES','PULSE_DASHBOARD','PULSE_REPORT','trafficCommandData','PULSE_CASE_CANDIDATES']);
@@ -1542,6 +1544,19 @@ function dashboardMode(){
   if(isTeamLeadUser())return 'TEAM_LEAD';
   return 'STAFF';
 }
+function dashboardUiRequiredNodes(){return['onitRadar','homeAnalytics','homeRecentActivity','homeUpcomingDeadlines','homePrimarySection','homePrimaryTitle','homeBriefList','homeQueueSection']}
+function dashboardUiHealth(){
+  const home=document.getElementById('home'),missing=dashboardUiRequiredNodes().filter(id=>!document.getElementById(id));
+  const mounted=Number(home&&home.dataset.dashboardUiRevision||0),mode=(()=>{try{return dashboardMode()}catch(e){return'UNKNOWN'}})();
+  const healthy=!!home&&missing.length===0&&(!currentUser||mounted===DASHBOARD_UI_REVISION);
+  return{healthy,revision:DASHBOARD_UI_REVISION,mountedRevision:mounted,mode,missing};
+}
+function markDashboardUiCurrent(home,mode){
+  if(!home)return;
+  home.dataset.dashboardUiRevision=String(DASHBOARD_UI_REVISION);home.dataset.dashboardMode=String(mode||'UNKNOWN');
+  try{localStorage.setItem(DASHBOARD_UI_STORAGE_KEY,JSON.stringify({revision:DASHBOARD_UI_REVISION,appVersion:APP_VERSION,mode:String(mode||'UNKNOWN'),at:Date.now()}))}catch(e){}
+}
+window.getDashboardUiHealth=dashboardUiHealth;
 function isAssignedToCurrent(b){return allAssignments.some(a=>sameBrief(a,b.code)&&rowVal(a,'User ID','userId')===CURRENT_USER_ID&&String(rowVal(a,'Assignment Type','assignmentType')).toUpperCase()==='TO'&&String(rowVal(a,'Active','active')).toLowerCase()!=='false')}
 function myAssignedBriefs(){return briefs.filter(isAssignedToCurrent)}
 function myManagedBriefs(){return briefs.filter(b=>b.createdByUserId===CURRENT_USER_ID)}
@@ -1758,6 +1773,7 @@ function renderHome(){
   renderDashboardDeadlines(active.length?active:briefs);
   const homeEmpty=mode==='TRAFFIC'?'No briefs are in production right now.':mode==='ACCOUNT'?'No briefs currently being managed by you.':mode==='LEADERSHIP'||mode==='OWNER'?'No active organisation briefs right now.':'No active briefs assigned to you.';document.getElementById('homeBriefList').innerHTML=homeCardList(productionActive,homeEmpty);
   if(!queueSection.classList.contains('hidden')){if(mode==='TRAFFIC')renderTrafficQueue(queue);else{queueList.classList.remove('trafficQueueHost');const sorted=queue.slice().sort((a,b)=>attentionRank(a)-attentionRank(b)),top=sorted.slice(0,3);queueList.innerHTML=(top.length?top.map(briefMarkup).join(''):`<div class='empty'>Nothing is waiting for your review right now.</div>`)+(sorted.length>3?`<div class='compactQueueFooter'><button class='secondary' onclick="show('briefs')">VIEW ALL IN WORK</button></div>`:'')}}
+  markDashboardUiCurrent(home,mode);
   hydrateProfilePhotos();
 }
 function attentionRank(b){return -riskForBrief(b).score}
@@ -2404,7 +2420,7 @@ function renderMore(){if(!currentUser)return;const names=backendAccess();let htm
   html+=dataExportRequestsMarkup();
   if(typeof autoCareMoreCardMarkup==='function')html+=autoCareMoreCardMarkup();
   html+=`<div class='morecard' style='grid-column:1/-1'><h3>INSTALL / UPDATE ONIT</h3><div class='bigTiny'>Install ONIT on this device for quick access. Global UI Sync keeps browser, mobile and desktop installs on the newest published ONIT interface automatically. AutoCare protects unfinished forms, repairs stale caches and activates the update as soon as the screen is safe.</div><div class='actions'><button class='secondary linkbtn' onclick='installOnit()'>INSTALL ON THIS DEVICE</button><button class='secondary linkbtn' onclick='forceFrontendUpdate()'>CHECK / REPAIR UPDATE</button></div></div>`;
-  html+=`<div class='morecard' style='grid-column:1/-1'><div class='streamlineAbout'><div><h3>ABOUT ONIT</h3><div class='bigTiny'>Frontend v${APP_VERSION} • Backend ${backendVersion||'checking…'}</div></div><button class='secondary linkbtn' onclick="showToast('ONIT','Work. People. Attention. Proof.')">VIEW DETAILS</button></div></div></div>`;document.getElementById('moreContent').innerHTML=html;hydrateProfilePhotos()}
+  html+=`<div class='morecard' style='grid-column:1/-1'><div class='streamlineAbout'><div><h3>ABOUT ONIT</h3><div class='bigTiny'>Frontend v${APP_VERSION} • Dashboard UI r${DASHBOARD_UI_REVISION} • Backend ${backendVersion||'checking…'}</div></div><button class='secondary linkbtn' onclick="showToast('ONIT','Work. People. Attention. Proof.')">VIEW DETAILS</button></div></div></div>`;document.getElementById('moreContent').innerHTML=html;hydrateProfilePhotos()}
 async function approvePending(id){
   const targetUserId=decodeURIComponent(id),target=pendingUsers.find(u=>String(rowVal(u,'User ID'))===String(targetUserId)),name=target?rowVal(target,'Full Name'):'The member';
   try{
@@ -2556,10 +2572,10 @@ let uiUpdateChannel=null;
 try{if('BroadcastChannel'in window)uiUpdateChannel=new BroadcastChannel('onit-ui-release-v1')}catch(e){}
 function versionNumbers(v){return String(v||'').trim().split(/[.+-]/).slice(0,4).map(x=>Number(String(x).replace(/\D/g,''))||0)}
 function compareUiVersions(a,b){const aa=versionNumbers(a),bb=versionNumbers(b),n=Math.max(aa.length,bb.length,3);for(let i=0;i<n;i++){const d=(aa[i]||0)-(bb[i]||0);if(d)return d>0?1:-1}return 0}
-function remoteUiIsNewer(release){const remote=String(release&&release.version||'').trim();if(!remote)return false;const rev=Number(release&&release.uiRevision||0);if(rev&&typeof UI_REVISION!=='undefined'&&rev>UI_REVISION)return true;return compareUiVersions(remote,APP_VERSION)>0}
+function remoteUiIsNewer(release){const remote=String(release&&release.version||'').trim();if(!remote)return false;const rev=Number(release&&release.uiRevision||0),dashRev=Number(release&&release.dashboardUiRevision||0);if(dashRev&&typeof DASHBOARD_UI_REVISION!=='undefined'&&dashRev>DASHBOARD_UI_REVISION)return true;if(rev&&typeof UI_REVISION!=='undefined'&&rev>UI_REVISION)return true;return compareUiVersions(remote,APP_VERSION)>0}
 function safeToReloadForUpdate(){return !mutationBusy&&uiDirtySections.size===0}
 function publishUiUpdateSignal(release){
-  const payload={type:'ONIT_UI_UPDATE_AVAILABLE',version:String(release&&release.version||''),uiRevision:Number(release&&release.uiRevision||0),at:Date.now()};
+  const payload={type:'ONIT_UI_UPDATE_AVAILABLE',version:String(release&&release.version||''),uiRevision:Number(release&&release.uiRevision||0),dashboardUiRevision:Number(release&&release.dashboardUiRevision||0),at:Date.now()};
   try{localStorage.setItem(UI_SIGNAL_KEY,JSON.stringify(payload))}catch(e){}
   try{uiUpdateChannel&&uiUpdateChannel.postMessage(payload)}catch(e){}
 }
@@ -2574,22 +2590,23 @@ function queueUiUpdate(release,source='release-check'){
   pendingFrontendVersion=remote;pendingFrontendRelease=release;
   try{localStorage.setItem(UI_EXPECTED_KEY,remote)}catch(e){}
   if(source!=='broadcast'&&source!=='storage'&&source!=='service-worker')publishUiUpdateSignal(release);
-  if(!safeToReloadForUpdate()&&uiUpdateToastVersion!==remote){uiUpdateToastVersion=remote;showToast('ONIT is updating',`UI v${remote} is ready. Finish your current form/action; ONIT will switch automatically.`)}
+  if(!safeToReloadForUpdate()&&uiUpdateToastVersion!==remote){uiUpdateToastVersion=remote;const dashboardOnly=Number(release&&release.dashboardUiRevision||0)>DASHBOARD_UI_REVISION&&compareUiVersions(remote,APP_VERSION)===0;showToast('ONIT is updating',dashboardOnly?'A newer dashboard UI is ready. Finish your current form/action; ONIT will repair it automatically.':`UI v${remote} is ready. Finish your current form/action; ONIT will switch automatically.`)}
   if(safeToReloadForUpdate())setTimeout(()=>performFrontendRefresh(remote,false),50);
   return true;
 }
 async function performFrontendRefresh(targetVersion,force=false){
   targetVersion=String(targetVersion||pendingFrontendVersion||'').trim();
-  const targetRevision=Number(pendingFrontendRelease&&pendingFrontendRelease.uiRevision||0);
+  const targetRevision=Number(pendingFrontendRelease&&pendingFrontendRelease.uiRevision||0),targetDashboardRevision=Number(pendingFrontendRelease&&pendingFrontendRelease.dashboardUiRevision||0);
   const versionNewer=!!targetVersion&&compareUiVersions(targetVersion,APP_VERSION)>0;
   const revisionNewer=!!targetVersion&&compareUiVersions(targetVersion,APP_VERSION)===0&&targetRevision>UI_REVISION;
-  if(!versionNewer&&!revisionNewer){pendingFrontendVersion='';pendingFrontendRelease=null;return false}
+  const dashboardRevisionNewer=!!targetVersion&&compareUiVersions(targetVersion,APP_VERSION)===0&&targetDashboardRevision>DASHBOARD_UI_REVISION;
+  if(!versionNewer&&!revisionNewer&&!dashboardRevisionNewer){pendingFrontendVersion='';pendingFrontendRelease=null;return false}
   if(uiUpdateInFlight)return false;
   if(!force&&!safeToReloadForUpdate()){pendingFrontendVersion=targetVersion;return false}
   uiUpdateInFlight=true;
   try{
     try{localStorage.setItem(UI_EXPECTED_KEY,targetVersion);localStorage.setItem(UI_RELOAD_GUARD_KEY,JSON.stringify({from:APP_VERSION,to:targetVersion,at:Date.now()}))}catch(e){}
-    try{window.AutoCare&&AutoCare.recordRepair&&AutoCare.recordRepair('GLOBAL_UI_SYNC',`Updating ONIT UI ${APP_VERSION} → ${targetVersion}`)}catch(e){}
+    try{window.AutoCare&&AutoCare.recordRepair&&AutoCare.recordRepair(targetDashboardRevision>DASHBOARD_UI_REVISION?'DASHBOARD_UI_SYNC':'GLOBAL_UI_SYNC',targetDashboardRevision>DASHBOARD_UI_REVISION&&compareUiVersions(targetVersion,APP_VERSION)===0?`Repairing dashboard UI r${DASHBOARD_UI_REVISION} → r${targetDashboardRevision}`:`Updating ONIT UI ${APP_VERSION} → ${targetVersion}`)}catch(e){}
     if('serviceWorker'in navigator){
       try{navigator.serviceWorker.controller&&navigator.serviceWorker.controller.postMessage({type:'ONIT_UI_SYNC_NOW',targetVersion})}catch(e){}
       const regs=await navigator.serviceWorker.getRegistrations();
@@ -2597,7 +2614,7 @@ async function performFrontendRefresh(targetVersion,force=false){
     }
     if('caches'in window){const keys=await caches.keys();await Promise.all(keys.filter(k=>k.startsWith('onit-')).map(k=>caches.delete(k)))}
   }catch(e){console.warn('ONIT Global UI Sync preparation:',e)}
-  const url=new URL(location.href);url.searchParams.set('onit_ui',targetVersion);if(targetRevision)url.searchParams.set('ui_rev',String(targetRevision));url.searchParams.set('_ui_refresh',Date.now());url.hash='';
+  const url=new URL(location.href);url.searchParams.set('onit_ui',targetVersion);if(targetRevision)url.searchParams.set('ui_rev',String(targetRevision));if(targetDashboardRevision)url.searchParams.set('dashboard_rev',String(targetDashboardRevision));url.searchParams.set('_ui_refresh',Date.now());url.hash='';
   location.replace(url.toString());
   return true;
 }
@@ -2606,7 +2623,7 @@ async function checkFrontendRelease(force=false){
   try{
     const release=await fetchFrontendRelease(),remote=String(release.version||'').trim();
     if(remoteUiIsNewer(release)){queueUiUpdate(release,'release-check');if(force&&safeToReloadForUpdate())await performFrontendRefresh(remote,true);return release}
-    if(remote&&compareUiVersions(remote,APP_VERSION)===0){
+    if(remote&&compareUiVersions(remote,APP_VERSION)===0&&Number(release.uiRevision||0)<=UI_REVISION&&Number(release.dashboardUiRevision||0)<=DASHBOARD_UI_REVISION){
       pendingFrontendVersion='';pendingFrontendRelease=null;uiUpdateToastVersion='';
       try{if(localStorage.getItem(UI_EXPECTED_KEY)===remote)localStorage.removeItem(UI_EXPECTED_KEY)}catch(e){}
     }
@@ -2626,7 +2643,7 @@ async function forceFrontendUpdate(){
 }
 function acceptUiUpdateSignal(data,source){
   if(!data||data.type!=='ONIT_UI_UPDATE_AVAILABLE')return;
-  const release={version:String(data.version||''),uiRevision:Number(data.uiRevision||0)};
+  const release={version:String(data.version||''),uiRevision:Number(data.uiRevision||0),dashboardUiRevision:Number(data.dashboardUiRevision||0)};
   if(remoteUiIsNewer(release))queueUiUpdate(release,source);
 }
 try{if(uiUpdateChannel)uiUpdateChannel.onmessage=e=>acceptUiUpdateSignal(e.data,'broadcast')}catch(e){}
@@ -2683,7 +2700,7 @@ if('serviceWorker' in navigator && isHttpsApp()){
     setInterval(()=>reg.update().catch(()=>{}),UI_RELEASE_CHECK_MS);
     navigator.serviceWorker.addEventListener('message',e=>{
       const d=e.data||{};
-      if(d.type==='ONIT_UI_VERSION_ACTIVATED'&&d.version)acceptUiUpdateSignal({type:'ONIT_UI_UPDATE_AVAILABLE',version:d.version,uiRevision:d.uiRevision||0},'service-worker');
+      if(d.type==='ONIT_UI_VERSION_ACTIVATED'&&d.version)acceptUiUpdateSignal({type:'ONIT_UI_UPDATE_AVAILABLE',version:d.version,uiRevision:d.uiRevision||0,dashboardUiRevision:d.dashboardUiRevision||0},'service-worker');
     });
     navigator.serviceWorker.addEventListener('controllerchange',()=>{checkFrontendRelease(false);processPendingUiUpdate()});
     checkFrontendRelease(false);
@@ -2697,11 +2714,11 @@ setInterval(()=>{const now=Date.now(),gap=firebaseRealtimeHealthy?60000:15000;if
 async function boot(){if(SESSION_TOKEN){document.getElementById('authGate').classList.add('hidden');document.getElementById('appShell').classList.remove('hidden');await loadFromGoogle(false);if(SESSION_TOKEN)return}document.getElementById('appShell').classList.add('hidden');document.getElementById('authGate').classList.remove('hidden');showAuthMode('signin')}
 document.addEventListener('DOMContentLoaded',()=>boot(),{once:true});
 </script>
-<script src="./autocare-module.js?v=0.32.1"></script>
-<script src="./cases-module.js?v=0.32.1"></script>
-<script src="./pulse-module.js?v=0.32.1"></script>
-<script src="./assist-traffic-module.js?v=0.32.1"></script>
-<script src="./core-intelligence.js?v=0.32.1"></script>
+<script src="./autocare-module.js?v=0.32.2"></script>
+<script src="./cases-module.js?v=0.32.2"></script>
+<script src="./pulse-module.js?v=0.32.2"></script>
+<script src="./assist-traffic-module.js?v=0.32.2"></script>
+<script src="./core-intelligence.js?v=0.32.2"></script>
 </body>
 </html>
 
