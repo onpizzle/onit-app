@@ -887,8 +887,8 @@ img,video,canvas,svg{max-width:100%}
 .reviewQueueNote{font-size:11px;color:#777;margin-top:6px}
 @media(max-width:760px){.reviewPreviewModal{padding:4px!important}.reviewPreviewModal .modalBox{width:100%!important;height:calc(100dvh - 8px)!important;max-height:none!important;border-radius:12px!important}.previewAssetStage{padding:5px}.previewFooter{padding:7px}.previewNav{justify-content:flex-start;overflow-x:auto;flex-wrap:nowrap}.previewNav .mini{white-space:nowrap}}
 </style>
-<link rel="stylesheet" href="./cases-module.css?v=0.31.2">
-<link rel="stylesheet" href="./pulse-module.css?v=0.31.2">
+<link rel="stylesheet" href="./cases-module.css?v=0.32.1">
+<link rel="stylesheet" href="./pulse-module.css?v=0.32.1">
 
 <style id="onit-mobile-nav-v0212">
 .navLabelMobile{display:none!important}
@@ -1002,8 +1002,8 @@ html.onitReduceMotion *,html.onitReduceMotion *::before,html.onitReduceMotion *:
   *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
 }
 </style>
-<link rel="stylesheet" href="./assist-traffic-module.css?v=0.31.2">
-<link rel="stylesheet" href="./core-intelligence.css?v=0.31.2">
+<link rel="stylesheet" href="./assist-traffic-module.css?v=0.32.1">
+<link rel="stylesheet" href="./core-intelligence.css?v=0.32.1">
 <style id="role-consistency-v0311">
 /* ONIT v0.31.2 — role authority + Digital Pulse access hardening */
 .radarMorningGrid .morningMetric b,
@@ -1016,6 +1016,7 @@ html.onitReduceMotion *,html.onitReduceMotion *::before,html.onitReduceMotion *:
 .radarLevel{color:#f2f2ee!important}
 </style>
 
+<link rel="stylesheet" href="./autocare-module.css?v=0.32.1">
 </head>
 <body>
 <a class="onitSkipLink" href="#mainContent">Skip to main content</a>
@@ -1204,9 +1205,11 @@ html.onitReduceMotion *,html.onitReduceMotion *::before,html.onitReduceMotion *:
 <script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-messaging-compat.js"></script>
-<script>const APP_VERSION='0.31.2';
+<script>const APP_VERSION='0.32.1';
+const UI_REVISION=3201;
 const BACKEND_DATASETS=['USERS','CLIENTS','BRIEFS','ASSIGNMENTS','ITERATIONS','ACTIVITY_LOG','NOTIFICATIONS','REPORTS'];
 const API_URL='https://script.google.com/macros/s/AKfycbyLVpsQLFCpQWRIvRndw66sghmu5rtK31cuthS7hXjJ--lf703mJPIbJ2zpLDIlH76b/exec';
+const SAFE_RETRY_POST_ACTIONS=new Set(['getFilePreview','getBriefAttachmentPreview','getBriefAttachmentDownload','getBackendDataset','getProfilePhoto','getBroadcastFile','getPushConfig','CASES_CAPABILITIES','CASES_OWNER_GRANTS','CASES_LIST','CASES_GET','CASES_INTELLIGENCE','PULSE_CAPABILITIES','PULSE_DASHBOARD','PULSE_REPORT','trafficCommandData','PULSE_CASE_CANDIDATES']);
 let ORG_ID=localStorage.getItem('onit-org')||'';
 const MAX_FILE_BYTES=20*1024*1024;
 const MAX_BROADCAST_BYTES=8*1024*1024;
@@ -1249,18 +1252,19 @@ function departmentOf(u){return String(rowVal(u,'Department','department')||'').
 function permissionProfile(u){return String(rowVal(u,'Permission Profile','permissionProfile')||'').toUpperCase()}
 function isOwner(u=currentUser){return !!u&&(permissionProfile(u)==='ORG_OWNER'||String(rowVal(u,'Role')).toLowerCase()==='system owner')}
 function backendAccess(u=currentUser){if(isOwner(u))return BACKEND_DATASETS.slice();const v=String(rowVal(u,'Backend Data Access')||'').trim().toUpperCase();return v?v.split(',').map(x=>x.trim()).filter(x=>BACKEND_DATASETS.includes(x)):[]}
-function isManagingDirector(u=currentUser){const p=positionOf(u).toLowerCase();return p==='md'||p==='managing director'}
+function isManagingDirector(u=currentUser){const p=positionOf(u).toLowerCase().replace(/\s+/g,' ').trim();return p==='md'||p==='managing director'||/^managing director\s*[-–—,/|()]/.test(p)}
 function isDrKunbiUser(u=currentUser){return !!u&&(String(rowVal(u,'User ID'))==='USR-TIOLUWALOGO-OLAKUN'||String(rowVal(u,'Email')).toLowerCase()==='kunbi@spice360.com.ng'||positionOf(u).toLowerCase()==='group head, brands & accounts management')}
 function isAccountManagerUser(u=currentUser){return !!u&&(permissionProfile(u)==='ACCOUNT_MANAGER'||departmentOf(u).toLowerCase()==='account management')&&!isManagingDirector(u)}
 function isTrafficManagerUser(u=currentUser){if(!u)return false;const p=positionOf(u).toLowerCase(),d=departmentOf(u).toLowerCase();return p==='traffic manager'||p.includes('traffic manager')||d==='traffic'}
-function isRegularAccountManagerForTraffic(u=currentUser){return !!u&&isAccountManagerUser(u)&&!isTrafficManagerUser(u)&&!isDrKunbiUser(u)&&!isCreativeLeadership(u)&&!isManagingDirector(u)}
+function isCreativeLeadership(u=currentUser){if(!u)return false;const p=positionOf(u).toLowerCase().replace(/\s+/g,' ').trim();return permissionProfile(u)==='CREATIVE_LEADERSHIP'||p==='creative director'||p==='deputy creative director'||p==='cd'||p==='dcd'||/^deputy creative director\s*[-–—,/|()]/.test(p)||/^creative director\s*[-–—,/|()]/.test(p)}
+function canApprove(u=currentUser){if(!u)return false;const p=positionOf(u).toLowerCase().replace(/\s+/g,' ').trim();return truthy(rowVal(u,'Can Approve Final'))||permissionProfile(u)==='CREATIVE_LEADERSHIP'||['creative director','deputy creative director','cd','dcd','md','managing director'].includes(p)}
+function isAgencyLeadership(u=currentUser){return !!u&&!isOwner(u)&&(isCreativeLeadership(u)||isManagingDirector(u)||isDrKunbiUser(u)||canApprove(u))}
+function isRegularAccountManagerForTraffic(u=currentUser){return !!u&&isAccountManagerUser(u)&&!isTrafficManagerUser(u)&&!isAgencyLeadership(u)}
 function isAccountTeamUser(u=currentUser){return !!u&&(isAccountManagerUser(u)||isTrafficManagerUser(u)||isDrKunbiUser(u))}
-function canCreateBrief(u=currentUser){if(!u||isOwner(u))return false;const roleAllowed=isAccountTeamUser(u)||isCreativeLeadership(u)||isManagingDirector(u);if(u===currentUser&&permissions&&typeof permissions.createBrief!=='undefined')return !!permissions.createBrief||roleAllowed;return roleAllowed}
-function canUseBuzzer(u=currentUser){if(!u||isOwner(u))return false;const roleAllowed=isAccountManagerUser(u)||isTrafficManagerUser(u)||isCreativeLeadership(u)||isManagingDirector(u)||isDrKunbiUser(u);if(u===currentUser&&permissions&&typeof permissions.buzzerSend!=='undefined')return !!permissions.buzzerSend&&roleAllowed;return roleAllowed}
-function canApprove(u=currentUser){if(!u)return false;const p=positionOf(u).toLowerCase();return truthy(rowVal(u,'Can Approve Final'))||['creative director','deputy creative director','md','managing director'].includes(p)}
+function canCreateBrief(u=currentUser){if(!u||isOwner(u))return false;const roleAllowed=isAccountTeamUser(u)||isAgencyLeadership(u);if(u===currentUser&&permissions&&typeof permissions.createBrief!=='undefined')return !!permissions.createBrief||roleAllowed;return roleAllowed}
+function canUseBuzzer(u=currentUser){if(!u||isOwner(u))return false;const roleAllowed=isAccountManagerUser(u)||isTrafficManagerUser(u)||isAgencyLeadership(u);if(u===currentUser&&permissions&&typeof permissions.buzzerSend!=='undefined')return !!permissions.buzzerSend&&roleAllowed;return roleAllowed}
 function canReview(u=currentUser){return !!u&&(canApprove(u)||['ceo','chief executive officer'].includes(positionOf(u).toLowerCase()))}
 function isTeamLeadUser(u=currentUser){return !!u&&truthy(rowVal(u,'Team Lead'))}
-function isCreativeLeadership(u){const p=positionOf(u).toLowerCase();return p==='creative director'||p==='deputy creative director'}
 function userById(id){if(!id)return null;if(currentUser&&rowVal(currentUser,'User ID')===id)return currentUser;return users.find(u=>rowVal(u,'User ID')===id)||null}
 function leadershipAssigneeBrief(b){const mine=currentUserAssignment(b?.code,'TO');return isCreativeLeadership(userById(rowVal(mine,'User ID','userId')||b?.assigneeUserId))}
 function exportApprovalRole(){return String(permissions.exportApprovalRole||'')}
@@ -1348,12 +1352,26 @@ async function fetchWithTimeout(url,options={},timeoutMs=25000){
   catch(e){if(e&&e.name==='AbortError')throw new Error('Request timed out. Please retry.');throw e}
   finally{clearTimeout(timer)}
 }
+function apiRetryableError(err){return /timed out|failed to fetch|network|load failed|API 5\d\d|API 429/i.test(String(err&&err.message||err||''))}
 async function apiGet(action='bootstrap'){
   if(!SESSION_TOKEN)throw new Error('AUTH_REQUIRED');
   const url=API_URL+'?action='+encodeURIComponent(action)+'&token='+encodeURIComponent(SESSION_TOKEN);
-  const r=await fetchWithTimeout(url,{},20000);if(!r.ok)throw new Error('API '+r.status);const data=await r.json();if(data.success!==true)throw new Error(data.error||'Could not load ONIT backend.');return data
+  let lastError=null;
+  for(let attempt=0;attempt<2;attempt++){
+    try{const r=await fetchWithTimeout(url,{cache:'no-store'},20000);if(!r.ok)throw new Error('API '+r.status);const data=await r.json();if(data.success!==true)throw new Error(data.error||'Could not load ONIT backend.');return data}
+    catch(e){lastError=e;if(window.AutoCare)window.AutoCare.signalApiFailure(action,e,true);if(attempt===0&&apiRetryableError(e)){await sleep(650);continue}throw e}
+  }
+  throw lastError||new Error('Could not load ONIT backend.');
 }
-async function apiPost(action,payload={},requiresAuth=true){const data={...payload};if(requiresAuth){if(!SESSION_TOKEN)throw new Error('AUTH_REQUIRED');data.sessionToken=SESSION_TOKEN}const r=await fetchWithTimeout(API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action,data})},30000);if(!r.ok)throw new Error('API '+r.status);const result=await r.json();if(!result.success)throw new Error(result.error||result.message||'API request failed');return result}
+async function apiPost(action,payload={},requiresAuth=true){
+  const data={...payload};if(requiresAuth){if(!SESSION_TOKEN)throw new Error('AUTH_REQUIRED');data.sessionToken=SESSION_TOKEN}
+  const safeRead=SAFE_RETRY_POST_ACTIONS.has(action),attempts=safeRead?2:1;let lastError=null;
+  for(let attempt=0;attempt<attempts;attempt++){
+    try{const r=await fetchWithTimeout(API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action,data})},30000);if(!r.ok)throw new Error('API '+r.status);const result=await r.json();if(!result.success)throw new Error(result.error||result.message||'API request failed');return result}
+    catch(e){lastError=e;if(window.AutoCare)window.AutoCare.signalApiFailure(action,e,safeRead);if(safeRead&&attempt===0&&apiRetryableError(e)){await sleep(650);continue}throw e}
+  }
+  throw lastError||new Error('API request failed');
+}
 function table(data,name){if(name==='ACTIVITY_LOG'&&Array.isArray(data.activity))return data.activity;return data[name]||data[name.toLowerCase()]||data.data?.[name]||data.data?.[name.toLowerCase()]||[]}
 function sleep(ms){return new Promise(r=>setTimeout(r,ms))}
 function firebasePlain_(value){if(value&&typeof value.toDate==='function')return value.toDate().toISOString();if(Array.isArray(value))return value.map(firebasePlain_);if(value&&typeof value==='object'){const out={};Object.keys(value).forEach(k=>out[k]=firebasePlain_(value[k]));return out}return value}
@@ -1399,14 +1417,14 @@ async function startFirebaseRealtime(){
     await apiPost('bindFirebaseIdentity',{firebaseUid:authUser.uid});
     ensurePushRegistrationQuietly();
     const briefsQ=firebaseDb.collection('organisations').doc(ORG_ID).collection('briefs').where('viewerUserIds','array-contains',CURRENT_USER_ID);
-    firebaseUnsubs.push(briefsQ.onSnapshot(snap=>{snap.docChanges().forEach(applyFirebaseBriefChange_);firebaseRealtimeHealthy=true;connectionNotice('')},err=>{firebaseRealtimeHealthy=false;console.warn('Firebase briefs:',err)}));
+    firebaseUnsubs.push(briefsQ.onSnapshot(snap=>{snap.docChanges().forEach(applyFirebaseBriefChange_);firebaseRealtimeHealthy=true;if(window.AutoCare)window.AutoCare.signalRealtimeHealthy();connectionNotice('')},err=>{firebaseRealtimeHealthy=false;if(window.AutoCare)window.AutoCare.signalRealtimeFailure(err);console.warn('Firebase briefs:',err)}));
     const activityQ=firebaseDb.collection('organisations').doc(ORG_ID).collection('activity').where('viewerUserIds','array-contains',CURRENT_USER_ID);
-    firebaseUnsubs.push(activityQ.onSnapshot(snap=>{snap.docChanges().forEach(applyFirebaseActivityChange_);firebaseRealtimeHealthy=true},err=>{firebaseRealtimeHealthy=false;console.warn('Firebase activity:',err)}));
+    firebaseUnsubs.push(activityQ.onSnapshot(snap=>{snap.docChanges().forEach(applyFirebaseActivityChange_);firebaseRealtimeHealthy=true;if(window.AutoCare)window.AutoCare.signalRealtimeHealthy()},err=>{firebaseRealtimeHealthy=false;if(window.AutoCare)window.AutoCare.signalRealtimeFailure(err);console.warn('Firebase activity:',err)}));
     const notifQ=firebaseDb.collection('organisations').doc(ORG_ID).collection('users').doc(CURRENT_USER_ID).collection('notifications');
-    firebaseUnsubs.push(notifQ.onSnapshot(snap=>{applyFirebaseNotificationSnapshot_(snap);firebaseRealtimeHealthy=true},err=>{firebaseRealtimeHealthy=false;console.warn('Firebase notifications:',err)}));
+    firebaseUnsubs.push(notifQ.onSnapshot(snap=>{applyFirebaseNotificationSnapshot_(snap);firebaseRealtimeHealthy=true;if(window.AutoCare)window.AutoCare.signalRealtimeHealthy()},err=>{firebaseRealtimeHealthy=false;if(window.AutoCare)window.AutoCare.signalRealtimeFailure(err);console.warn('Firebase notifications:',err)}));
     const buzzerQ=firebaseDb.collection('organisations').doc(ORG_ID).collection('users').doc(CURRENT_USER_ID).collection('buzzers');
-    firebaseUnsubs.push(buzzerQ.onSnapshot(snap=>{applyFirebaseBuzzerSnapshot_(snap);firebaseRealtimeHealthy=true},err=>{firebaseRealtimeHealthy=false;console.warn('Firebase buzzers:',err)}));
-  }catch(e){firebaseRealtimeHealthy=false;console.warn('Firebase realtime unavailable; ONIT fallback remains active.',e);}finally{firebaseStarting=false;}
+    firebaseUnsubs.push(buzzerQ.onSnapshot(snap=>{applyFirebaseBuzzerSnapshot_(snap);firebaseRealtimeHealthy=true;if(window.AutoCare)window.AutoCare.signalRealtimeHealthy()},err=>{firebaseRealtimeHealthy=false;if(window.AutoCare)window.AutoCare.signalRealtimeFailure(err);console.warn('Firebase buzzers:',err)}));
+  }catch(e){firebaseRealtimeHealthy=false;if(window.AutoCare)window.AutoCare.signalRealtimeFailure(e);console.warn('Firebase realtime unavailable; ONIT fallback remains active.',e);}finally{firebaseStarting=false;}
 }
 
 function saveSession(result){const d=result.data||result;if(!d.sessionToken)throw new Error('No session token returned.');SESSION_TOKEN=d.sessionToken;CURRENT_USER_ID=rowVal(d.user,'User ID');ORG_ID=rowVal(d.organisation,'Organisation ID');localStorage.setItem('onit-session',SESSION_TOKEN);localStorage.setItem('onit-user',CURRENT_USER_ID);localStorage.setItem('onit-org',ORG_ID);announcedNotifications=new Set(JSON.parse(localStorage.getItem(announcedKey(CURRENT_USER_ID))||'[]'));loadPendingBriefSounds_();}
@@ -1455,6 +1473,7 @@ async function loadFromGoogle(strict=false,silent=false){
         if(!document.getElementById('data').classList.contains('hidden')&&!preserve.has('data'))renderDataPage();
         if(current){current=briefs.find(b=>b.code===current.code)||null;if(current){if(!preserve.has('detail'))renderDetail()}else show('home')}
         if(!silent)uiDirtySections.clear();
+        if(window.AutoCare)window.AutoCare.markHealthy();
         return;
       }catch(e){lastError=e;if(authError(e))throw e;if(attempt<2){await sleep(650*(attempt+1));continue}throw e}
     }
@@ -1515,7 +1534,7 @@ function riskMarkup(b){const r=riskForBrief(b),code=encodeURIComponent(b.code).r
 function dashboardMode(){
   // Privileged roles are resolved from the signed-in user first. A stale backend dashboardMode must never downgrade Owner or leadership views.
   if(isOwner())return 'OWNER';
-  if(isCreativeLeadership(currentUser)||isManagingDirector(currentUser)||isDrKunbiUser(currentUser)||canApprove())return 'LEADERSHIP';
+  if(isAgencyLeadership(currentUser))return 'LEADERSHIP';
   if(isTrafficManagerUser())return 'TRAFFIC';
   const serverMode=String(permissions.dashboardMode||'').toUpperCase();
   if(['ACCOUNT','TEAM_LEAD','STAFF'].includes(serverMode))return serverMode;
@@ -1724,7 +1743,7 @@ function renderHome(){
     scope=briefs;queue=briefs.filter(b=>['Team Lead Review','In Review'].includes(String(b.status||''))&&!b.finalApproved);
     document.getElementById('homeSub').textContent=`Platform administration and agency work health across ${orgName}.`;
     primaryTitle.textContent='ORGANISATION OPERATIONS';primaryCopy.textContent='Platform health, access, workflow visibility and agency-wide operational signals.';
-    queueTitle.textContent='WORK IN REVIEW';queueCopy.textContent='Current work moving through the review and approval system.';
+    queueTitle.textContent='WORK IN REVIEW';queueCopy.textContent='Current work moving through the review and approval system.';queueSection.classList.remove('hidden');
   }else{
     scope=myAssignedBriefs();
     document.getElementById('homeSub').textContent=`Here’s what’s happening in your ONIT workspace today.`;
@@ -1732,12 +1751,12 @@ function renderHome(){
   }
   renderOnitRadar(mode);
   renderAccountPortfolio();
-  document.getElementById('homePrimarySection').classList.toggle('hidden',['ACCOUNT','LEADERSHIP','OWNER'].includes(mode));
+  document.getElementById('homePrimarySection').classList.toggle('hidden',mode==='ACCOUNT');
   const active=scope.filter(b=>!['Closed','Approved'].includes(b.status));
   const productionActive=mode==='TRAFFIC'?active.filter(b=>!isTrafficQueuedBrief(b)):active;
   renderDashboardActivity(scope.length?scope:briefs);
   renderDashboardDeadlines(active.length?active:briefs);
-  document.getElementById('homeBriefList').innerHTML=homeCardList(productionActive,mode==='TRAFFIC'?'No briefs are in production right now.':(mode==='ACCOUNT'?'No briefs currently being managed by you.':'No active briefs assigned to you.'));
+  const homeEmpty=mode==='TRAFFIC'?'No briefs are in production right now.':mode==='ACCOUNT'?'No briefs currently being managed by you.':mode==='LEADERSHIP'||mode==='OWNER'?'No active organisation briefs right now.':'No active briefs assigned to you.';document.getElementById('homeBriefList').innerHTML=homeCardList(productionActive,homeEmpty);
   if(!queueSection.classList.contains('hidden')){if(mode==='TRAFFIC')renderTrafficQueue(queue);else{queueList.classList.remove('trafficQueueHost');const sorted=queue.slice().sort((a,b)=>attentionRank(a)-attentionRank(b)),top=sorted.slice(0,3);queueList.innerHTML=(top.length?top.map(briefMarkup).join(''):`<div class='empty'>Nothing is waiting for your review right now.</div>`)+(sorted.length>3?`<div class='compactQueueFooter'><button class='secondary' onclick="show('briefs')">VIEW ALL IN WORK</button></div>`:'')}}
   hydrateProfilePhotos();
 }
@@ -2383,7 +2402,8 @@ function renderMore(){if(!currentUser)return;const names=backendAccess();let htm
   if(canManagePeople()){html+=`<div class='morecard' style='grid-column:1/-1'><h3>MANAGE</h3><button class='secondary linkbtn' onclick='addMember()'>+ ADD MEMBER PROFILE</button></div>`}
   if(names.length||canSeeReports()){html+=`<div class='morecard' style='grid-column:1/-1'><h3>DATA & ACCESS</h3><div class='bigTiny'>Reports, governed exports and authorised backend datasets live in one place.</div><button class='secondary linkbtn' onclick="show('data')">OPEN DATA & ACCESS</button></div>`}
   html+=dataExportRequestsMarkup();
-  html+=`<div class='morecard' style='grid-column:1/-1'><h3>INSTALL / UPDATE ONIT</h3><div class='bigTiny'>Install ONIT on this device for quick access. ONIT now checks the hosted frontend version automatically and repairs stale installed copies without requiring a reinstall.</div><div class='actions'><button class='secondary linkbtn' onclick='installOnit()'>INSTALL ON THIS DEVICE</button><button class='secondary linkbtn' onclick='forceFrontendUpdate()'>CHECK / REPAIR UPDATE</button></div></div>`;
+  if(typeof autoCareMoreCardMarkup==='function')html+=autoCareMoreCardMarkup();
+  html+=`<div class='morecard' style='grid-column:1/-1'><h3>INSTALL / UPDATE ONIT</h3><div class='bigTiny'>Install ONIT on this device for quick access. Global UI Sync keeps browser, mobile and desktop installs on the newest published ONIT interface automatically. AutoCare protects unfinished forms, repairs stale caches and activates the update as soon as the screen is safe.</div><div class='actions'><button class='secondary linkbtn' onclick='installOnit()'>INSTALL ON THIS DEVICE</button><button class='secondary linkbtn' onclick='forceFrontendUpdate()'>CHECK / REPAIR UPDATE</button></div></div>`;
   html+=`<div class='morecard' style='grid-column:1/-1'><div class='streamlineAbout'><div><h3>ABOUT ONIT</h3><div class='bigTiny'>Frontend v${APP_VERSION} • Backend ${backendVersion||'checking…'}</div></div><button class='secondary linkbtn' onclick="showToast('ONIT','Work. People. Attention. Proof.')">VIEW DETAILS</button></div></div></div>`;document.getElementById('moreContent').innerHTML=html;hydrateProfilePhotos()}
 async function approvePending(id){
   const targetUserId=decodeURIComponent(id),target=pendingUsers.find(u=>String(rowVal(u,'User ID'))===String(targetUserId)),name=target?rowVal(target,'Full Name'):'The member';
@@ -2525,66 +2545,93 @@ function makeId(){return crypto.randomUUID?crypto.randomUUID():Array.from(crypto
 
 
 
-// ===== Self-healing frontend update manager =====
-let pendingFrontendVersion='';
+// ===== Global UI Sync + self-healing frontend update manager =====
+const UI_RELEASE_CHECK_MS=60000;
+const UI_PENDING_RETRY_MS=2000;
+const UI_SIGNAL_KEY='onit-ui-release-signal-v1';
+const UI_EXPECTED_KEY='onit-ui-expected-version-v1';
+const UI_RELOAD_GUARD_KEY='onit-ui-reload-guard-v1';
+let pendingFrontendVersion='',pendingFrontendRelease=null,uiUpdateInFlight=false,uiUpdateToastVersion='';
+let uiUpdateChannel=null;
+try{if('BroadcastChannel'in window)uiUpdateChannel=new BroadcastChannel('onit-ui-release-v1')}catch(e){}
+function versionNumbers(v){return String(v||'').trim().split(/[.+-]/).slice(0,4).map(x=>Number(String(x).replace(/\D/g,''))||0)}
+function compareUiVersions(a,b){const aa=versionNumbers(a),bb=versionNumbers(b),n=Math.max(aa.length,bb.length,3);for(let i=0;i<n;i++){const d=(aa[i]||0)-(bb[i]||0);if(d)return d>0?1:-1}return 0}
+function remoteUiIsNewer(release){const remote=String(release&&release.version||'').trim();if(!remote)return false;const rev=Number(release&&release.uiRevision||0);if(rev&&typeof UI_REVISION!=='undefined'&&rev>UI_REVISION)return true;return compareUiVersions(remote,APP_VERSION)>0}
+function safeToReloadForUpdate(){return !mutationBusy&&uiDirtySections.size===0}
+function publishUiUpdateSignal(release){
+  const payload={type:'ONIT_UI_UPDATE_AVAILABLE',version:String(release&&release.version||''),uiRevision:Number(release&&release.uiRevision||0),at:Date.now()};
+  try{localStorage.setItem(UI_SIGNAL_KEY,JSON.stringify(payload))}catch(e){}
+  try{uiUpdateChannel&&uiUpdateChannel.postMessage(payload)}catch(e){}
+}
 async function fetchFrontendRelease(){
-  const r=await fetch('./version.json?t='+Date.now(),{cache:'no-store',headers:{'Cache-Control':'no-cache'}});
+  const u=new URL('./version.json',location.href);u.searchParams.set('_ui_check',Date.now());u.searchParams.set('running',APP_VERSION);
+  const r=await fetch(u.toString(),{cache:'no-store',headers:{'Cache-Control':'no-cache, no-store, must-revalidate','Pragma':'no-cache'}});
   if(!r.ok)throw new Error('Version check '+r.status);
   return r.json();
 }
-function safeToReloadForUpdate(){
-  return !mutationBusy && uiDirtySections.size===0;
+function queueUiUpdate(release,source='release-check'){
+  const remote=String(release&&release.version||'').trim();if(!remote||!remoteUiIsNewer(release))return false;
+  pendingFrontendVersion=remote;pendingFrontendRelease=release;
+  try{localStorage.setItem(UI_EXPECTED_KEY,remote)}catch(e){}
+  if(source!=='broadcast'&&source!=='storage'&&source!=='service-worker')publishUiUpdateSignal(release);
+  if(!safeToReloadForUpdate()&&uiUpdateToastVersion!==remote){uiUpdateToastVersion=remote;showToast('ONIT is updating',`UI v${remote} is ready. Finish your current form/action; ONIT will switch automatically.`)}
+  if(safeToReloadForUpdate())setTimeout(()=>performFrontendRefresh(remote,false),50);
+  return true;
 }
-async function performFrontendRefresh(targetVersion,force){
-  if(!force && !safeToReloadForUpdate()){
-    pendingFrontendVersion=targetVersion||pendingFrontendVersion;
-    showToast('ONIT update ready','Finish your current form/action. ONIT will update automatically afterwards.');
-    return false;
-  }
+async function performFrontendRefresh(targetVersion,force=false){
+  targetVersion=String(targetVersion||pendingFrontendVersion||'').trim();
+  const targetRevision=Number(pendingFrontendRelease&&pendingFrontendRelease.uiRevision||0);
+  const versionNewer=!!targetVersion&&compareUiVersions(targetVersion,APP_VERSION)>0;
+  const revisionNewer=!!targetVersion&&compareUiVersions(targetVersion,APP_VERSION)===0&&targetRevision>UI_REVISION;
+  if(!versionNewer&&!revisionNewer){pendingFrontendVersion='';pendingFrontendRelease=null;return false}
+  if(uiUpdateInFlight)return false;
+  if(!force&&!safeToReloadForUpdate()){pendingFrontendVersion=targetVersion;return false}
+  uiUpdateInFlight=true;
   try{
-    if('serviceWorker' in navigator){
+    try{localStorage.setItem(UI_EXPECTED_KEY,targetVersion);localStorage.setItem(UI_RELOAD_GUARD_KEY,JSON.stringify({from:APP_VERSION,to:targetVersion,at:Date.now()}))}catch(e){}
+    try{window.AutoCare&&AutoCare.recordRepair&&AutoCare.recordRepair('GLOBAL_UI_SYNC',`Updating ONIT UI ${APP_VERSION} → ${targetVersion}`)}catch(e){}
+    if('serviceWorker'in navigator){
+      try{navigator.serviceWorker.controller&&navigator.serviceWorker.controller.postMessage({type:'ONIT_UI_SYNC_NOW',targetVersion})}catch(e){}
       const regs=await navigator.serviceWorker.getRegistrations();
-      await Promise.all(regs.map(async reg=>{try{await reg.update()}catch(e){}}));
+      await Promise.all(regs.map(async reg=>{try{await reg.update();if(reg.waiting)reg.waiting.postMessage({type:'SKIP_WAITING'})}catch(e){}}));
     }
-  }catch(e){}
-  const url=new URL(location.href);
-  url.searchParams.set('onit_v',targetVersion||Date.now());
-  url.searchParams.set('_refresh',Date.now());
+    if('caches'in window){const keys=await caches.keys();await Promise.all(keys.filter(k=>k.startsWith('onit-')).map(k=>caches.delete(k)))}
+  }catch(e){console.warn('ONIT Global UI Sync preparation:',e)}
+  const url=new URL(location.href);url.searchParams.set('onit_ui',targetVersion);if(targetRevision)url.searchParams.set('ui_rev',String(targetRevision));url.searchParams.set('_ui_refresh',Date.now());url.hash='';
   location.replace(url.toString());
   return true;
 }
 async function checkFrontendRelease(force=false){
-  if(!isHttpsApp()||navigator.onLine===false)return;
+  if(!isHttpsApp()||navigator.onLine===false)return null;
   try{
-    const release=await fetchFrontendRelease();
-    const remote=String(release.version||'').trim();
-    if(remote && remote!==APP_VERSION){
-      pendingFrontendVersion=remote;
-      await performFrontendRefresh(remote,force);
-      return;
+    const release=await fetchFrontendRelease(),remote=String(release.version||'').trim();
+    if(remoteUiIsNewer(release)){queueUiUpdate(release,'release-check');if(force&&safeToReloadForUpdate())await performFrontendRefresh(remote,true);return release}
+    if(remote&&compareUiVersions(remote,APP_VERSION)===0){
+      pendingFrontendVersion='';pendingFrontendRelease=null;uiUpdateToastVersion='';
+      try{if(localStorage.getItem(UI_EXPECTED_KEY)===remote)localStorage.removeItem(UI_EXPECTED_KEY)}catch(e){}
     }
-    if(pendingFrontendVersion && safeToReloadForUpdate()){
-      const target=pendingFrontendVersion;pendingFrontendVersion='';
-      await performFrontendRefresh(target,true);
-    }
-  }catch(e){console.warn('Frontend version check:',e)}
+    return release;
+  }catch(e){console.warn('Frontend version check:',e);return null}
 }
+function processPendingUiUpdate(){if(pendingFrontendVersion&&safeToReloadForUpdate()&&!uiUpdateInFlight)performFrontendRefresh(pendingFrontendVersion,false)}
 async function forceFrontendUpdate(){
-  if(uiDirtySections.size){
-    if(!confirm('You have an unfinished form. Reload ONIT and discard those unsaved changes?'))return;
-  }
+  if(uiDirtySections.size&&!confirm('You have an unfinished form. Reload ONIT and discard those unsaved changes?'))return;
   try{
-    if('serviceWorker' in navigator){
-      const regs=await navigator.serviceWorker.getRegistrations();
-      await Promise.all(regs.map(async reg=>{try{await reg.unregister()}catch(e){}}));
-    }
-    if('caches' in window){
-      const keys=await caches.keys();
-      await Promise.all(keys.filter(k=>k.startsWith('onit-')).map(k=>caches.delete(k)));
-    }
+    if('serviceWorker'in navigator){const regs=await navigator.serviceWorker.getRegistrations();await Promise.all(regs.map(async reg=>{try{await reg.unregister()}catch(e){}}))}
+    if('caches'in window){const keys=await caches.keys();await Promise.all(keys.filter(k=>k.startsWith('onit-')).map(k=>caches.delete(k)))}
+    try{localStorage.removeItem(UI_RELOAD_GUARD_KEY)}catch(e){}
   }catch(e){}
-  location.replace('./?repair=1&t='+Date.now());
+  let remote=APP_VERSION;try{const release=await fetchFrontendRelease();remote=String(release.version||APP_VERSION)}catch(e){}
+  const url=new URL(location.href);url.search='';url.hash='';url.searchParams.set('repair','1');url.searchParams.set('onit_ui',remote);url.searchParams.set('t',Date.now());location.replace(url.toString())
 }
+function acceptUiUpdateSignal(data,source){
+  if(!data||data.type!=='ONIT_UI_UPDATE_AVAILABLE')return;
+  const release={version:String(data.version||''),uiRevision:Number(data.uiRevision||0)};
+  if(remoteUiIsNewer(release))queueUiUpdate(release,source);
+}
+try{if(uiUpdateChannel)uiUpdateChannel.onmessage=e=>acceptUiUpdateSignal(e.data,'broadcast')}catch(e){}
+window.addEventListener('storage',e=>{if(e.key!==UI_SIGNAL_KEY||!e.newValue)return;try{acceptUiUpdateSignal(JSON.parse(e.newValue),'storage')}catch(err){}});
+setInterval(processPendingUiUpdate,UI_PENDING_RETRY_MS);
 
 // ===== Installable app / near-real-time shell =====
 let deferredInstallPrompt=null,lastFocusRefresh=0;
@@ -2626,27 +2673,21 @@ async function checkForUpdates(){
     console.warn('ONIT pulse:',e);
   }
 }
-function refreshWhenActive(){if(document.hidden)return;checkFrontendRelease(false);if(!SESSION_TOKEN||mutationBusy)return;const now=Date.now();if(now-lastFocusRefresh<4000)return;lastFocusRefresh=now;checkForUpdates()}
+function refreshWhenActive(){if(document.hidden)return;checkFrontendRelease(false);processPendingUiUpdate();if(!SESSION_TOKEN||mutationBusy)return;const now=Date.now();if(now-lastFocusRefresh<4000)return;lastFocusRefresh=now;checkForUpdates()}
 window.addEventListener('focus',refreshWhenActive);document.addEventListener('visibilitychange',()=>{if(!document.hidden)refreshWhenActive()});
-window.addEventListener('online',()=>{connectionNotice('');recoverConnectionNow()});
+window.addEventListener('online',()=>{connectionNotice('');checkFrontendRelease(false);recoverConnectionNow()});
 window.addEventListener('offline',()=>{connectionNotice(lastSuccessfulSyncAt?`You are offline. Showing last synced data from ${syncClockText()}.`:'You are offline. ONIT will update when your connection returns.');updateLastSyncLabel(true)});
 if('serviceWorker' in navigator && isHttpsApp()){
-  window.addEventListener('load',()=>navigator.serviceWorker.register('./service-worker.js',{updateViaCache:'none'}).then(reg=>{
+  window.addEventListener('load',()=>navigator.serviceWorker.register('./service-worker.js?v='+encodeURIComponent(APP_VERSION),{updateViaCache:'none'}).then(reg=>{
     reg.update().catch(()=>{});
-    setInterval(()=>reg.update().catch(()=>{}),30000);
-    let reloading=false;
-    navigator.serviceWorker.addEventListener('controllerchange',()=>{
-      if(reloading)return;
-      if(!safeToReloadForUpdate()){
-        pendingFrontendVersion=pendingFrontendVersion||'new';
-        showToast('ONIT update ready','Finish your current form/action. The app will refresh automatically afterwards.');
-        return;
-      }
-      reloading=true;
-      location.reload();
+    setInterval(()=>reg.update().catch(()=>{}),UI_RELEASE_CHECK_MS);
+    navigator.serviceWorker.addEventListener('message',e=>{
+      const d=e.data||{};
+      if(d.type==='ONIT_UI_VERSION_ACTIVATED'&&d.version)acceptUiUpdateSignal({type:'ONIT_UI_UPDATE_AVAILABLE',version:d.version,uiRevision:d.uiRevision||0},'service-worker');
     });
+    navigator.serviceWorker.addEventListener('controllerchange',()=>{checkFrontendRelease(false);processPendingUiUpdate()});
     checkFrontendRelease(false);
-    setInterval(()=>checkFrontendRelease(false),30000);
+    setInterval(()=>{if(!document.hidden)checkFrontendRelease(false)},UI_RELEASE_CHECK_MS);
   }).catch(err=>console.warn('Service worker:',err)))
 }
 refreshInstallButton();
@@ -2654,12 +2695,13 @@ refreshInstallButton();
 setInterval(()=>{if(!document.getElementById('briefs').classList.contains('hidden'))renderBriefs();if(current&&!document.getElementById('detail').classList.contains('hidden')){const t=timeInfo(current),el=document.getElementById('dtimer');el.textContent=t.text;el.className='num '+t.cls}renderApprovalClocks()},1000);
 setInterval(()=>{const now=Date.now(),gap=firebaseRealtimeHealthy?60000:15000;if(now-lastFallbackPulseAt>=gap){lastFallbackPulseAt=now;checkForUpdates()}},5000);
 async function boot(){if(SESSION_TOKEN){document.getElementById('authGate').classList.add('hidden');document.getElementById('appShell').classList.remove('hidden');await loadFromGoogle(false);if(SESSION_TOKEN)return}document.getElementById('appShell').classList.add('hidden');document.getElementById('authGate').classList.remove('hidden');showAuthMode('signin')}
-boot();
+document.addEventListener('DOMContentLoaded',()=>boot(),{once:true});
 </script>
-<script src="./cases-module.js?v=0.31.2"></script>
-<script src="./pulse-module.js?v=0.31.2"></script>
-<script src="./assist-traffic-module.js?v=0.31.2"></script>
-<script src="./core-intelligence.js?v=0.31.2"></script>
+<script src="./autocare-module.js?v=0.32.1"></script>
+<script src="./cases-module.js?v=0.32.1"></script>
+<script src="./pulse-module.js?v=0.32.1"></script>
+<script src="./assist-traffic-module.js?v=0.32.1"></script>
+<script src="./core-intelligence.js?v=0.32.1"></script>
 </body>
 </html>
 
