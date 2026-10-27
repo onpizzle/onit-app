@@ -15,10 +15,12 @@ function commands(){
   {group:'Go to',icon:'M',title:'Memory',sub:'Search organisational memory',type:'PAGE',keys:'memory history archive knowledge',run:()=>show('memory')},
   {group:'Go to',icon:'P',title:'Digital Pulse',sub:'Digital Strategy operations',type:'PAGE',keys:'digital pulse social',run:()=>show('pulse')},
   {group:'Go to',icon:'C',title:'Cases',sub:'Case studies and evidence',type:'PAGE',keys:'cases casemode evidence',run:()=>show('cases')},
+  {group:'Go to',icon:'I',title:'Ideas Dump',sub:'Agency signals and proactive intelligence',type:'PAGE',keys:'ideas dump signals observations market research proactive',run:()=>show('ideas')},
   {group:'Go to',icon:'⚙',title:'Settings',sub:'Profile, access and System Health',type:'PAGE',keys:'settings health autocare profile',run:()=>show('more')}
  ];
  if(authority('createBrief',typeof canCreateBrief==='function'&&canCreateBrief()))out.unshift({group:'Quick actions',icon:'+',title:'New Brief',sub:'Create and send a new brief',type:'ACTION',keys:'new create send brief',run:()=>openNew()});
  if(authority('trafficManager',typeof isTrafficManagerUser==='function'&&isTrafficManagerUser())&&typeof openTrafficManager==='function')out.unshift({group:'Quick actions',icon:'↔',title:'Open Traffic Control',sub:'Queue, schedule and release work',type:'ACTION',keys:'traffic schedule queue',run:()=>openTrafficManager()});
+ if(window.ActivationCommand&&!document.getElementById('navActivation')?.classList.contains('hiddenByRole'))out.push({group:'Go to',icon:'A',title:'Activation Command',sub:'Private on-ground operations',type:'PAGE',keys:'activation on-ground field vendors readiness',run:()=>show('activation')});
  if(window.AutoCare)out.push({group:'Quick actions',icon:'✓',title:'System Health',sub:'Open AutoCare diagnostics',type:'ACTION',keys:'system health autocare diagnostics repair',run:()=>{show('more');setTimeout(()=>window.openAutoCareHealth?.(),80)}});
  return out;
 }

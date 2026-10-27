@@ -146,18 +146,18 @@ function listening(){const d=state.data||{},open=(d.escalations||[]).filter(x=>S
 function reports(){const d=state.data||{},s=d.summary||{},sent=s.sentiment||{},gate=canWrite()?'':' hidden';root().innerHTML=shell(`<div class='dpMetrics'>${metric('COMMENTS',s.comments||0,'Today')}${metric('DMs',s.dms||0,'Today')}${metric('INSIGHTS',s.insightsToday||0,'Today')}${metric('OPEN ISSUES',s.openEscalations||0)}</div><div class='dpGrid'><div class='dpCard'><h3>SENTIMENT TODAY</h3><div class='dpSentiment'><div><b>${num(sent.positive)}</b><span>Positive</span></div><div><b>${num(sent.neutral)}</b><span>Neutral</span></div><div><b>${num(sent.negative)}</b><span>Negative</span></div></div></div><div class='dpCard${gate}'><h3>ADD PERFORMANCE METRIC</h3><div class='dpFormGrid'><div class='field'><label>BRAND</label><input id='pmBrand'></div><div class='field'><label>CAMPAIGN</label><input id='pmCampaign'></div><div class='field'><label>METRIC</label><input id='pmName' placeholder='Engagement rate'></div><div class='field'><label>VALUE</label><input id='pmValue'></div><div class='field'><label>UNIT</label><input id='pmUnit' placeholder='%, views, members'></div><div class='field'><label>PLATFORM</label><input id='pmPlatform'></div><div class='field'><label>PERIOD</label><input id='pmPeriod' placeholder='22 Oct 2026 / campaign period'></div><div class='field'><label>BRIEF CODE</label><input id='pmBrief'></div><div class='field wide'><label>SOURCE</label><input id='pmSource' placeholder='Platform analytics / client report / URL'></div></div><label class='dpCandidate'><input id='pmCase' type='checkbox'> Flag metric for Cases</label><button class='new' onclick='DigitalPulse.addMetric()'>SAVE METRIC</button></div></div><div class='dpCard'><h3>RECENT METRICS</h3>${(d.metrics||[]).length?(d.metrics||[]).map(x=>`<div class='dpRow'><div><b>${esc(val(x,'Name'))}: ${esc(val(x,'Value'))} ${esc(val(x,'Unit'))}</b><small>${esc(val(x,'Brand'))} • ${esc(val(x,'Platform'))} • ${esc(val(x,'Period'))} • ${esc(val(x,'Source'))}</small></div>${String(val(x,'Case Candidate')).toLowerCase()==='true'?`<span class='dpCaseFlag'>CASE</span>`:''}</div>`).join(''):`<div class='empty'>No performance metrics logged yet.</div>`}</div>`,'Reports','Pulse builds the daily digital report from work the team already logs.')}
 
 function downloadPdfPayload(d){
- if(!d||!d.base64)return alert('ONIT could not prepare this PDF.');
+ if(!d||!d.base64)return onitAlert('ONIT could not prepare this PDF.');
  try{
    const raw=atob(d.base64),bytes=new Uint8Array(raw.length);for(let i=0;i<raw.length;i++)bytes[i]=raw.charCodeAt(i);
    const blob=new Blob([bytes],{type:d.mimeType||'application/pdf'}),url=URL.createObjectURL(blob),a=document.createElement('a');
    a.href=url;a.download=d.fileName||'ONIT.pdf';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1500);
- }catch(e){alert('Could not download PDF. '+e.message)}
+ }catch(e){onitAlert('Could not download PDF. '+e.message)}
 }
 async function downloadReport(){
  if(!canDownloadReport()){showToast('Digital Pulse','Report download is available to leadership.');return}
  if(state.busy)return;state.busy=true;
  try{showToast('Digital Pulse','Preparing report…');const d=await api('PULSE_EXPORT_REPORT',{date:state.data?.today||''});downloadPdfPayload(d);showToast('Digital Pulse','Report downloaded.');}
- catch(e){alert(e.message)}finally{state.busy=false}
+ catch(e){onitAlert(e.message)}finally{state.busy=false}
 }
 
 function candidateSummary(x){const r=x.row||{},t=x.sourceType;if(t==='metric')return `${val(r,'Name')}: ${val(r,'Value')} ${val(r,'Unit')}`;if(t==='insight')return val(r,'Insight');if(t==='escalation')return val(r,'Summary');if(t==='content')return `${val(r,'Platform')} — ${val(r,'Title')} (${val(r,'Status')})`;return `${val(r,'Platform')} — ${val(r,'Comments Handled')} comments, ${val(r,'DMs Answered')} DMs`}
@@ -173,7 +173,7 @@ async function cases(){
 }
 async function buildOnePageCase(sourceType,sourceId){
  if(!canBuildOnePageCase()){showToast('Digital Pulse','Only leadership or the System Owner can build a one-page Case.');return}
- if(!confirm('Build a private 1-page Case draft from this Digital Pulse signal?'))return;
+ if(!await onitConfirm('Build a private 1-page Case draft from this Digital Pulse signal?'))return;
  if(state.busy)return;state.busy=true;
  try{
    showToast('Cases','Building 1-page Case draft…');
@@ -181,7 +181,7 @@ async function buildOnePageCase(sourceType,sourceId){
    state.candidates=null;state.lastAt=0;await load(true);downloadPdfPayload(d);
    showToast('Cases',`Case ${d.caseId||''} created and the one-page draft downloaded.`);
    await cases();
- }catch(e){alert(e.message)}finally{state.busy=false}
+ }catch(e){onitAlert(e.message)}finally{state.busy=false}
 }
 async function render(){const r=root();if(!r)return;await refreshCapabilities(false);restoreLastTab();if(!allowed()){r.innerHTML=shell(`<div class='dpLock'><b>Digital Pulse is not available for this account.</b><div class='muted'>Digital Pulse is available to active ONIT users.</div></div>`);return}try{await load();if(state.tab==='today')today();else if(state.tab==='engagement')engagement();else if(state.tab==='content')content();else if(state.tab==='listening')listening();else if(state.tab==='reports')reports();else if(state.tab==='cases')await cases();restoreDraft();updateDraftStatus();}catch(e){r.innerHTML=shell(`<div class='dpLock'><b>Pulse could not load.</b><div class='muted'>${esc(e.message)}</div></div>`)} }
 async function openTab(tab){saveDraftNow();state.tab=tab;const d=readDraftStore();d.lastTab=tab;writeDraftStore(d);state.dirtyGroups=new Set((d.tabs&&d.tabs[tab]&&d.tabs[tab].groups)||[]);loading(({today:'Today',engagement:'Engagement',content:'Content',listening:'Listening',reports:'Reports',cases:'Case Signals'})[tab]||'Digital Pulse');await render()}
@@ -200,7 +200,7 @@ async function mutate(action,payload,msg){
    await load(true);
    showToast('Saved to ONIT',`${msg} Leadership live view will update automatically.`);
    await render();
- }catch(e){saveDraftNow();alert(e.message)}
+ }catch(e){saveDraftNow();onitAlert(e.message)}
  finally{state.busy=false;updateDraftStatus()}
 }
 function byId(id){return document.getElementById(id)}
@@ -212,9 +212,9 @@ function addContent(){return mutate('PULSE_ADD_CONTENT',{title:text('pcTitle'),b
 function updateContent(contentId,status){return mutate('PULSE_UPDATE_CONTENT',{contentId,status},`Content marked ${status}.`)}
 function addInsight(){return mutate('PULSE_ADD_INSIGHT',{brand:text('piBrand'),campaign:text('piCampaign'),source:text('piSource'),type:text('piType'),sentiment:text('piSentiment'),briefCode:text('piBrief'),insight:text('piInsight'),caseCandidate:checked('piCase')},'Insight saved.')}
 function addEscalation(){return mutate('PULSE_ADD_ESCALATION',{brand:text('pxBrand'),campaign:text('pxCampaign'),source:text('pxSource'),severity:text('pxSeverity'),type:text('pxType'),briefCode:text('pxBrief'),summary:text('pxSummary'),caseCandidate:checked('pxCase')},'Escalation saved.')}
-function resolveEscalation(escalationId){if(!confirm('Mark this escalation as resolved?'))return;return mutate('PULSE_RESOLVE_ESCALATION',{escalationId},'Escalation resolved.')}
+async function resolveEscalation(escalationId){if(!await onitConfirm('Mark this escalation as resolved?'))return;return mutate('PULSE_RESOLVE_ESCALATION',{escalationId},'Escalation resolved.')}
 function addMetric(){return mutate('PULSE_ADD_METRIC',{brand:text('pmBrand'),campaign:text('pmCampaign'),name:text('pmName'),value:text('pmValue'),unit:text('pmUnit'),platform:text('pmPlatform'),period:text('pmPeriod'),briefCode:text('pmBrief'),source:text('pmSource'),caseCandidate:checked('pmCase')},'Performance metric saved.')}
-async function sendToCases(sourceType,sourceId){if(!canPromote()){showToast('Digital Pulse','You do not have permission to send Pulse evidence to Cases.');return}const caseId=(prompt('Enter the ONIT Case ID to receive this evidence:','')||'').trim();if(!caseId)return;try{await api('PULSE_SEND_TO_CASES',{sourceType,sourceId,caseId});state.candidates=null;state.lastAt=0;showToast('Digital Pulse','Evidence sent to Cases Data Vault.');await render()}catch(e){alert(e.message)}}
+async function sendToCases(sourceType,sourceId){if(!canPromote()){showToast('Digital Pulse','You do not have permission to send Pulse evidence to Cases.');return}const caseId=(await onitPrompt('Enter the ONIT Case ID to receive this evidence:','')||'').trim();if(!caseId)return;try{await api('PULSE_SEND_TO_CASES',{sourceType,sourceId,caseId});state.candidates=null;state.lastAt=0;showToast('Digital Pulse','Evidence sent to Cases Data Vault.');await render()}catch(e){onitAlert(e.message)}}
 const originalApply=window.applyPermissions;if(typeof originalApply==='function')window.applyPermissions=function(){const r=originalApply.apply(this,arguments);setTimeout(()=>refreshCapabilities(true),0);return r};
 const originalShow=window.show;if(typeof originalShow==='function')window.show=function(id,btn){const r=originalShow.apply(this,arguments);if(id==='pulse'){restoreLastTab();loading();render()}return r};
 const originalLoad=window.loadFromGoogle;if(typeof originalLoad==='function')window.loadFromGoogle=async function(){return await originalLoad.apply(this,arguments)};
