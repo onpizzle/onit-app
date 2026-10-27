@@ -18,7 +18,7 @@
 <link rel="dns-prefetch" href="//www.gstatic.com">
 <link rel="dns-prefetch" href="//script.google.com">
 <link rel="manifest" href="manifest.webmanifest">
-<link rel="stylesheet" href="./dialog-system.css?v=0.36.3">
+<link rel="stylesheet" href="./dialog-system.css?v=0.36.4">
 <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
@@ -888,10 +888,10 @@ img,video,canvas,svg{max-width:100%}
 .reviewQueueNote{font-size:11px;color:#777;margin-top:6px}
 @media(max-width:760px){.reviewPreviewModal{padding:4px!important}.reviewPreviewModal .modalBox{width:100%!important;height:calc(100dvh - 8px)!important;max-height:none!important;border-radius:12px!important}.previewAssetStage{padding:5px}.previewFooter{padding:7px}.previewNav{justify-content:flex-start;overflow-x:auto;flex-wrap:nowrap}.previewNav .mini{white-space:nowrap}}
 </style>
-<link rel="stylesheet" href="./cases-module.css?v=0.36.3">
-<link rel="stylesheet" href="./activation-command.css?v=0.36.3">
-<link rel="stylesheet" href="./ideas-dump.css?v=0.36.3">
-<link rel="stylesheet" href="./pulse-module.css?v=0.36.3">
+<link rel="stylesheet" href="./cases-module.css?v=0.36.4">
+<link rel="stylesheet" href="./activation-command.css?v=0.36.4">
+<link rel="stylesheet" href="./ideas-dump.css?v=0.36.4">
+<link rel="stylesheet" href="./pulse-module.css?v=0.36.4">
 
 <style id="onit-mobile-nav-v0212">
 .navLabelMobile{display:none!important}
@@ -1005,8 +1005,8 @@ html.onitReduceMotion *,html.onitReduceMotion *::before,html.onitReduceMotion *:
   *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
 }
 </style>
-<link rel="stylesheet" href="./assist-traffic-module.css?v=0.36.3">
-<link rel="stylesheet" href="./core-intelligence.css?v=0.36.3">
+<link rel="stylesheet" href="./assist-traffic-module.css?v=0.36.4">
+<link rel="stylesheet" href="./core-intelligence.css?v=0.36.4">
 <style id="role-consistency-v0311">
 /* ONIT v0.31.2 — role authority + Digital Pulse access hardening */
 .radarMorningGrid .morningMetric b,
@@ -1019,11 +1019,11 @@ html.onitReduceMotion *,html.onitReduceMotion *::before,html.onitReduceMotion *:
 .radarLevel{color:#f2f2ee!important}
 </style>
 
-<link rel="stylesheet" href="./autocare-module.css?v=0.36.3">
-<link rel="stylesheet" href="./command-palette.css?v=0.36.3">
+<link rel="stylesheet" href="./autocare-module.css?v=0.36.4">
+<link rel="stylesheet" href="./command-palette.css?v=0.36.4">
 
-<link rel="stylesheet" href="./visual-contrast.css?v=0.36.3">
-<link rel="stylesheet" href="./attention-loop.css?v=0.36.3">
+<link rel="stylesheet" href="./visual-contrast.css?v=0.36.4">
+<link rel="stylesheet" href="./attention-loop.css?v=0.36.4">
 </head>
 <body>
 <a class="onitSkipLink" href="#mainContent">Skip to main content</a>
@@ -1218,9 +1218,9 @@ html.onitReduceMotion *,html.onitReduceMotion *::before,html.onitReduceMotion *:
 <script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-messaging-compat.js"></script>
-<script>const APP_VERSION='0.36.3';
-const UI_REVISION=3630;
-const DASHBOARD_UI_REVISION=36301;
+<script>const APP_VERSION='0.36.4';
+const UI_REVISION=3640;
+const DASHBOARD_UI_REVISION=36401;
 const DASHBOARD_UI_STORAGE_KEY='onit-dashboard-ui-state-v1';
 window.ONIT_RUNTIME={version:APP_VERSION,uiRevision:UI_REVISION,dashboardUiRevision:DASHBOARD_UI_REVISION};
 const BACKEND_DATASETS=['USERS','CLIENTS','BRIEFS','ASSIGNMENTS','ITERATIONS','ACTIVITY_LOG','NOTIFICATIONS','REPORTS'];
@@ -1358,7 +1358,7 @@ function sheetBriefToUI(r){return {
   code:rowVal(r,'Brief Code','briefCode','code'),clientId:rowVal(r,'Client ID','clientId'),client:rowVal(r,'Client Name','clientName','client')||'Client',brand:rowVal(r,'Brand','brand')||'',project:rowVal(r,'Project Title','projectTitle','project')||'Untitled Brief',description:rowVal(r,'Description','description')||'',deliverables:rowVal(r,'Deliverables','deliverables')||'',priority:rowVal(r,'Priority','priority')||'Normal',
   createdByUserId:rowVal(r,'Created By User ID'),createdAt:rowVal(r,'Created At'),approvalRequestedAt:rowVal(r,'Approval Requested At'),approvalDueAt:rowVal(r,'Approval Due At'),deadline:rowVal(r,'Current Deadline','currentDeadline','deadline'),originalDeadline:rowVal(r,'Original Deadline'),pauseStartedAt:rowVal(r,'Pause Started At'),pauseRemainingMs:rowVal(r,'Pause Remaining Ms'),pausedByUserId:rowVal(r,'Paused By User ID'),finalApproved:truthy(rowVal(r,'Final Approved')),approvedBy:rowVal(r,'Approved By User ID'),approvedByPosition:rowVal(r,'Approved By Position'),approvedAt:rowVal(r,'Approved At'),clientSent:truthy(rowVal(r,'Client Sent')),clientSentBy:rowVal(r,'Client Sent By User ID'),clientSentAt:rowVal(r,'Client Sent At'),status:rowVal(r,'Status','status')||'Assigned',paused:truthy(rowVal(r,'Paused','paused')),iteration:Number(rowVal(r,'Current Iteration','currentIteration','iteration')||0),
   attachmentIds:parseJsonArray(rowVal(r,'Brief Attachment IDs')),attachmentNames:parseJsonArray(rowVal(r,'Brief Attachment Names')),attachmentTypes:parseJsonArray(rowVal(r,'Brief Attachment Types')),attachmentUrls:parseJsonArray(rowVal(r,'Brief Attachment URLs')),
-  clientDeadline:rowVal(r,'Client Deadline')||rowVal(r,'Original Deadline')||rowVal(r,'Current Deadline'),trafficQueueStatus:rowVal(r,'Traffic Queue Status')||'',trafficQueuePosition:Number(rowVal(r,'Traffic Queue Position')||0),proposedAssigneeIds:parseJsonArray(rowVal(r,'Traffic Proposed Assignee IDs')),proposedAssigneeNames:parseJsonArray(rowVal(r,'Traffic Proposed Assignee Names')),trafficScheduledStart:rowVal(r,'Traffic Scheduled Start')||'',trafficScheduledAt:rowVal(r,'Traffic Scheduled At')||'',trafficInternalDeadline:rowVal(r,'Traffic Internal Deadline')||'',trafficHoldReason:rowVal(r,'Traffic Hold Reason')||'',trafficNotes:rowVal(r,'Traffic Notes')||'',
+  clientDeadline:rowVal(r,'Client Deadline')||rowVal(r,'Original Deadline')||rowVal(r,'Current Deadline'),trafficQueueStatus:rowVal(r,'Traffic Queue Status')||'',trafficQueuePosition:Number(rowVal(r,'Traffic Queue Position')||0),proposedAssigneeIds:parseJsonArray(rowVal(r,'Traffic Proposed Assignee IDs')),proposedAssigneeNames:parseJsonArray(rowVal(r,'Traffic Proposed Assignee Names')),trafficScheduledStart:rowVal(r,'Traffic Scheduled Start')||'',trafficScheduledAt:rowVal(r,'Traffic Scheduled At')||'',trafficInternalDeadline:rowVal(r,'Traffic Internal Deadline')||'',trafficHoldReason:rowVal(r,'Traffic Hold Reason')||'',trafficNotes:rowVal(r,'Traffic Notes')||'',leadershipResponseStatus:rowVal(r,'Leadership Response Status')||'',leadershipResponseByUserId:rowVal(r,'Leadership Response By User ID')||'',leadershipResponseByName:rowVal(r,'Leadership Response By Name')||'',leadershipResponsePosition:rowVal(r,'Leadership Response Position')||'',leadershipResponseAt:rowVal(r,'Leadership Response At')||'',leadershipResponseNote:rowVal(r,'Leadership Response Note')||'',
   iterations:[],activity:[],activityRows:[],assignee:(parseJsonArray(rowVal(r,'Traffic Proposed Assignee Names')).join(' + ')||'Awaiting assignment'),assigneeUserId:'',assigneeFullName:''
 }}
 
@@ -1963,11 +1963,26 @@ function isTrafficQueuedBrief(b){return !!b&&trafficQueueStatuses().includes(Str
 function trafficAssigneeDisplay(b){if(!b)return '—';if(isTrafficQueuedBrief(b))return b.proposedAssigneeNames?.length?('Proposed: '+b.proposedAssigneeNames.join(' + ')):'Awaiting Traffic assignment';return b.assignee||'Unassigned'}
 function trafficScheduleText(b){if(!b||!isTrafficQueuedBrief(b))return '';const parts=[];if(b.trafficScheduledStart)parts.push('Start '+formatDateTime(b.trafficScheduledStart));if(b.trafficInternalDeadline)parts.push('Internal deadline '+formatDateTime(b.trafficInternalDeadline));if(b.clientDeadline)parts.push('Client deadline '+formatDateTime(b.clientDeadline));if(b.status==='Traffic Hold'&&b.trafficHoldReason)parts.push('Hold: '+b.trafficHoldReason);return parts.join(' • ')||'Awaiting Traffic scheduling'}
 
+function leadershipBriefResponseTargeted(b){
+  if(!b||!isAgencyLeadership(currentUser)||String(b.status||'')==='Closed')return false;
+  if(currentUserAssignment(b.code,'TO'))return true;
+  return (b.proposedAssigneeIds||[]).map(String).includes(String(CURRENT_USER_ID));
+}
+function leadershipResponsePanel(){
+  if(!current||!leadershipBriefResponseTargeted(current))return '';
+  const status=current.leadershipResponseStatus||'',who=current.leadershipResponseByName||current.leadershipResponsePosition||'',when=current.leadershipResponseAt?formatDateTime(current.leadershipResponseAt):'',note=current.leadershipResponseNote||'';
+  const previous=status?`<div class="leadershipResponseLatest ${status==='APPROVED'?'approved':status==='SENT BACK'?'sentBack':'commented'}"><b>LATEST RESPONSE: ${escapeHTML(status)}</b>${who?` • ${escapeHTML(who)}`:''}${when?` • ${escapeHTML(when)}`:''}${note?`<div>${escapeHTML(note)}</div>`:''}</div>`:'';
+  return `<section class="leadershipResponseBox"><div><div class="leadershipResponseKicker">LEADERSHIP RESPONSE</div><h3>Respond to the sender</h3><p>This brief/request was sent to you for attention. Your response goes straight back to the Account Manager / sender and is recorded in ONIT.</p></div>${previous}<div class="leadershipResponseActions"><button class="leadershipApprove" onclick="leadershipApproveBrief(this)">APPROVE</button><button class="leadershipSendBack" onclick="leadershipSendBackBrief(this)">SEND BACK</button><button class="leadershipComment" onclick="leadershipCommentBrief(this)">COMMENT</button></div></section>`;
+}
+async function leadershipApproveBrief(button){if(!current||!leadershipBriefResponseTargeted(current))return;const ok=await onitConfirm('Approve this brief/request and send the decision back to the sender?',{title:'Leadership approval',okLabel:'APPROVE',cancelLabel:'CANCEL'});if(!ok)return;await runAction(button,'leadershipBriefResponse',{decision:'APPROVE',note:'Approved.'},'Approval sent back to the Account Manager / sender.');}
+async function leadershipSendBackBrief(button){if(!current||!leadershipBriefResponseTargeted(current))return;const note=await onitPrompt('What should the sender change or address?','Please revise / address the points below.');if(!note?.trim())return;await runAction(button,'leadershipBriefResponse',{decision:'SEND_BACK',note:note.trim()},'The brief/request was sent back with your feedback.');}
+async function leadershipCommentBrief(button){if(!current||!leadershipBriefResponseTargeted(current))return;const note=await onitPrompt('Add your comment for the Account Manager / sender:','');if(!note?.trim())return;await runAction(button,'leadershipBriefResponse',{decision:'COMMENT',note:note.trim()},'Your comment was sent to the Account Manager / sender.');}
+
 function renderBriefPanel(){
   const creator=users.find(u=>rowVal(u,'User ID')===current.createdByUserId),assignment=activeToAssignment(current.code),mineAssignment=currentUserAssignment(current.code,'TO'),canDownloadSource=['Assigned','In Progress','Revision','Paused'].includes(current.status)&&(current.createdByUserId===CURRENT_USER_ID||!!mineAssignment),leadership=leadershipAssigneeBrief(current);
   const attachments=current.attachmentNames.map((name,i)=>`<div class='attachmentItem'><div><b>${escapeHTML(name)}</b><div class='tiny'>${escapeHTML(current.attachmentTypes[i]||'file')}</div></div><div><button class='mini' onclick="openBriefAttachmentPreview(${i},'${encodeURIComponent(name)}')">PREVIEW</button>${canDownloadSource?`<button class='mini downloadBriefBtn' onclick="downloadBriefAttachment(${i},'${encodeURIComponent(name)}')">DOWNLOAD</button>`:''}</div></div>`).join('');
   const copyText=isAccountManagerUser(creator)?'Creative Director • Deputy Creative Director • Managing Director • Dr. Kunbi':'Creative Director • Deputy Creative Director';
-  document.getElementById('briefPanel').innerHTML=`<div class='detailMeta'><div class='metaBlock'><b>ASSIGNED TEAM</b>${escapeHTML(trafficAssigneeDisplay(current))}${leadership?`<div class='leadershipNote'>Leadership assignment: this CD/DCD submission does not need a separate final approval.</div>`:''}</div><div class='metaBlock'><b>CC — AUTOMATIC</b>${escapeHTML(copyText)}</div><div class='metaBlock'><b>TASK RECEIPTS</b>${assignmentReceiptMarkup(current.code)}</div><div class='metaBlock'><b>PRIORITY</b>${escapeHTML(current.priority)}</div><div class='metaBlock'><b>FROM</b>${escapeHTML(rowVal(creator,'Full Name')||'Account Management')}</div><div class='metaBlock'><b>${isTrafficQueuedBrief(current)?'TRAFFIC SCHEDULE':'CURRENT DEADLINE'}</b>${isTrafficQueuedBrief(current)?escapeHTML(trafficScheduleText(current)):(current.deadline?escapeHTML(formatDateTime(current.deadline)):'—')}</div></div><div class='section'><h2>BRIEF</h2><p>${escapeHTML(current.description||'No brief text supplied.').replace(/\n/g,'<br>')}</p></div><div class='section'><h2>DELIVERABLES</h2><p>${escapeHTML(current.deliverables||'No deliverables listed.').replace(/\n/g,'<br>')}</p></div><div class='section'><h2>INITIAL BRIEF FILES</h2>${attachments||`<div class='empty'>No brief attachments.</div>`}<div class='tiny'>Original brief files are downloadable during the active work stage. Submitted work remains preview-only until final approval.</div></div>${workerReplyMarkup()}`
+  document.getElementById('briefPanel').innerHTML=`${leadershipResponsePanel()}<div class='detailMeta'><div class='metaBlock'><b>ASSIGNED TEAM</b>${escapeHTML(trafficAssigneeDisplay(current))}${leadership?`<div class='leadershipNote'>Leadership assignment: this CD/DCD submission does not need a separate final approval.</div>`:''}</div><div class='metaBlock'><b>CC — AUTOMATIC</b>${escapeHTML(copyText)}</div><div class='metaBlock'><b>TASK RECEIPTS</b>${assignmentReceiptMarkup(current.code)}</div><div class='metaBlock'><b>PRIORITY</b>${escapeHTML(current.priority)}</div><div class='metaBlock'><b>FROM</b>${escapeHTML(rowVal(creator,'Full Name')||'Account Management')}</div><div class='metaBlock'><b>${isTrafficQueuedBrief(current)?'TRAFFIC SCHEDULE':'CURRENT DEADLINE'}</b>${isTrafficQueuedBrief(current)?escapeHTML(trafficScheduleText(current)):(current.deadline?escapeHTML(formatDateTime(current.deadline)):'—')}</div></div><div class='section'><h2>BRIEF</h2><p>${escapeHTML(current.description||'No brief text supplied.').replace(/\n/g,'<br>')}</p></div><div class='section'><h2>DELIVERABLES</h2><p>${escapeHTML(current.deliverables||'No deliverables listed.').replace(/\n/g,'<br>')}</p></div><div class='section'><h2>INITIAL BRIEF FILES</h2>${attachments||`<div class='empty'>No brief attachments.</div>`}<div class='tiny'>Original brief files are downloadable during the active work stage. Submitted work remains preview-only until final approval.</div></div>${workerReplyMarkup()}`
 }
 function submissionResourceMarkup(i){
   const files=(i.files||[]).map((f,index)=>`<div class='resourceCard'><b>FILE ${index+1} — ${escapeHTML(f.name||'Submission file')}</b><div class='tiny'>${escapeHTML(f.type||'file')}</div><div class='fileActions'><button class='mini' onclick="openIterationPreview('${encodeURIComponent(i.id)}','${encodeURIComponent(f.name||'Submission file')}',${index})">PREVIEW</button>${current.finalApproved?`<button class='mini' onclick="downloadIteration('${encodeURIComponent(i.id)}',${index})">DOWNLOAD APPROVED FILE</button>`:''}</div></div>`).join('');
@@ -1986,7 +2001,7 @@ function renderWorkPanel(){
   document.getElementById('closeBtn').classList.toggle('hidden',!((current.createdByUserId===CURRENT_USER_ID||mine)&&current.status==='Approved'&&current.finalApproved));
   document.getElementById('reviewActions').classList.toggle('hidden',[...document.querySelectorAll('#reviewActions button')].every(b=>b.classList.contains('hidden')))
 }
-function replayLabel(action){const labels={BRIEF_CREATED:'Brief created',USER_ASSIGNED:'Assigned',TASK_ACKNOWLEDGED:'Task receipt acknowledged',MANDATORY_CC_ADDED:'Leadership copied',WORK_STARTED:'Work started',REVISION_WORK_STARTED:'Revision work started',BRIEF_PAUSED:'Work paused',BRIEF_RESUMED:'Work resumed',DEADLINE_CHANGED:'Deadline changed',ITERATION_SUBMITTED:'Work submitted',TEAM_LEAD_APPROVED:'Team Lead approved',TEAM_LEAD_REVISION_REQUESTED:'Team Lead requested rework',REVISION_REQUESTED:'Final review requested changes',FINAL_APPROVED:'Final approved',FILE_DOWNLOADED_ASSUMED_CLIENT_SENT:'File downloaded / client send recorded',BRIEF_CLOSED:'Brief closed',BRIEF_HANDOVER:'Brief handed over',LEADERSHIP_SUBMISSION_AUTO_APPROVED:'Leadership submission cleared'};return labels[action]||String(action||'Update').replaceAll('_',' ').toLowerCase().replace(/\b\w/g,c=>c.toUpperCase())}
+function replayLabel(action){const labels={BRIEF_CREATED:'Brief created',USER_ASSIGNED:'Assigned',TASK_ACKNOWLEDGED:'Task receipt acknowledged',MANDATORY_CC_ADDED:'Leadership copied',WORK_STARTED:'Work started',REVISION_WORK_STARTED:'Revision work started',BRIEF_PAUSED:'Work paused',BRIEF_RESUMED:'Work resumed',DEADLINE_CHANGED:'Deadline changed',ITERATION_SUBMITTED:'Work submitted',TEAM_LEAD_APPROVED:'Team Lead approved',TEAM_LEAD_REVISION_REQUESTED:'Team Lead requested rework',REVISION_REQUESTED:'Final review requested changes',FINAL_APPROVED:'Final approved',FILE_DOWNLOADED_ASSUMED_CLIENT_SENT:'File downloaded / client send recorded',BRIEF_CLOSED:'Brief closed',BRIEF_HANDOVER:'Brief handed over',LEADERSHIP_SUBMISSION_AUTO_APPROVED:'Leadership submission cleared',LEADERSHIP_BRIEF_APPROVED:'Leadership approved request',LEADERSHIP_BRIEF_SENT_BACK:'Leadership sent request back',LEADERSHIP_BRIEF_COMMENTED:'Leadership commented on request'};return labels[action]||String(action||'Update').replaceAll('_',' ').toLowerCase().replace(/\b\w/g,c=>c.toUpperCase())}
 function replayTimestamp(r){const v=rowVal(r,'Timestamp','timestamp');const n=new Date(v).getTime();return Number.isFinite(n)?n:0}
 function replayAuditMarkup(rows){return rows.length?rows.map(r=>{const action=rowVal(r,'Action','action'),actor=rowVal(r,'Actor Name','actorName')||'ONIT',reason=rowVal(r,'Reason','reason'),prev=rowVal(r,'Previous Value','previousValue'),next=rowVal(r,'New Value','newValue'),ts=rowVal(r,'Timestamp','timestamp');let meta='';try{const m=JSON.parse(rowVal(r,'Metadata','metadata')||'{}');if(m.version)meta+=`${m.version} • `;if(m.submissionNote)meta+=m.submissionNote}catch(e){}const detail=[prev&&next&&prev!==next?`${prev} → ${next}`:'',reason,meta].filter(Boolean).join(' • ');return `<div class='replayItem'><div class='replayTime'>${escapeHTML(formatDateTime(ts))}</div><div class='replayDot'></div><div class='replayBody'><b>${escapeHTML(replayLabel(action))}</b><div class='replayMeta'>${escapeHTML(actor)}${detail?' • '+escapeHTML(detail):''}</div></div></div>`}).join(''):`<div class='empty'>No activity yet.</div>`}
 function replayJourneyDuration(ms){if(!Number.isFinite(ms)||ms<=0)return '—';const mins=Math.round(ms/60000);if(mins<60)return `${Math.max(1,mins)}m`;const hrs=Math.floor(mins/60),rem=mins%60;if(hrs<24)return rem?`${hrs}h ${rem}m`:`${hrs}h`;const days=Math.floor(hrs/24),h=hrs%24;return h?`${days}d ${h}h`:`${days}d`}
@@ -2743,19 +2758,19 @@ setInterval(()=>{const now=Date.now(),gap=firebaseRealtimeHealthy?60000:15000;if
 async function boot(){if(SESSION_TOKEN){document.getElementById('authGate').classList.add('hidden');document.getElementById('appShell').classList.remove('hidden');await loadFromGoogle(false);if(SESSION_TOKEN)return}document.getElementById('appShell').classList.add('hidden');document.getElementById('authGate').classList.remove('hidden');showAuthMode('signin')}
 document.addEventListener('DOMContentLoaded',()=>boot(),{once:true});
 </script>
-<script src="./dialog-system.js?v=0.36.3"></script>
-<script src="./authority-engine.js?v=0.36.3"></script>
-<script src="./sync-engine.js?v=0.36.3"></script>
-<script src="./release-guard.js?v=0.36.3"></script>
-<script src="./command-palette.js?v=0.36.3"></script>
-<script src="./autocare-module.js?v=0.36.3"></script>
-<script src="./cases-module.js?v=0.36.3"></script>
-<script src="./activation-command.js?v=0.36.3"></script>
-<script src="./ideas-dump.js?v=0.36.3"></script>
-<script src="./pulse-module.js?v=0.36.3"></script>
-<script src="./assist-traffic-module.js?v=0.36.3"></script>
-<script src="./core-intelligence.js?v=0.36.3"></script>
-<script src="./attention-loop.js?v=0.36.3"></script>
+<script src="./dialog-system.js?v=0.36.4"></script>
+<script src="./authority-engine.js?v=0.36.4"></script>
+<script src="./sync-engine.js?v=0.36.4"></script>
+<script src="./release-guard.js?v=0.36.4"></script>
+<script src="./command-palette.js?v=0.36.4"></script>
+<script src="./autocare-module.js?v=0.36.4"></script>
+<script src="./cases-module.js?v=0.36.4"></script>
+<script src="./activation-command.js?v=0.36.4"></script>
+<script src="./ideas-dump.js?v=0.36.4"></script>
+<script src="./pulse-module.js?v=0.36.4"></script>
+<script src="./assist-traffic-module.js?v=0.36.4"></script>
+<script src="./core-intelligence.js?v=0.36.4"></script>
+<script src="./attention-loop.js?v=0.36.4"></script>
 </body>
 </html>
 
