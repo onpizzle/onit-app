@@ -1,0 +1,12 @@
+/* ONIT v0.36.3 — persistent brief attention */
+.brief.onitUnattendedBrief{background:#fff2eb!important;border-left:5px solid #ff4f1f!important;padding-left:12px!important;border-radius:10px;box-shadow:0 0 0 1px rgba(255,79,31,.08)}
+.onitNeedsAckChip{background:#ff4f1f!important;color:#fff!important;border-color:#ff4f1f!important;font-weight:900!important}
+.onitNeedsAckChip *{color:#fff!important}
+.notifItem.onitNotifClickable{display:block;width:100%;border:0;border-bottom:1px solid #eee;background:#fff;text-align:left;cursor:pointer;border-radius:0}
+.notifItem.onitNotifClickable:hover,.notifItem.onitNotifClickable:focus-visible{background:#f7f5f1;outline:none}
+.notifItem.onitNotifPending{border-left:4px solid #ff4f1f;padding-left:10px!important}
+.notifItem.onitNotifPending b{color:#171717!important}
+.badge.attentionPulse{background:#ff4f1f!important;color:#fff!important;animation:onitAttentionPulse 1.6s ease-in-out infinite}
+@keyframes onitAttentionPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.14)}}
+@media(max-width:820px){.brief.onitUnattendedBrief{padding-left:10px!important}.notifItem.onitNotifClickable{min-height:64px;padding:13px 8px!important}}
+@media(prefers-reduced-motion:reduce){.badge.attentionPulse{animation:none}}
