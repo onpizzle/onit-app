@@ -18,7 +18,7 @@
 <link rel="dns-prefetch" href="//www.gstatic.com">
 <link rel="dns-prefetch" href="//script.google.com">
 <link rel="manifest" href="manifest.webmanifest">
-<link rel="stylesheet" href="./dialog-system.css?v=0.34.0">
+<link rel="stylesheet" href="./dialog-system.css?v=0.35.0">
 <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
@@ -888,8 +888,9 @@ img,video,canvas,svg{max-width:100%}
 .reviewQueueNote{font-size:11px;color:#777;margin-top:6px}
 @media(max-width:760px){.reviewPreviewModal{padding:4px!important}.reviewPreviewModal .modalBox{width:100%!important;height:calc(100dvh - 8px)!important;max-height:none!important;border-radius:12px!important}.previewAssetStage{padding:5px}.previewFooter{padding:7px}.previewNav{justify-content:flex-start;overflow-x:auto;flex-wrap:nowrap}.previewNav .mini{white-space:nowrap}}
 </style>
-<link rel="stylesheet" href="./cases-module.css?v=0.34.0">
-<link rel="stylesheet" href="./pulse-module.css?v=0.34.0">
+<link rel="stylesheet" href="./cases-module.css?v=0.35.0">
+<link rel="stylesheet" href="./activation-command.css?v=0.35.0">
+<link rel="stylesheet" href="./pulse-module.css?v=0.35.0">
 
 <style id="onit-mobile-nav-v0212">
 .navLabelMobile{display:none!important}
@@ -1003,8 +1004,8 @@ html.onitReduceMotion *,html.onitReduceMotion *::before,html.onitReduceMotion *:
   *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
 }
 </style>
-<link rel="stylesheet" href="./assist-traffic-module.css?v=0.34.0">
-<link rel="stylesheet" href="./core-intelligence.css?v=0.34.0">
+<link rel="stylesheet" href="./assist-traffic-module.css?v=0.35.0">
+<link rel="stylesheet" href="./core-intelligence.css?v=0.35.0">
 <style id="role-consistency-v0311">
 /* ONIT v0.31.2 — role authority + Digital Pulse access hardening */
 .radarMorningGrid .morningMetric b,
@@ -1017,8 +1018,8 @@ html.onitReduceMotion *,html.onitReduceMotion *::before,html.onitReduceMotion *:
 .radarLevel{color:#f2f2ee!important}
 </style>
 
-<link rel="stylesheet" href="./autocare-module.css?v=0.34.0">
-<link rel="stylesheet" href="./command-palette.css?v=0.34.0">
+<link rel="stylesheet" href="./autocare-module.css?v=0.35.0">
+<link rel="stylesheet" href="./command-palette.css?v=0.35.0">
 
 </head>
 <body>
@@ -1077,6 +1078,7 @@ html.onitReduceMotion *,html.onitReduceMotion *::before,html.onitReduceMotion *:
     <button id="navData" class="hiddenByRole mobileSecondaryNav" data-section="data" onclick="show('data',this)"><span class="navIcon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5h14v14H5zM8 9h8M8 13h8M8 17h5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="navLabel">Data</span></button>
     <button id="navPulse" class="hiddenByRole mobilePrimaryNav" data-section="pulse" onclick="show('pulse',this)"><span class="navIcon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 13h4l2-6 4 11 2-6h6" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="navLabel navLabelDesktop">Digital Pulse</span><span class="navLabel navLabelMobile">Pulse</span></button>
     <button id="navCases" class="hiddenByRole mobileSecondaryNav" data-section="cases" onclick="show('cases',this)"><span class="navIcon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7.5h6l1.5 2H20v9.5H4zM4 7.5V5h6l1.5 2.5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="navLabel">Cases</span></button>
+    <button id="navActivation" class="hiddenByRole mobileSecondaryNav" data-section="activation" onclick="show('activation',this)"><span class="navIcon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 18h16M6 18V9l6-4 6 4v9M9 18v-5h6v5M3.5 9.5 12 3l8.5 6.5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="navLabel">Activation</span></button>
     <button id="navMore" class="mobilePrimaryNav" data-section="more" onclick="handleMoreNavigation(this)"><span class="navIcon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="1.6" fill="currentColor"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/><circle cx="19" cy="12" r="1.6" fill="currentColor"/></svg></span><span class="navLabel navLabelDesktop">Settings</span><span class="navLabel navLabelMobile">More</span></button>
   </div>
   <div class="navFooter">
@@ -1093,6 +1095,7 @@ html.onitReduceMotion *,html.onitReduceMotion *::before,html.onitReduceMotion *:
       <button type="button" onclick="openMobileMoreSection('memory')"><span class="mobileMoreIcon"><svg viewBox="0 0 24 24"><path d="M5 5.5h14v13H5zM8 9h8M8 12.5h5M7 3.5h10" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span><b>Memory</b><small>Search ONIT's organisational memory</small></span><span class="mobileMoreChevron">›</span></button>
       <button id="mobileMoreData" type="button" onclick="openMobileMoreSection('data')"><span class="mobileMoreIcon"><svg viewBox="0 0 24 24"><path d="M5 5h14v14H5zM8 9h8M8 13h8M8 17h5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span><b>Data</b><small>Reports and authorised datasets</small></span><span class="mobileMoreChevron">›</span></button>
       <button id="mobileMoreCases" type="button" onclick="openMobileMoreSection('cases')"><span class="mobileMoreIcon"><svg viewBox="0 0 24 24"><path d="M4 7.5h6l1.5 2H20v9.5H4zM4 7.5V5h6l1.5 2.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span><b>Cases</b><small>Evidence-backed case studies</small></span><span class="mobileMoreChevron">›</span></button>
+      <button id="mobileMoreActivation" class="hiddenByRole" type="button" onclick="openMobileMoreSection('activation')"><span class="mobileMoreIcon"><svg viewBox="0 0 24 24"><path d="M4 18h16M6 18V9l6-4 6 4v9M9 18v-5h6v5M3.5 9.5 12 3l8.5 6.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span><b>Activation Command</b><small>Private on-ground operations</small></span><span class="mobileMoreChevron">›</span></button>
       <button type="button" onclick="openMobileMoreSection('more')"><span class="mobileMoreIcon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M19 12a7 7 0 0 0-.1-1l2-1.6-2-3.4-2.5 1a7 7 0 0 0-1.8-1L14.2 3h-4.4l-.4 3a7 7 0 0 0-1.8 1L5.1 6 3 9.4 5.1 11a7 7 0 0 0 0 2L3 14.6 5.1 18l2.5-1a7 7 0 0 0 1.8 1l.4 3h4.4l.4-3a7 7 0 0 0 1.8-1l2.5 1 2.1-3.4-2.1-1.6c.1-.3.1-.7.1-1z" fill="none" stroke="currentColor" stroke-width="1.45" stroke-linejoin="round"/></svg></span><span><b>Settings</b><small>Profile, notifications and access</small></span><span class="mobileMoreChevron">›</span></button>
     </div>
   </div>
@@ -1163,6 +1166,7 @@ html.onitReduceMotion *,html.onitReduceMotion *::before,html.onitReduceMotion *:
 
 <section id="pulse" class="hidden"><div id="pulseRoot"><div class="dpLoading"><span class="dpSpinner"></span><div><b>Digital Pulse is checking access.</b><div class="tiny">ONIT is loading the Digital Strategy workspace.</div></div></div></div></section>
 <section id="cases" class="hidden"><div id="casesRoot"><div class="caseEmpty">Cases is locked until ONIT verifies access.</div></div></section>
+<section id="activation" class="hidden"><div id="activationRoot"><div class="activationEmpty">Activation Command is locked until ONIT verifies private access.</div></div></section>
 <section id="more" class="hidden"><h1>Settings</h1><p class="muted">Manage your profile, notifications, access and organisation preferences.</p><div id="moreContent"></div></section>
 
 <section id="newbrief" class="hidden">
@@ -1208,8 +1212,8 @@ html.onitReduceMotion *,html.onitReduceMotion *::before,html.onitReduceMotion *:
 <script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-messaging-compat.js"></script>
-<script>const APP_VERSION='0.34.0';
-const UI_REVISION=3400;
+<script>const APP_VERSION='0.35.0';
+const UI_REVISION=3500;
 const DASHBOARD_UI_REVISION=34001;
 const DASHBOARD_UI_STORAGE_KEY='onit-dashboard-ui-state-v1';
 window.ONIT_RUNTIME={version:APP_VERSION,uiRevision:UI_REVISION,dashboardUiRevision:DASHBOARD_UI_REVISION};
@@ -1303,7 +1307,7 @@ function onitSystemPrefersReducedMotion(){return !!window.matchMedia&&window.mat
 function onitReducedMotionEnabled(){const saved=localStorage.getItem(ONIT_REDUCE_MOTION_KEY);return saved===null?onitSystemPrefersReducedMotion():saved==='1'}
 function applyOnitMotionPreference(){document.documentElement.classList.toggle('onitReduceMotion',onitReducedMotionEnabled())}
 function toggleOnitReducedMotion(box){localStorage.setItem(ONIT_REDUCE_MOTION_KEY,box.checked?'1':'0');applyOnitMotionPreference();showToast('Motion preference',box.checked?'Reduced motion is on. ONIT will keep transitions minimal.':'Reduced motion is off. Subtle interface motion is enabled.');renderMore()}
-function updateNavAccessibility(sectionId){document.querySelectorAll('.nav button[data-section]').forEach(btn=>{const active=btn.classList.contains('active')||btn.dataset.section===sectionId&&(!mobileNavMode()||!['archive','memory','data','cases','more'].includes(sectionId));if(active)btn.setAttribute('aria-current','page');else btn.removeAttribute('aria-current')})}
+function updateNavAccessibility(sectionId){document.querySelectorAll('.nav button[data-section]').forEach(btn=>{const active=btn.classList.contains('active')||btn.dataset.section===sectionId&&(!mobileNavMode()||!['archive','memory','data','cases','activation','more'].includes(sectionId));if(active)btn.setAttribute('aria-current','page');else btn.removeAttribute('aria-current')})}
 function animateOnitSection(section){if(!section||onitReducedMotionEnabled())return;section.classList.remove('onitSectionEnter');void section.offsetWidth;section.classList.add('onitSectionEnter');setTimeout(()=>section.classList.remove('onitSectionEnter'),320)}
 function decorateOnitInteractiveRegions(root=document){root.querySelectorAll?.('.brief[onclick],.memoryResult[onclick],.trafficQueueCard[onclick],.resourceCard[onclick]').forEach(el=>{if(!el.hasAttribute('tabindex'))el.tabIndex=0;if(!el.hasAttribute('role'))el.setAttribute('role','button')})}
 function onitOpenModal(){return [...document.querySelectorAll('.modal:not(.hidden)')].pop()||null}
@@ -1485,8 +1489,8 @@ async function loadFromGoogle(strict=false,silent=false){
 }
 function mobileNavMode(){return window.matchMedia&&window.matchMedia('(max-width:820px)').matches}
 function currentVisibleSection(){const s=[...document.querySelectorAll('main>section')].find(x=>!x.classList.contains('hidden'));return s?.id||'home'}
-function syncMobileNavActive(id){const moreSections=['archive','memory','data','cases','more'];document.querySelectorAll('.nav button').forEach(x=>x.classList.toggle('active',mobileNavMode()?(moreSections.includes(id)?x.id==='navMore':x.dataset.section===id):x.dataset.section===id))}
-function syncMobileMorePermissions(){const data=document.getElementById('mobileMoreData'),cases=document.getElementById('mobileMoreCases'),navData=document.getElementById('navData'),navCases=document.getElementById('navCases');if(data&&navData)data.classList.toggle('hiddenByRole',navData.classList.contains('hiddenByRole'));if(cases&&navCases)cases.classList.toggle('hiddenByRole',navCases.classList.contains('hiddenByRole'))}
+function syncMobileNavActive(id){const moreSections=['archive','memory','data','cases','activation','more'];document.querySelectorAll('.nav button').forEach(x=>x.classList.toggle('active',mobileNavMode()?(moreSections.includes(id)?x.id==='navMore':x.dataset.section===id):x.dataset.section===id))}
+function syncMobileMorePermissions(){const data=document.getElementById('mobileMoreData'),cases=document.getElementById('mobileMoreCases'),activation=document.getElementById('mobileMoreActivation'),navData=document.getElementById('navData'),navCases=document.getElementById('navCases'),navActivation=document.getElementById('navActivation');if(data&&navData)data.classList.toggle('hiddenByRole',navData.classList.contains('hiddenByRole'));if(cases&&navCases)cases.classList.toggle('hiddenByRole',navCases.classList.contains('hiddenByRole'));if(activation&&navActivation)activation.classList.toggle('hiddenByRole',navActivation.classList.contains('hiddenByRole'))}
 function handleMoreNavigation(btn){if(!mobileNavMode())return show('more',btn);syncMobileMorePermissions();const back=document.getElementById('mobileMoreBackdrop');if(!back)return;back.classList.add('open');back.setAttribute('aria-hidden','false');document.body.classList.add('mobileMoreOpen');document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active'));btn?.classList.add('active')}
 function closeMobileMore(restore=true){const back=document.getElementById('mobileMoreBackdrop');if(back){back.classList.remove('open');back.setAttribute('aria-hidden','true')}document.body.classList.remove('mobileMoreOpen');if(restore)syncMobileNavActive(currentVisibleSection())}
 function openMobileMoreSection(id){closeMobileMore(false);show(id)}
@@ -2711,16 +2715,17 @@ setInterval(()=>{const now=Date.now(),gap=firebaseRealtimeHealthy?60000:15000;if
 async function boot(){if(SESSION_TOKEN){document.getElementById('authGate').classList.add('hidden');document.getElementById('appShell').classList.remove('hidden');await loadFromGoogle(false);if(SESSION_TOKEN)return}document.getElementById('appShell').classList.add('hidden');document.getElementById('authGate').classList.remove('hidden');showAuthMode('signin')}
 document.addEventListener('DOMContentLoaded',()=>boot(),{once:true});
 </script>
-<script src="./dialog-system.js?v=0.34.0"></script>
-<script src="./authority-engine.js?v=0.34.0"></script>
-<script src="./sync-engine.js?v=0.34.0"></script>
-<script src="./release-guard.js?v=0.34.0"></script>
-<script src="./command-palette.js?v=0.34.0"></script>
-<script src="./autocare-module.js?v=0.34.0"></script>
-<script src="./cases-module.js?v=0.34.0"></script>
-<script src="./pulse-module.js?v=0.34.0"></script>
-<script src="./assist-traffic-module.js?v=0.34.0"></script>
-<script src="./core-intelligence.js?v=0.34.0"></script>
+<script src="./dialog-system.js?v=0.35.0"></script>
+<script src="./authority-engine.js?v=0.35.0"></script>
+<script src="./sync-engine.js?v=0.35.0"></script>
+<script src="./release-guard.js?v=0.35.0"></script>
+<script src="./command-palette.js?v=0.35.0"></script>
+<script src="./autocare-module.js?v=0.35.0"></script>
+<script src="./cases-module.js?v=0.35.0"></script>
+<script src="./activation-command.js?v=0.35.0"></script>
+<script src="./pulse-module.js?v=0.35.0"></script>
+<script src="./assist-traffic-module.js?v=0.35.0"></script>
+<script src="./core-intelligence.js?v=0.35.0"></script>
 </body>
 </html>
 
