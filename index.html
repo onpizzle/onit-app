@@ -24,7 +24,7 @@
 <link rel="preconnect" href="https://script.google.com">
 <link rel="dns-prefetch" href="//www.gstatic.com">
 <link rel="dns-prefetch" href="//script.google.com">
-<link rel="stylesheet" href="./dialog-system.css?v=0.36.8.1">
+<link rel="stylesheet" href="./dialog-system.css?v=0.36.8.2">
 <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
@@ -896,10 +896,10 @@ img,video,canvas,svg{max-width:100%}
 .reviewQueueNote{font-size:11px;color:#777;margin-top:6px}
 @media(max-width:760px){.reviewPreviewModal{padding:4px!important}.reviewPreviewModal .modalBox{width:100%!important;height:calc(100dvh - 8px)!important;max-height:none!important;border-radius:12px!important}.previewAssetStage{padding:5px}.previewFooter{padding:7px}.previewNav{justify-content:flex-start;overflow-x:auto;flex-wrap:nowrap}.previewNav .mini{white-space:nowrap}}
 </style>
-<link rel="stylesheet" href="./cases-module.css?v=0.36.8.1">
-<link rel="stylesheet" href="./activation-command.css?v=0.36.8.1">
-<link rel="stylesheet" href="./ideas-dump.css?v=0.36.8.1">
-<link rel="stylesheet" href="./pulse-module.css?v=0.36.8.1">
+<link rel="stylesheet" href="./cases-module.css?v=0.36.8.2">
+<link rel="stylesheet" href="./activation-command.css?v=0.36.8.2">
+<link rel="stylesheet" href="./ideas-dump.css?v=0.36.8.2">
+<link rel="stylesheet" href="./pulse-module.css?v=0.36.8.2">
 
 <style id="onit-mobile-nav-v0212">
 .navLabelMobile{display:none!important}
@@ -1013,8 +1013,8 @@ html.onitReduceMotion *,html.onitReduceMotion *::before,html.onitReduceMotion *:
   *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
 }
 </style>
-<link rel="stylesheet" href="./assist-traffic-module.css?v=0.36.8.1">
-<link rel="stylesheet" href="./core-intelligence.css?v=0.36.8.1">
+<link rel="stylesheet" href="./assist-traffic-module.css?v=0.36.8.2">
+<link rel="stylesheet" href="./core-intelligence.css?v=0.36.8.2">
 <style id="role-consistency-v0311">
 /* ONIT v0.31.2 — role authority + Digital Pulse access hardening */
 .radarMorningGrid .morningMetric b,
@@ -1027,11 +1027,11 @@ html.onitReduceMotion *,html.onitReduceMotion *::before,html.onitReduceMotion *:
 .radarLevel{color:#f2f2ee!important}
 </style>
 
-<link rel="stylesheet" href="./autocare-module.css?v=0.36.8.1">
-<link rel="stylesheet" href="./command-palette.css?v=0.36.8.1">
+<link rel="stylesheet" href="./autocare-module.css?v=0.36.8.2">
+<link rel="stylesheet" href="./command-palette.css?v=0.36.8.2">
 
-<link rel="stylesheet" href="./visual-contrast.css?v=0.36.8.1">
-<link rel="stylesheet" href="./attention-loop.css?v=0.36.8.1">
+<link rel="stylesheet" href="./visual-contrast.css?v=0.36.8.2">
+<link rel="stylesheet" href="./attention-loop.css?v=0.36.8.2">
 </head>
 <body>
 <a class="onitSkipLink" href="#mainContent">Skip to main content</a>
@@ -1226,8 +1226,8 @@ html.onitReduceMotion *,html.onitReduceMotion *::before,html.onitReduceMotion *:
 <script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-messaging-compat.js"></script>
-<script>const APP_VERSION='0.36.8.1';
-const UI_REVISION=36811;
+<script>const APP_VERSION='0.36.8.2';
+const UI_REVISION=36812;
 const DASHBOARD_UI_REVISION=36801;
 const DASHBOARD_UI_STORAGE_KEY='onit-dashboard-ui-state-v1';
 window.ONIT_RUNTIME={version:APP_VERSION,uiRevision:UI_REVISION,dashboardUiRevision:DASHBOARD_UI_REVISION};
@@ -1254,10 +1254,11 @@ function uiSectionId(el){const s=el&&el.closest?el.closest('main>section'):null;
 function markUiDirty(el){const id=uiSectionId(el);if(id)uiDirtySections.add(id)}
 function clearUiDirty(id){if(id)uiDirtySections.delete(id)}
 function uiSectionIsDirty(id){return uiDirtySections.has(id)}
+function transientUiControl(el){return !!el&&(el.id==='briefSearch'||el.id==='memorySearch'||el.id==='teamSort'||el.matches?.('[data-onit-transient]'))}
 function trackUiEdit(e){
   const el=e.target;
   if(!el||!el.matches||!el.matches('input, textarea, select'))return;
-  if(el.type==='button'||el.type==='submit'||el.type==='reset')return;
+  if(el.type==='button'||el.type==='submit'||el.type==='reset'||transientUiControl(el))return;
   markUiDirty(el);
 }
 document.addEventListener('input',trackUiEdit,true);
@@ -1312,7 +1313,6 @@ function activeToAssignment(code){return activeToAssignments(code)[0]||null}
 function taskAcknowledged(code){const mine=currentUserAssignment(code,'TO');return !!rowVal(mine||activeToAssignment(code),'Acknowledged At','acknowledgedAt')}
 function assignmentReceiptMarkup(code){const rows=activeToAssignments(code);if(!rows.length)return `<span class='receiptBadge'>AWAITING ASSIGNMENT</span>`;return `<div class='assignmentReceipts'>${rows.map(a=>{const ack=rowVal(a,'Acknowledged At','acknowledgedAt'),name=rowVal(a,'Full Name','fullName')||'Assigned team member';return `<div class='assignmentReceiptRow'><span>${escapeHTML(name)}</span>${ack?`<span class='receiptBadge ok'>✓ ACKNOWLEDGED ${escapeHTML(formatDateTime(ack))}</span>`:`<span class='receiptBadge'>AWAITING ACKNOWLEDGEMENT</span>`}</div>`}).join('')}</div>`}
 function sameBrief(r,code){return String(rowVal(r,'Brief Code','briefCode','code'))===String(code)}
-function parseJsonArray(v){try{const a=JSON.parse(v||'[]');return Array.isArray(a)?a:[]}catch(e){return []}}
 function versionAtLeast(actual,min){const a=String(actual||'').split('.').map(Number),b=String(min).split('.').map(Number);for(let i=0;i<3;i++){const x=a[i]||0,y=b[i]||0;if(x>y)return true;if(x<y)return false}return true}
 let busyDepth=0,busyShowTimer=null,syncChipTimer=null;
 const ONIT_REDUCE_MOTION_KEY='onit-reduce-motion';
@@ -1403,7 +1403,7 @@ function stopFirebaseRealtime(){firebaseUnsubs.forEach(fn=>{try{fn()}catch(e){}}
 let firebaseRenderQueued=false;
 function firebaseRenderLive_(){
   if(window.ONITSync){ONITSync.emit('BRIEF_CHANGED');return}
-  if(firebaseRenderQueued)return;firebaseRenderQueued=true;requestAnimationFrame(()=>{firebaseRenderQueued=false;if(!document.getElementById('home').classList.contains('hidden'))renderHome();if(!document.getElementById('briefs').classList.contains('hidden'))renderBriefs();if(!document.getElementById('archive').classList.contains('hidden'))renderArchive();if(!document.getElementById('memory').classList.contains('hidden'))renderMemory(false);if(current&&!document.getElementById('detail').classList.contains('hidden')){current=briefs.find(b=>b.code===current.code)||current;renderDetail();}});
+  if(firebaseRenderQueued)return;firebaseRenderQueued=true;requestAnimationFrame(()=>{firebaseRenderQueued=false;if(!document.getElementById('home').classList.contains('hidden'))renderHome();if(!document.getElementById('briefs').classList.contains('hidden'))renderBriefs();if(!document.getElementById('archive').classList.contains('hidden'))renderArchive();if(!document.getElementById('memory').classList.contains('hidden'))memoryUpdateDynamic();if(current&&!document.getElementById('detail').classList.contains('hidden')){current=briefs.find(b=>b.code===current.code)||current;renderDetail();}});
 }
 function applyFirebaseBriefChange_(change){
   const data=firebasePlain_(change.doc.data()||{}),row=data.row||{},code=rowVal(row,'Brief Code')||data.briefCode||change.doc.id;if(!code)return;
@@ -1483,7 +1483,7 @@ async function loadFromGoogle(strict=false,silent=false){
         renderBriefFilters();
         if(!preserve.has('briefs'))renderBriefs();
         if(!preserve.has('archive'))renderArchive();
-        if(!document.getElementById('memory').classList.contains('hidden')&&!preserve.has('memory'))renderMemory(false);
+        if(!document.getElementById('memory').classList.contains('hidden')&&!preserve.has('memory'))memoryUpdateDynamic();
         if(!preserve.has('team'))renderTeam();
         if(!preserve.has('more'))renderMore();
         renderNotifications();queuePendingBuzzers_();runWhenIdle(()=>hydrateProfilePhotos(),500);runWhenIdle(()=>showNextBroadcast(),700);runWhenIdle(()=>startFirebaseRealtime(),900);
@@ -1800,7 +1800,7 @@ function renderBriefs(){const list=filteredBriefs();document.getElementById('bri
 function briefMarkup(b){const t=timeInfo(b),r=riskForBrief(b),clock=approvalClockInfo(b),code=encodeURIComponent(b.code).replace(/'/g,'%27'),s=String(b.status||''),statusClass=/Approved|Closed/i.test(s)?'ok':/Review/i.test(s)?'review':/Revision|Paused/i.test(s)?'warn':'active';return `<div class='brief' onclick="detail(decodeURIComponent('${code}'))"><div class='briefIdentity'><span class='briefThumb'>${escapeHTML((b.client||'O').charAt(0).toUpperCase())}</span><span class='briefCopy'><b>${escapeHTML(b.client)} — ${escapeHTML(b.project)}</b><small>${escapeHTML(b.code)} • ${escapeHTML(b.assignee||'Unassigned')}</small></span></div><div class='briefTags'><span class='statusChip ${statusClass}'>${escapeHTML(b.status)}</span>${b.iteration?`<span class='miniChip'>V${b.iteration}</span>`:`<span class='miniChip'>NEW</span>`}${clock?`<span class='approvalClock ${clock.cls}' data-approval-due='${escapeHTML(b.approvalDueAt)}'>${escapeHTML(clock.text)}</span>`:''}${r.score>=35?`<span class='miniChip risk ${r.level==='HIGH'?'high':''}'>Risk ${r.score}</span>`:''}</div><div class='timer ${t.cls}'>${escapeHTML(t.text)}</div><span class='rowArrow'>›</span></div>`}
 
 // ===== ONIT Experience Streamline v0.28.1 =====
-const memoryState={filter:'all',cases:[],pulse:null,ideas:[],externalLoaded:false,loading:false,lastExternalAt:0,errors:[]};
+const memoryState={filter:'all',query:'',cases:[],pulse:null,ideas:[],externalLoaded:false,loading:false,lastExternalAt:0,errors:[]};
 function memoryVal(o,...keys){for(const k of keys){const v=rowVal(o,k);if(v!==undefined&&v!==null&&String(v).trim()!=='')return v}return ''}
 function memoryText(v){if(Array.isArray(v))return v.map(memoryText).join(' ');if(v&&typeof v==='object')return Object.values(v).map(memoryText).join(' ');return String(v==null?'':v)}
 function memoryNorm(v){return memoryText(v).toLowerCase().normalize('NFKD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,' ').trim()}
@@ -1825,14 +1825,17 @@ function memoryPulseDocs(){const d=memoryState.pulse||{},out=[];const add=(rows,
 }
 function memoryIdeasDocs(){return (memoryState.ideas||[]).map(r=>{const id=memoryVal(r,'Signal ID','signalId'),brand=memoryVal(r,'Brand','brand'),theme=memoryVal(r,'Theme','theme'),type=memoryVal(r,'Signal Type','signalType');return{id:'ideas:'+id,source:'ideas',sourceLabel:'IDEAS',title:`${brand||'Agency'} — ${theme||type||'Signal'}`,subtitle:[type,memoryVal(r,'Route','route'),id].filter(Boolean).join(' • '),brand,people:memoryVal(r,'Contributor Department','department'),body:[memoryVal(r,'Observation','observation'),memoryVal(r,'Why It Matters','whyItMatters'),memoryVal(r,'Where Seen','whereSeen'),memoryVal(r,'Audience','audience'),memoryVal(r,'Tags','tags')].join(' '),date:memoryBestDate(memoryVal(r,'Updated At','updatedAt'),memoryVal(r,'Created At','createdAt')),signalId:id,action:'ideas'}})}
 function memoryAllDocs(){return [...memoryBriefDocs(),...memoryCaseDocs(),...memoryPulseDocs(),...memoryIdeasDocs()]}
-function memoryQuery(){return (document.getElementById('memorySearch')?.value||'').trim()}
+function memoryQuery(){const el=document.getElementById('memorySearch');if(el)memoryState.query=String(el.value||'');return String(memoryState.query||'').trim()}
 function memoryMatch(doc,q){const terms=memoryNorm(q).split(' ').filter(Boolean);if(!terms.length)return{score:0,why:[]};const fields=[['title',doc.title,8],['brand',doc.brand,6],['code',doc.briefCode||doc.caseId||'',7],['people',doc.people,5],['status',doc.subtitle,3],['content',doc.body,2]],why=[];let score=0;const full=memoryNorm([doc.title,doc.subtitle,doc.brand,doc.people,doc.body,doc.briefCode,doc.caseId].join(' '));for(const term of terms){if(!full.includes(term))return null;let best=0,label='content';for(const [name,val,w] of fields){if(memoryNorm(val).includes(term)&&w>best){best=w;label=name}}score+=best||1;if(!why.includes(label))why.push(label)}if(memoryNorm(doc.title).includes(memoryNorm(q)))score+=8;return{score,why}}
 function memorySnippet(doc,q){const raw=memoryText(doc.body).replace(/\s+/g,' ').trim();if(!raw)return doc.subtitle||'Open the original ONIT record for details.';const terms=memoryNorm(q).split(' ').filter(Boolean);let i=-1;for(const t of terms){i=memoryNorm(raw).indexOf(t);if(i>=0)break}const start=Math.max(0,i<0?0:i-70),snippet=raw.slice(start,start+210);return `${start?'…':''}${snippet}${start+210<raw.length?'…':''}`}
 function memoryFilteredDocs(){const q=memoryQuery(),filter=memoryState.filter;let docs=memoryAllDocs().filter(d=>filter==='all'||d.source===filter);const scored=docs.map(d=>{const m=memoryMatch(d,q);return m?{...d,_score:m.score,_why:m.why}:null}).filter(Boolean);if(!q)return scored.sort((a,b)=>memoryDateValue(b.date)-memoryDateValue(a.date));return scored.sort((a,b)=>(b._score-a._score)||(memoryDateValue(b.date)-memoryDateValue(a.date)))}
+function memoryDynamicMarkup_(){const q=memoryQuery(),docs=memoryFilteredDocs();return{q,docs,counts:{work:memoryBriefDocs().length,case:memoryCaseDocs().length,digital:memoryPulseDocs().length,ideas:memoryIdeasDocs().length}}}
+function memoryUpdateDynamic(){const x=memoryDynamicMarkup_(),q=x.q,docs=x.docs,c=x.counts;const ids={work:'memoryCountWork',case:'memoryCountCase',digital:'memoryCountDigital',ideas:'memoryCountIdeas'};Object.keys(ids).forEach(k=>{const el=document.getElementById(ids[k]);if(el)el.textContent=String(c[k]||0)});const status=document.getElementById('memoryStatus');if(status)status.innerHTML=memoryState.loading?`<span class='memoryLoading'><i class='memoryDot'></i> Checking sources…</span>`:memoryState.errors.length?`Some sources unavailable: ${escapeHTML(memoryState.errors.join(', '))}`:`${docs.length} ${q?'match'+(docs.length===1?'':'es'):'recent record'+(docs.length===1?'':'s')}`;const results=document.querySelector('#memoryRoot .memoryResults');if(results)results.innerHTML=docs.length?docs.slice(0,60).map(d=>memoryResultMarkup(d,q)).join(''):`<div class='memoryEmpty'><b>${q?'Nothing matched that search.':'No organisational memory is available to this account yet.'}</b>${q?'Try a brand, project, person, brief code or phrase from the work.':'As ONIT captures work, Cases, Digital and Ideas Dump signals, they will become searchable here.'}</div>`;decorateOnitInteractiveRegions(document.getElementById('memoryRoot'));}
+function memoryHandleInput(el){memoryState.query=String(el?.value||'');memoryUpdateDynamic()}
 function memoryFormatDate(v){if(!memoryDateValue(v))return '';try{return new Date(v).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric',timeZone:'Africa/Lagos'})}catch(e){return ''}}
 function memoryOpen(id){const d=memoryAllDocs().find(x=>x.id===id);if(!d)return;if(d.action==='brief')return detail(d.briefCode);if(d.action==='case'){show('cases');setTimeout(()=>{if(window.CasesModule?.selectCase)CasesModule.selectCase(d.caseId)},100);return}if(d.action==='pulse'){show('pulse');setTimeout(()=>{if(window.DigitalPulse?.openTab)DigitalPulse.openTab(d.pulseTab||'listening')},100);return}if(d.action==='ideas'){show('ideas');setTimeout(()=>{if(window.IdeasDump?.openSignal)IdeasDump.openSignal(d.signalId)},100)}}
-function memorySetFilter(filter){memoryState.filter=filter;renderMemory(false)}
-function memorySetExample(q){const el=document.getElementById('memorySearch');if(el){el.value=q;renderMemory(false);el.focus()}}
+function memorySetFilter(filter){memoryState.filter=filter;document.querySelectorAll('.memoryFilters button').forEach(b=>b.classList.toggle('active',String(b.dataset.memoryFilter||'')===filter));memoryUpdateDynamic()}
+function memorySetExample(q){memoryState.query=String(q||'');const el=document.getElementById('memorySearch');if(el){el.value=memoryState.query;memoryUpdateDynamic();el.focus();try{el.setSelectionRange(el.value.length,el.value.length)}catch(e){}}}
 async function loadMemoryExternal(force=false){if(memoryState.loading)return;if(!force&&memoryState.externalLoaded&&Date.now()-memoryState.lastExternalAt<60000)return;memoryState.loading=true;memoryState.errors=[];if(document.getElementById('memoryStatus'))document.getElementById('memoryStatus').innerHTML=`<span class='memoryLoading'><i class='memoryDot'></i> Checking Cases + Digital + Ideas…</span>`;try{
   const [casesResult,pulseResult,ideasResult]=await Promise.allSettled([
     (async()=>{const r=await apiPost('CASES_CAPABILITIES',{},true),cap=r.data||r;if(!cap.canUse)return[];const list=await apiPost('CASES_LIST',{},true),d=list.data||list;return d.cases||[]})(),
@@ -1843,11 +1846,10 @@ async function loadMemoryExternal(force=false){if(memoryState.loading)return;if(
   if(pulseResult.status==='fulfilled')memoryState.pulse=pulseResult.value||null;else memoryState.errors.push('Digital');
   if(ideasResult.status==='fulfilled')memoryState.ideas=ideasResult.value||[];else memoryState.errors.push('Ideas');
   memoryState.externalLoaded=true;memoryState.lastExternalAt=Date.now();
- }finally{memoryState.loading=false;if(!document.getElementById('memory')?.classList.contains('hidden'))renderMemory(false)}}
-function refreshMemory(){memoryState.externalLoaded=false;memoryState.cases=[];memoryState.pulse=null;memoryState.ideas=[];renderMemory(false);loadMemoryExternal(true)}
+ }finally{memoryState.loading=false;if(!document.getElementById('memory')?.classList.contains('hidden'))memoryUpdateDynamic()}}
+function refreshMemory(){memoryState.externalLoaded=false;memoryState.cases=[];memoryState.pulse=null;memoryState.ideas=[];memoryUpdateDynamic();loadMemoryExternal(true)}
 function memoryResultMarkup(d,q){const icon=d.source==='work'?'WORK':d.source==='case'?'CASE':d.source==='ideas'?'IDEA':'PULSE',date=memoryFormatDate(d.date),why=(d._why||[]).slice(0,3),link=memorySafeUrl(d.link);return `<article class='memoryResult'><div class='memorySourceIcon ${escapeHTML(d.source)}'>${icon}</div><div><h3>${escapeHTML(d.title)}</h3><div class='memoryMeta'>${escapeHTML([d.sourceLabel,d.subtitle,date].filter(Boolean).join(' • '))}</div><div class='memorySnippet'>${escapeHTML(memorySnippet(d,q))}</div>${why.length?`<div class='memoryWhy'>${why.map(x=>`<span>MATCHED ${escapeHTML(x)}</span>`).join('')}</div>`:''}</div><div class='memoryActions'><button class='memoryOpen' onclick="memoryOpen('${escapeHTML(d.id)}')">OPEN ORIGINAL</button>${link?`<a class='memoryExternal' href='${escapeHTML(link)}' target='_blank' rel='noopener' title='Open linked work'>↗</a>`:''}</div></article>`}
-function renderMemory(loadExternal=true){const root=document.getElementById('memoryRoot');if(!root)return;const previous=memoryQuery(),docs=memoryFilteredDocs(),counts={work:memoryBriefDocs().length,case:memoryCaseDocs().length,digital:memoryPulseDocs().length,ideas:memoryIdeasDocs().length},q=previous;root.innerHTML=`<div class='memoryShell'><div class='memoryHero'><div class='memoryHeroTop'><div><div class='memoryEyebrow'>ONIT • ORGANISATIONAL MEMORY</div><h1>Memory</h1><p>Find work, decisions, evidence, digital learning and real-world agency signals the organisation has already captured. ONIT only searches records this account is already authorised to see.</p></div><button class='memoryRefresh' onclick='refreshMemory()'>REFRESH MEMORY</button></div><div class='memorySearchWrap'><input id='memorySearch' value='${escapeHTML(q)}' placeholder='Search a brand, campaign, person, insight, revision or phrase…' oninput='renderMemory(false)' onkeydown="if(event.key==='Enter'){event.preventDefault();renderMemory(false)}"><button class='memorySearchBtn' onclick='renderMemory(false)'>SEARCH</button></div><div class='memoryPrompt'><button onclick="memorySetExample('Christmas campaign')">Christmas campaign</button><button onclick="memorySetExample('client revision')">Client revision</button><button onclick="memorySetExample('Gen Z')">Gen Z</button><button onclick="memorySetExample('approved')">Approved work</button></div></div><div class='memorySourceSummary'><div class='memorySourceStat'><b>${counts.work}</b><span>VISIBLE WORK RECORDS</span></div><div class='memorySourceStat'><b>${counts.case}</b><span>VISIBLE CASES</span></div><div class='memorySourceStat'><b>${counts.digital}</b><span>DIGITAL SIGNALS</span></div><div class='memorySourceStat'><b>${counts.ideas}</b><span>IDEAS / SIGNALS</span></div></div><div class='memoryToolbar'><div class='memoryFilters'>${[['all','ALL'],['work','WORK'],['case','CASES'],['digital','DIGITAL'],['ideas','IDEAS']].map(([id,l])=>`<button class='${memoryState.filter===id?'active':''}' onclick="memorySetFilter('${id}')">${l}</button>`).join('')}</div><div class='memoryStatus' id='memoryStatus'>${memoryState.loading?`<span class='memoryLoading'><i class='memoryDot'></i> Checking sources…</span>`:memoryState.errors.length?`Some sources unavailable: ${escapeHTML(memoryState.errors.join(', '))}`:`${docs.length} ${q?'match'+(docs.length===1?'':'es'):'recent record'+(docs.length===1?'':'s')}`}</div></div><div class='memoryResults'>${docs.length?docs.slice(0,60).map(d=>memoryResultMarkup(d,q)).join(''):`<div class='memoryEmpty'><b>${q?'Nothing matched that search.':'No organisational memory is available to this account yet.'}</b>${q?'Try a brand, project, person, brief code or phrase from the work.':'As ONIT captures work, Cases, Digital and Ideas Dump signals, they will become searchable here.'}</div>`}</div></div>`;if(loadExternal&&!memoryState.externalLoaded&&!memoryState.loading)setTimeout(()=>loadMemoryExternal(false),0)}
-
+function renderMemory(loadExternal=true){const root=document.getElementById('memoryRoot');if(!root)return;const existing=document.getElementById('memorySearch');if(existing)memoryState.query=String(existing.value||'');const x=memoryDynamicMarkup_(),docs=x.docs,counts=x.counts,q=x.q;root.innerHTML=`<div class='memoryShell'><div class='memoryHero'><div class='memoryHeroTop'><div><div class='memoryEyebrow'>ONIT • ORGANISATIONAL MEMORY</div><h1>Memory</h1><p>Find work, decisions, evidence, digital learning and real-world agency signals the organisation has already captured. ONIT only searches records this account is already authorised to see.</p></div><button class='memoryRefresh' onclick='refreshMemory()'>REFRESH MEMORY</button></div><div class='memorySearchWrap'><input id='memorySearch' data-onit-transient value='${escapeHTML(memoryState.query)}' placeholder='Search a brand, campaign, person, insight, revision or phrase…' oninput='memoryHandleInput(this)' onkeydown="if(event.key==='Enter'){event.preventDefault();memoryUpdateDynamic()}"><button class='memorySearchBtn' onclick='memoryUpdateDynamic()'>SEARCH</button></div><div class='memoryPrompt'><button onclick="memorySetExample('Christmas campaign')">Christmas campaign</button><button onclick="memorySetExample('client revision')">Client revision</button><button onclick="memorySetExample('Gen Z')">Gen Z</button><button onclick="memorySetExample('approved')">Approved work</button></div></div><div class='memorySourceSummary'><div class='memorySourceStat'><b id='memoryCountWork'>${counts.work}</b><span>VISIBLE WORK RECORDS</span></div><div class='memorySourceStat'><b id='memoryCountCase'>${counts.case}</b><span>VISIBLE CASES</span></div><div class='memorySourceStat'><b id='memoryCountDigital'>${counts.digital}</b><span>DIGITAL SIGNALS</span></div><div class='memorySourceStat'><b id='memoryCountIdeas'>${counts.ideas}</b><span>IDEAS / SIGNALS</span></div></div><div class='memoryToolbar'><div class='memoryFilters'>${[['all','ALL'],['work','WORK'],['case','CASES'],['digital','DIGITAL'],['ideas','IDEAS']].map(([id,l])=>`<button data-memory-filter='${id}' class='${memoryState.filter===id?'active':''}' onclick="memorySetFilter('${id}')">${l}</button>`).join('')}</div><div class='memoryStatus' id='memoryStatus'>${memoryState.loading?`<span class='memoryLoading'><i class='memoryDot'></i> Checking sources…</span>`:memoryState.errors.length?`Some sources unavailable: ${escapeHTML(memoryState.errors.join(', '))}`:`${docs.length} ${q?'match'+(docs.length===1?'':'es'):'recent record'+(docs.length===1?'':'s')}`}</div></div><div class='memoryResults'>${docs.length?docs.slice(0,60).map(d=>memoryResultMarkup(d,q)).join(''):`<div class='memoryEmpty'><b>${q?'Nothing matched that search.':'No organisational memory is available to this account yet.'}</b>${q?'Try a brand, project, person, brief code or phrase from the work.':'As ONIT captures work, Cases, Digital and Ideas Dump signals, they will become searchable here.'}</div>`}</div></div>`;decorateOnitInteractiveRegions(root);if(loadExternal&&!memoryState.externalLoaded&&!memoryState.loading)setTimeout(()=>loadMemoryExternal(false),0)}
 function renderArchive(){const closed=briefs.filter(b=>b.status==='Closed').slice().sort((a,z)=>new Date(z.closedAt||z.updatedAt||z.createdAt||0)-new Date(a.closedAt||a.updatedAt||a.createdAt||0));document.getElementById('archiveList').innerHTML=closed.length?closed.map(briefMarkup).join(''):`<div class='empty'>No closed briefs yet.</div>`}
 function renderTeam(){document.getElementById('teamGrid').innerHTML=teamWorkload.length?teamWorkload.map(teamMarkup).join(''):`<div class='empty'>No team data yet.</div>`;hydrateProfilePhotos()}
 
@@ -2222,6 +2224,9 @@ async function enablePushNotifications(){
 }
 function pushNotificationStatus_(){if(typeof Notification==='undefined')return'UNSUPPORTED';if(Notification.permission==='granted'&&pushTokenRegistered)return'ON';if(Notification.permission==='denied')return'BLOCKED';return'OFF'}
 async function ensurePushRegistrationQuietly(){if(typeof Notification==='undefined'||Notification.permission!=='granted'||!SESSION_TOKEN||typeof firebase==='undefined'||!firebase.messaging)return;try{const configRes=await apiPost('getPushConfig',{}),cfg=configRes.data||configRes;if(!cfg.enabled||!cfg.vapidKey)return;if(!firebase.apps.length)firebaseApp=firebase.initializeApp(FIREBASE_CONFIG);firebaseMessaging=firebase.messaging();const reg=await navigator.serviceWorker.ready,token=await firebaseMessaging.getToken({vapidKey:cfg.vapidKey,serviceWorkerRegistration:reg});if(token&&token!==pushTokenRegistered){const uid=firebase.auth().currentUser?.uid||'';await apiPost('registerPushToken',{fcmToken:token,firebaseUid:uid,deviceLabel:navigator.userAgent});pushTokenRegistered=token;}}catch(e){console.warn('ONIT push registration:',e)}}
+function notificationRouteTarget_(n){const code=String(rowVal(n,'Brief Code')||''),type=String(rowVal(n,'Type')||'').toUpperCase();if(code){const b=briefs.find(x=>String(x.code)===code);if(b)return()=>detail(code);return()=>{show('memory');memorySetExample(code);showToast('Brief not in live workspace',`${code} is not loaded in the current workspace. Memory has been searched for it.`)}}if(/DATA_EXPORT|BACKEND_DATA/.test(type))return()=>show('data');if(/PULSE|DIGITAL/.test(type))return()=>show('pulse');if(/CASE/.test(type))return()=>show('cases');if(/ACTIVATION/.test(type))return()=>show('activation');if(/IDEA|SIGNAL|PROACTIVE/.test(type))return()=>show('ideas');if(type==='OWNER_BROADCAST')return()=>onitAlert(`${rowVal(n,'Title')||'Announcement'}\n\n${rowVal(n,'Message')||''}`);return()=>showToast(rowVal(n,'Title')||'ONIT update',rowVal(n,'Message')||'')}
+async function openNotificationTarget(id){const n=notifications.find(x=>String(rowVal(x,'Notification ID'))===String(id));if(!n)return;const nid=rowVal(n,'Notification ID');document.getElementById('notifPanel')?.classList.add('hidden');if(!truthy(rowVal(n,'Read'))){n['Read']=true;n['Read At']=new Date().toISOString();renderNotifications();if(nid)apiPost('markNotificationsRead',{notificationIds:[nid]}).catch(e=>console.warn('Notification read receipt:',e))}const go=notificationRouteTarget_(n);setTimeout(()=>{try{go()}catch(e){console.warn('Notification route:',e);show('home')}},0)}
+window.openNotificationTarget=openNotificationTarget;
 function renderNotifications(){
   const list=notifications.slice().sort((a,b)=>new Date(rowVal(b,'Created At')||0)-new Date(rowVal(a,'Created At')||0));
   const unread=list.filter(n=>!truthy(rowVal(n,'Read')));
@@ -2229,25 +2234,19 @@ function renderNotifications(){
   badge.textContent=unread.length;
   badge.classList.toggle('hidden',!unread.length);
   const items=list.length
-    ? list.map(n=>`<div class='notifItem ${truthy(rowVal(n,'Read'))?'':'unread'}'><b>${escapeHTML(rowVal(n,'Title'))}</b><div class='muted'>${escapeHTML(rowVal(n,'Message'))}</div><div class='tiny'>${escapeHTML(rowVal(n,'Brief Code'))}${truthy(rowVal(n,'Action Required'))?' • ACTION REQUIRED':''}${rowVal(n,'Type')==='OWNER_BROADCAST'?' • MANAGEMENT ANNOUNCEMENT':''} • ${escapeHTML(formatDateTime(rowVal(n,'Created At')))}</div></div>`).join('')
+    ? list.map(n=>{const id=encodeURIComponent(String(rowVal(n,'Notification ID')||''));return `<button type='button' class='notifItem onitNotifClickable ${truthy(rowVal(n,'Read'))?'':'unread'}' onclick="openNotificationTarget(decodeURIComponent('${id}'))"><b>${escapeHTML(rowVal(n,'Title'))}</b><div class='muted'>${escapeHTML(rowVal(n,'Message'))}</div><div class='tiny'>${escapeHTML(rowVal(n,'Brief Code'))}${truthy(rowVal(n,'Action Required'))?' • ACTION REQUIRED':''}${rowVal(n,'Type')==='OWNER_BROADCAST'?' • MANAGEMENT ANNOUNCEMENT':''} • ${escapeHTML(formatDateTime(rowVal(n,'Created At')))}</div></button>`}).join('')
     : `<p class='muted'>No notifications yet.</p>`;
   document.getElementById('notifPanel').innerHTML=`<b>Notifications</b>${items}`;
   const fresh=unread.filter(n=>!announcedNotifications.has(rowVal(n,'Notification ID')));
   if(fresh.length){
     const newest=fresh[0],briefFresh=fresh.filter(n=>isBriefAlertType(rowVal(n,'Type'))),ntype=rowVal(newest,'Type');
     if(ntype!=='OWNER_BROADCAST'&&ntype!=='BUZZER')showToast(rowVal(newest,'Title'),rowVal(newest,'Message'));
-    if(briefFresh.length){
-      const b=briefFresh[0],briefIds=briefFresh.map(n=>rowVal(n,'Notification ID')).filter(Boolean);
-      const sounded=playBriefAlertSound();
-      if(!sounded&&notificationSoundEnabled())queueBriefAlertSound(briefIds);
-      showSystemNotification('ONIT • NEW BRIEF',rowVal(b,'Message'));
-    }
+    if(briefFresh.length){const b=briefFresh[0],briefIds=briefFresh.map(n=>rowVal(n,'Notification ID')).filter(Boolean);const sounded=playBriefAlertSound();if(!sounded&&notificationSoundEnabled())queueBriefAlertSound(briefIds);showSystemNotification('ONIT • NEW BRIEF',rowVal(b,'Message'));}
     else if(ntype!=='BUZZER'){playNotificationSound();showSystemNotification(rowVal(newest,'Title'),rowVal(newest,'Message'));}
-    fresh.forEach(n=>announcedNotifications.add(rowVal(n,'Notification ID')));
-    localStorage.setItem(announcedKey(CURRENT_USER_ID),JSON.stringify([...announcedNotifications]));
+    fresh.forEach(n=>announcedNotifications.add(rowVal(n,'Notification ID')));localStorage.setItem(announcedKey(CURRENT_USER_ID),JSON.stringify([...announcedNotifications]));
   }
 }
-async function toggleNotifications(){const panel=document.getElementById('notifPanel'),opening=panel.classList.contains('hidden');panel.classList.toggle('hidden');if(opening){const ids=notifications.filter(n=>!truthy(rowVal(n,'Read'))&&rowVal(n,'Type')!=='OWNER_BROADCAST').map(n=>rowVal(n,'Notification ID')).filter(Boolean);if(ids.length){try{await apiPost('markNotificationsRead',{notificationIds:ids});notifications.forEach(n=>{if(ids.includes(rowVal(n,'Notification ID')))n['Read']=true});renderNotifications();panel.classList.remove('hidden')}catch(e){console.warn(e)}}}}
+async function toggleNotifications(){const panel=document.getElementById('notifPanel');if(!panel)return;panel.classList.toggle('hidden');if(!panel.classList.contains('hidden'))renderNotifications()}
 async function showNextBroadcast(){
   if(currentBroadcast||!SESSION_TOKEN)return;
   const n=notifications.filter(x=>rowVal(x,'Type')==='OWNER_BROADCAST'&&!truthy(rowVal(x,'Read'))&&!dismissedBroadcastIds.has(rowVal(x,'Notification ID'))).sort((a,b)=>new Date(rowVal(a,'Created At'))-new Date(rowVal(b,'Created At')))[0];
@@ -2772,19 +2771,19 @@ setInterval(()=>{const now=Date.now(),gap=firebaseRealtimeHealthy?60000:15000;if
 async function boot(){if(SESSION_TOKEN){document.getElementById('authGate').classList.add('hidden');document.getElementById('appShell').classList.remove('hidden');await loadFromGoogle(false);if(SESSION_TOKEN)return}document.getElementById('appShell').classList.add('hidden');document.getElementById('authGate').classList.remove('hidden');showAuthMode('signin')}
 document.addEventListener('DOMContentLoaded',()=>boot(),{once:true});
 </script>
-<script src="./dialog-system.js?v=0.36.8.1"></script>
-<script src="./authority-engine.js?v=0.36.8.1"></script>
-<script src="./sync-engine.js?v=0.36.8.1"></script>
-<script src="./release-guard.js?v=0.36.8.1"></script>
-<script src="./command-palette.js?v=0.36.8.1"></script>
-<script src="./autocare-module.js?v=0.36.8.1"></script>
-<script src="./cases-module.js?v=0.36.8.1"></script>
-<script src="./activation-command.js?v=0.36.8.1"></script>
-<script src="./ideas-dump.js?v=0.36.8.1"></script>
-<script src="./pulse-module.js?v=0.36.8.1"></script>
-<script src="./assist-traffic-module.js?v=0.36.8.1"></script>
-<script src="./core-intelligence.js?v=0.36.8.1"></script>
-<script src="./attention-loop.js?v=0.36.8.1"></script>
+<script src="./dialog-system.js?v=0.36.8.2"></script>
+<script src="./authority-engine.js?v=0.36.8.2"></script>
+<script src="./sync-engine.js?v=0.36.8.2"></script>
+<script src="./release-guard.js?v=0.36.8.2"></script>
+<script src="./command-palette.js?v=0.36.8.2"></script>
+<script src="./autocare-module.js?v=0.36.8.2"></script>
+<script src="./cases-module.js?v=0.36.8.2"></script>
+<script src="./activation-command.js?v=0.36.8.2"></script>
+<script src="./ideas-dump.js?v=0.36.8.2"></script>
+<script src="./pulse-module.js?v=0.36.8.2"></script>
+<script src="./assist-traffic-module.js?v=0.36.8.2"></script>
+<script src="./core-intelligence.js?v=0.36.8.2"></script>
+<script src="./attention-loop.js?v=0.36.8.2"></script>
 </body>
 </html>
 

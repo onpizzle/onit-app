@@ -15,7 +15,7 @@ function renderSection(id){
     if(id==='home'&&visible('home')&&typeof renderHome==='function')renderHome();
     else if(id==='briefs'&&visible('briefs')&&typeof renderBriefs==='function')renderBriefs();
     else if(id==='archive'&&visible('archive')&&typeof renderArchive==='function')renderArchive();
-    else if(id==='memory'&&visible('memory')&&typeof renderMemory==='function')renderMemory(false);
+    else if(id==='memory'&&visible('memory')){if(typeof memoryUpdateDynamic==='function')memoryUpdateDynamic();else if(typeof renderMemory==='function')renderMemory(false);}
     else if(id==='team'&&visible('team')&&typeof renderTeam==='function')renderTeam();
     else if(id==='detail'&&visible('detail')&&typeof current!=='undefined'&&current&&typeof renderDetail==='function'){current=((typeof briefs!=='undefined'&&briefs)||[]).find(b=>b.code===current.code)||current;renderDetail();}
     stats.renders++;

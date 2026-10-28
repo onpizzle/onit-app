@@ -1,6 +1,6 @@
 /* ONIT v0.36.4 — Persistent Brief Attention Loop */
 (function(){
-  const VERSION='0.1.0',SNOOZE_MS=10*60*1000,CHECK_MS=60*1000;
+  const VERSION='0.1.2',SNOOZE_MS=10*60*1000,CHECK_MS=60*1000;
   let promptBusy=false,bootDeepLinkHandled=false,lastVisualSignature='';
   const val=(row,...keys)=>{for(const k of keys){if(row&&row[k]!==undefined&&row[k]!==null)return row[k]}return''};
   const truth=v=>v===true||String(v||'').toLowerCase()==='true';
@@ -43,6 +43,7 @@
     return()=>show('home');
   }
   async function openNotification(id){
+    if(typeof window.openNotificationTarget==='function')return window.openNotificationTarget(id);
     const n=(notifications||[]).find(x=>String(val(x,'Notification ID','notificationId'))===String(id));if(!n)return;
     const nid=val(n,'Notification ID','notificationId');n['Read']=true;n['Read At']=new Date().toISOString();
     try{renderNotifications()}catch(e){}
