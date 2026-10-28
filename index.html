@@ -7,18 +7,24 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content">
 <meta name="theme-color" content="#f7f4ef">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="ONIT">
 <meta name="application-name" content="ONIT">
 <meta name="description" content="ONIT — Time + People + Status. Work and brief operations for teams.">
+<script>
+(function(){
+  const h=String(location.hostname||'').toLowerCase();
+  const staging=h==='onit-cases-test.onrender.com'||/(^|[.-])(staging|preview)([.-]|$)/.test(h);
+  window.ONIT_IS_STAGING=staging;
+  if(staging){document.documentElement.dataset.onitStaging='true';return;}
+  const meta=(name,content)=>{const m=document.createElement('meta');m.name=name;m.content=content;document.head.appendChild(m)};
+  meta('mobile-web-app-capable','yes');meta('apple-mobile-web-app-capable','yes');meta('apple-mobile-web-app-status-bar-style','default');meta('apple-mobile-web-app-title','ONIT');
+  const manifest=document.createElement('link');manifest.rel='manifest';manifest.href='manifest.webmanifest';document.head.appendChild(manifest);
+})();
+</script>
 <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://script.google.com">
 <link rel="dns-prefetch" href="//www.gstatic.com">
 <link rel="dns-prefetch" href="//script.google.com">
-<link rel="manifest" href="manifest.webmanifest">
-<link rel="stylesheet" href="./dialog-system.css?v=0.36.5">
+<link rel="stylesheet" href="./dialog-system.css?v=0.36.7">
 <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
@@ -119,6 +125,8 @@
 .memoryToolbar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:14px 0}.memoryFilters{display:flex;gap:7px;flex-wrap:wrap}.memoryFilters button{border:1px solid #ddd9d2;background:#fff;border-radius:999px;padding:8px 11px;font-size:11px;font-weight:900;cursor:pointer;color:#5b5752}.memoryFilters button.active{background:#171717;color:#fff;border-color:#171717}.memoryStatus{font-size:11px;color:#88837c;text-align:right}
 .memoryResults{display:grid;gap:10px}.memoryResult{border:1px solid #e5e1da;background:#fff;border-radius:16px;padding:15px 16px;display:grid;grid-template-columns:44px minmax(0,1fr) auto;gap:13px;align-items:start;cursor:default;transition:border-color .12s ease}.memoryResult:hover{border-color:#d4cec5}.memorySourceIcon{width:44px;height:44px;border-radius:13px;background:#f5f1eb;display:grid;place-items:center;font-size:10px;font-weight:950;letter-spacing:.05em;color:#746d65}.memorySourceIcon.work{background:#fff0e8;color:#b94e1b}.memorySourceIcon.case{background:#eeeef8;color:#5553a7}.memorySourceIcon.digital{background:#eaf5ef;color:#28704a}.memorySourceIcon.ideas{background:#f3f1ee;color:#171717}.memoryResult h3{font-size:14px;margin:1px 0 4px;line-height:1.3}.memoryMeta{font-size:10px;color:#88827a;font-weight:750;line-height:1.35}.memorySnippet{font-size:12px;color:#5f5a54;line-height:1.45;margin-top:7px}.memoryWhy{display:flex;gap:5px;flex-wrap:wrap;margin-top:9px}.memoryWhy span{font-size:9px;font-weight:900;border-radius:999px;background:#f5f2ed;color:#746d64;padding:5px 7px;text-transform:uppercase;letter-spacing:.04em}.memoryActions{display:flex;align-items:center;gap:7px}.memoryOpen{border:1px solid #d7d2ca;background:#fff;border-radius:9px;padding:8px 9px;font-size:9px;font-weight:950;white-space:nowrap;cursor:pointer}.memoryOpen:hover{border-color:#aaa39a}.memoryExternal{display:inline-grid;place-items:center;width:32px;height:32px;border:1px solid #d7d2ca;border-radius:9px;color:#555;text-decoration:none;font-size:15px}.memoryEmpty{border:1px dashed #d8d2ca;background:#fbfaf8;border-radius:18px;padding:34px 18px;text-align:center;color:#77716b}.memoryEmpty b{display:block;color:#33302c;margin-bottom:6px}.memorySourceSummary{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-bottom:13px}.memorySourceStat{border:1px solid #e6e1d9;border-radius:13px;background:#fff;padding:11px 12px}.memorySourceStat b{font-size:18px;display:block}.memorySourceStat span{font-size:9px;color:#88827a;font-weight:900;letter-spacing:.06em}.memoryLoading{display:inline-flex;align-items:center;gap:6px}.memoryDot{width:6px;height:6px;border-radius:50%;background:#ff7b43;animation:memoryBlink 1s infinite alternate}@keyframes memoryBlink{to{opacity:.25}}
 @media(max-width:820px){.memoryHero{border-radius:18px;padding:18px 15px}.memoryHeroTop{display:block}.memoryHero h1{font-size:26px}.memoryRefresh{margin-top:13px}.memorySearchWrap{grid-template-columns:1fr}.memorySearchBtn{min-height:44px}.memoryToolbar{display:block}.memoryStatus{text-align:left;margin-top:9px}.memorySourceSummary{grid-template-columns:repeat(2,1fr)}.memoryResult{grid-template-columns:40px minmax(0,1fr);padding:13px}.memorySourceIcon{width:40px;height:40px}.memoryActions{grid-column:2;justify-content:flex-start;margin-top:2px}.memoryOpen{min-height:34px}.memoryPrompt{overflow-x:auto;flex-wrap:nowrap;padding-bottom:2px}.memoryPrompt button{white-space:nowrap}}
+
+html[data-onit-staging='true'] .installBtn{display:none!important}.stagingInstallRetired{position:fixed;inset:0;z-index:99999;background:#171717;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:32px;gap:12px}.stagingInstallRetired b{font-size:22px}.stagingInstallRetired span{max-width:520px;line-height:1.5;color:#ddd}.stagingInstallRetired button{border:0;border-radius:12px;background:#fff;color:#171717;font-weight:900;padding:13px 18px;cursor:pointer}
 </style>
 <!-- ONIT v0.17.5: approved UI with slightly larger typography for readability. -->
 <style id="onit-approved-ui-v0174">
@@ -888,10 +896,10 @@ img,video,canvas,svg{max-width:100%}
 .reviewQueueNote{font-size:11px;color:#777;margin-top:6px}
 @media(max-width:760px){.reviewPreviewModal{padding:4px!important}.reviewPreviewModal .modalBox{width:100%!important;height:calc(100dvh - 8px)!important;max-height:none!important;border-radius:12px!important}.previewAssetStage{padding:5px}.previewFooter{padding:7px}.previewNav{justify-content:flex-start;overflow-x:auto;flex-wrap:nowrap}.previewNav .mini{white-space:nowrap}}
 </style>
-<link rel="stylesheet" href="./cases-module.css?v=0.36.5">
-<link rel="stylesheet" href="./activation-command.css?v=0.36.5">
-<link rel="stylesheet" href="./ideas-dump.css?v=0.36.5">
-<link rel="stylesheet" href="./pulse-module.css?v=0.36.5">
+<link rel="stylesheet" href="./cases-module.css?v=0.36.7">
+<link rel="stylesheet" href="./activation-command.css?v=0.36.7">
+<link rel="stylesheet" href="./ideas-dump.css?v=0.36.7">
+<link rel="stylesheet" href="./pulse-module.css?v=0.36.7">
 
 <style id="onit-mobile-nav-v0212">
 .navLabelMobile{display:none!important}
@@ -1005,8 +1013,8 @@ html.onitReduceMotion *,html.onitReduceMotion *::before,html.onitReduceMotion *:
   *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
 }
 </style>
-<link rel="stylesheet" href="./assist-traffic-module.css?v=0.36.5">
-<link rel="stylesheet" href="./core-intelligence.css?v=0.36.5">
+<link rel="stylesheet" href="./assist-traffic-module.css?v=0.36.7">
+<link rel="stylesheet" href="./core-intelligence.css?v=0.36.7">
 <style id="role-consistency-v0311">
 /* ONIT v0.31.2 — role authority + Digital Pulse access hardening */
 .radarMorningGrid .morningMetric b,
@@ -1019,11 +1027,11 @@ html.onitReduceMotion *,html.onitReduceMotion *::before,html.onitReduceMotion *:
 .radarLevel{color:#f2f2ee!important}
 </style>
 
-<link rel="stylesheet" href="./autocare-module.css?v=0.36.5">
-<link rel="stylesheet" href="./command-palette.css?v=0.36.5">
+<link rel="stylesheet" href="./autocare-module.css?v=0.36.7">
+<link rel="stylesheet" href="./command-palette.css?v=0.36.7">
 
-<link rel="stylesheet" href="./visual-contrast.css?v=0.36.5">
-<link rel="stylesheet" href="./attention-loop.css?v=0.36.5">
+<link rel="stylesheet" href="./visual-contrast.css?v=0.36.7">
+<link rel="stylesheet" href="./attention-loop.css?v=0.36.7">
 </head>
 <body>
 <a class="onitSkipLink" href="#mainContent">Skip to main content</a>
@@ -1218,9 +1226,9 @@ html.onitReduceMotion *,html.onitReduceMotion *::before,html.onitReduceMotion *:
 <script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-messaging-compat.js"></script>
-<script>const APP_VERSION='0.36.5';
-const UI_REVISION=3650;
-const DASHBOARD_UI_REVISION=36501;
+<script>const APP_VERSION='0.36.7';
+const UI_REVISION=3670;
+const DASHBOARD_UI_REVISION=36701;
 const DASHBOARD_UI_STORAGE_KEY='onit-dashboard-ui-state-v1';
 window.ONIT_RUNTIME={version:APP_VERSION,uiRevision:UI_REVISION,dashboardUiRevision:DASHBOARD_UI_REVISION};
 const BACKEND_DATASETS=['USERS','CLIENTS','BRIEFS','ASSIGNMENTS','ITERATIONS','ACTIVITY_LOG','NOTIFICATIONS','REPORTS'];
@@ -2463,7 +2471,7 @@ function renderMore(){if(!currentUser)return;const names=backendAccess();let htm
   if(isOwner()||dashboardMode()==='LEADERSHIP'){html+=`<div class='morecard leadershipReportCard' style='grid-column:1/-1'><h3>LEADERSHIP OPERATIONS REPORT</h3><div class='bigTiny'>Download one current PDF covering workload, overdue jobs, review bottlenecks, turnaround time, Traffic pressure and department utilisation.</div><div class='actions'><button class='new' onclick='downloadLeadershipReport(this)'>DOWNLOAD LEADERSHIP REPORT</button></div></div>`}
   html+=dataExportRequestsMarkup();
   if(typeof autoCareMoreCardMarkup==='function')html+=autoCareMoreCardMarkup();
-  html+=`<div class='morecard' style='grid-column:1/-1'><h3>INSTALL / UPDATE ONIT</h3><div class='bigTiny'>Install ONIT on this device for quick access. Global UI Sync keeps browser, mobile and desktop installs on the newest published ONIT interface automatically. AutoCare protects unfinished forms, repairs stale caches and activates the update as soon as the screen is safe.</div><div class='actions'><button class='secondary linkbtn' onclick='installOnit()'>INSTALL ON THIS DEVICE</button><button class='secondary linkbtn' onclick='forceFrontendUpdate()'>CHECK / REPAIR UPDATE</button></div></div>`;
+  html+=isStagingEnvironment()?`<div class='morecard' style='grid-column:1/-1'><h3>STAGING • BROWSER ONLY</h3><div class='bigTiny'>This test environment cannot be installed as ONIT. Use it only in the browser. Install the production app from https://onit-d5sr.onrender.com/.</div><div class='actions'><button class='secondary linkbtn' onclick="window.open('https://onit-d5sr.onrender.com/','_blank','noopener')">OPEN PRODUCTION ONIT</button></div></div>`:`<div class='morecard' style='grid-column:1/-1'><h3>INSTALL / UPDATE ONIT</h3><div class='bigTiny'>Install ONIT on this device for quick access. Global UI Sync keeps browser, mobile and desktop installs on the newest published ONIT interface automatically. AutoCare protects unfinished forms, repairs stale caches and activates the update as soon as the screen is safe.</div><div class='actions'><button class='secondary linkbtn' onclick='installOnit()'>INSTALL ON THIS DEVICE</button><button class='secondary linkbtn' onclick='forceFrontendUpdate()'>CHECK / REPAIR UPDATE</button></div></div>`;
   html+=`<div class='morecard' style='grid-column:1/-1'><div class='streamlineAbout'><div><h3>ABOUT ONIT</h3><div class='bigTiny'>Frontend v${APP_VERSION} • Dashboard UI r${DASHBOARD_UI_REVISION} • Authority v1 • Sync v1 • Backend ${backendVersion||'checking…'}</div></div><button class='secondary linkbtn' onclick="showToast('ONIT','Work. People. Attention. Proof.')">VIEW DETAILS</button></div></div></div>`;document.getElementById('moreContent').innerHTML=html;hydrateProfilePhotos()}
 async function approvePending(id){
   const targetUserId=decodeURIComponent(id),target=pendingUsers.find(u=>String(rowVal(u,'User ID'))===String(targetUserId)),name=target?rowVal(target,'Full Name'):'The member';
@@ -2700,11 +2708,15 @@ let deferredInstallPrompt=null,lastFocusRefresh=0;
 function isStandalone(){return window.matchMedia?.('(display-mode: standalone)').matches||window.navigator.standalone===true}
 function isIOS(){return /iphone|ipad|ipod/i.test(navigator.userAgent)}
 function isHttpsApp(){return location.protocol==='https:'||['localhost','127.0.0.1'].includes(location.hostname)}
-function refreshInstallButton(){const b=document.getElementById('installBtn');if(!b)return;const show=!isStandalone();b.classList.toggle('hidden',!show);b.textContent=isIOS()?'ADD TO HOME':'INSTALL'}
-window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredInstallPrompt=e;refreshInstallButton()});
+function isStagingEnvironment(){return window.ONIT_IS_STAGING===true||String(location.hostname||'').toLowerCase()==='onit-cases-test.onrender.com'}
+async function retireStagingInstall_(){if(!isStagingEnvironment())return;deferredInstallPrompt=null;try{if('serviceWorker'in navigator){const regs=await navigator.serviceWorker.getRegistrations();await Promise.all(regs.map(r=>r.unregister().catch(()=>false)))}}catch(e){}try{if('caches'in window){const keys=await caches.keys();await Promise.all(keys.filter(k=>String(k).startsWith('onit-')).map(k=>caches.delete(k)))}}catch(e){}}
+function refreshInstallButton(){const b=document.getElementById('installBtn');if(!b)return;const show=!isStandalone()&&!isStagingEnvironment();b.classList.toggle('hidden',!show);b.textContent=isIOS()?'ADD TO HOME':'INSTALL'}
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();if(isStagingEnvironment()){deferredInstallPrompt=null;refreshInstallButton();return}deferredInstallPrompt=e;refreshInstallButton()});
 document.addEventListener('DOMContentLoaded',initialiseOnitPolish,{once:true});
-window.addEventListener('appinstalled',()=>{deferredInstallPrompt=null;refreshInstallButton();showToast('ONIT installed','ONIT is now available like an app on this device and will receive updates automatically.')});
+document.addEventListener('DOMContentLoaded',()=>{if(!isStagingEnvironment())return;document.body.classList.add('onit-staging-browser-only');if(isStandalone()){const note=document.createElement('div');note.className='stagingInstallRetired';note.innerHTML="<b>STAGING INSTALL RETIRED</b><span>Staging is browser-only. Open the production ONIT app for normal use.</span><button type='button' onclick=\"location.href='https://onit-d5sr.onrender.com/'\">OPEN PRODUCTION</button>";document.body.appendChild(note)}},{once:true});
+window.addEventListener('appinstalled',()=>{deferredInstallPrompt=null;refreshInstallButton();if(!isStagingEnvironment())showToast('ONIT installed','ONIT is now available like an app on this device and will receive updates automatically.')});
 async function installOnit(){
+  if(isStagingEnvironment())return onitAlert('Staging is browser-only. Install ONIT only from the production address: https://onit-d5sr.onrender.com/');
   if(isStandalone())return showToast('ONIT','Already installed on this device.');
   if(!isHttpsApp()){
     onitAlert('ONIT can only install directly from its secure online address. This copy is running from a local file. Once ONIT is published to its HTTPS address, this same INSTALL button will install it directly.');
@@ -2738,7 +2750,7 @@ function refreshWhenActive(){if(document.hidden)return;checkFrontendRelease(fals
 window.addEventListener('focus',refreshWhenActive);document.addEventListener('visibilitychange',()=>{if(!document.hidden)refreshWhenActive()});
 window.addEventListener('online',()=>{connectionNotice('');checkFrontendRelease(false);recoverConnectionNow()});
 window.addEventListener('offline',()=>{connectionNotice(lastSuccessfulSyncAt?`You are offline. Showing last synced data from ${syncClockText()}.`:'You are offline. ONIT will update when your connection returns.');updateLastSyncLabel(true)});
-if('serviceWorker' in navigator && isHttpsApp()){
+if('serviceWorker' in navigator && isHttpsApp() && !isStagingEnvironment()){
   window.addEventListener('load',()=>navigator.serviceWorker.register('./service-worker.js?v='+encodeURIComponent(APP_VERSION),{updateViaCache:'none'}).then(reg=>{
     reg.update().catch(()=>{});
     setInterval(()=>reg.update().catch(()=>{}),UI_RELEASE_CHECK_MS);
@@ -2750,6 +2762,8 @@ if('serviceWorker' in navigator && isHttpsApp()){
     checkFrontendRelease(false);
     setInterval(()=>{if(!document.hidden)checkFrontendRelease(false)},UI_RELEASE_CHECK_MS);
   }).catch(err=>console.warn('Service worker:',err)))
+}else if(isStagingEnvironment()){
+  window.addEventListener('load',()=>retireStagingInstall_().catch(()=>{}),{once:true});
 }
 refreshInstallButton();
 
@@ -2758,19 +2772,19 @@ setInterval(()=>{const now=Date.now(),gap=firebaseRealtimeHealthy?60000:15000;if
 async function boot(){if(SESSION_TOKEN){document.getElementById('authGate').classList.add('hidden');document.getElementById('appShell').classList.remove('hidden');await loadFromGoogle(false);if(SESSION_TOKEN)return}document.getElementById('appShell').classList.add('hidden');document.getElementById('authGate').classList.remove('hidden');showAuthMode('signin')}
 document.addEventListener('DOMContentLoaded',()=>boot(),{once:true});
 </script>
-<script src="./dialog-system.js?v=0.36.5"></script>
-<script src="./authority-engine.js?v=0.36.5"></script>
-<script src="./sync-engine.js?v=0.36.5"></script>
-<script src="./release-guard.js?v=0.36.5"></script>
-<script src="./command-palette.js?v=0.36.5"></script>
-<script src="./autocare-module.js?v=0.36.5"></script>
-<script src="./cases-module.js?v=0.36.5"></script>
-<script src="./activation-command.js?v=0.36.5"></script>
-<script src="./ideas-dump.js?v=0.36.5"></script>
-<script src="./pulse-module.js?v=0.36.5"></script>
-<script src="./assist-traffic-module.js?v=0.36.5"></script>
-<script src="./core-intelligence.js?v=0.36.5"></script>
-<script src="./attention-loop.js?v=0.36.5"></script>
+<script src="./dialog-system.js?v=0.36.7"></script>
+<script src="./authority-engine.js?v=0.36.7"></script>
+<script src="./sync-engine.js?v=0.36.7"></script>
+<script src="./release-guard.js?v=0.36.7"></script>
+<script src="./command-palette.js?v=0.36.7"></script>
+<script src="./autocare-module.js?v=0.36.7"></script>
+<script src="./cases-module.js?v=0.36.7"></script>
+<script src="./activation-command.js?v=0.36.7"></script>
+<script src="./ideas-dump.js?v=0.36.7"></script>
+<script src="./pulse-module.js?v=0.36.7"></script>
+<script src="./assist-traffic-module.js?v=0.36.7"></script>
+<script src="./core-intelligence.js?v=0.36.7"></script>
+<script src="./attention-loop.js?v=0.36.7"></script>
 </body>
 </html>
 
