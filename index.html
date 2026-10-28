@@ -24,7 +24,7 @@
 <link rel="preconnect" href="https://script.google.com">
 <link rel="dns-prefetch" href="//www.gstatic.com">
 <link rel="dns-prefetch" href="//script.google.com">
-<link rel="stylesheet" href="./dialog-system.css?v=0.36.8">
+<link rel="stylesheet" href="./dialog-system.css?v=0.36.8.1">
 <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
@@ -896,10 +896,10 @@ img,video,canvas,svg{max-width:100%}
 .reviewQueueNote{font-size:11px;color:#777;margin-top:6px}
 @media(max-width:760px){.reviewPreviewModal{padding:4px!important}.reviewPreviewModal .modalBox{width:100%!important;height:calc(100dvh - 8px)!important;max-height:none!important;border-radius:12px!important}.previewAssetStage{padding:5px}.previewFooter{padding:7px}.previewNav{justify-content:flex-start;overflow-x:auto;flex-wrap:nowrap}.previewNav .mini{white-space:nowrap}}
 </style>
-<link rel="stylesheet" href="./cases-module.css?v=0.36.8">
-<link rel="stylesheet" href="./activation-command.css?v=0.36.8">
-<link rel="stylesheet" href="./ideas-dump.css?v=0.36.8">
-<link rel="stylesheet" href="./pulse-module.css?v=0.36.8">
+<link rel="stylesheet" href="./cases-module.css?v=0.36.8.1">
+<link rel="stylesheet" href="./activation-command.css?v=0.36.8.1">
+<link rel="stylesheet" href="./ideas-dump.css?v=0.36.8.1">
+<link rel="stylesheet" href="./pulse-module.css?v=0.36.8.1">
 
 <style id="onit-mobile-nav-v0212">
 .navLabelMobile{display:none!important}
@@ -1013,8 +1013,8 @@ html.onitReduceMotion *,html.onitReduceMotion *::before,html.onitReduceMotion *:
   *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
 }
 </style>
-<link rel="stylesheet" href="./assist-traffic-module.css?v=0.36.8">
-<link rel="stylesheet" href="./core-intelligence.css?v=0.36.8">
+<link rel="stylesheet" href="./assist-traffic-module.css?v=0.36.8.1">
+<link rel="stylesheet" href="./core-intelligence.css?v=0.36.8.1">
 <style id="role-consistency-v0311">
 /* ONIT v0.31.2 — role authority + Digital Pulse access hardening */
 .radarMorningGrid .morningMetric b,
@@ -1027,11 +1027,11 @@ html.onitReduceMotion *,html.onitReduceMotion *::before,html.onitReduceMotion *:
 .radarLevel{color:#f2f2ee!important}
 </style>
 
-<link rel="stylesheet" href="./autocare-module.css?v=0.36.8">
-<link rel="stylesheet" href="./command-palette.css?v=0.36.8">
+<link rel="stylesheet" href="./autocare-module.css?v=0.36.8.1">
+<link rel="stylesheet" href="./command-palette.css?v=0.36.8.1">
 
-<link rel="stylesheet" href="./visual-contrast.css?v=0.36.8">
-<link rel="stylesheet" href="./attention-loop.css?v=0.36.8">
+<link rel="stylesheet" href="./visual-contrast.css?v=0.36.8.1">
+<link rel="stylesheet" href="./attention-loop.css?v=0.36.8.1">
 </head>
 <body>
 <a class="onitSkipLink" href="#mainContent">Skip to main content</a>
@@ -1226,9 +1226,9 @@ html.onitReduceMotion *,html.onitReduceMotion *::before,html.onitReduceMotion *:
 <script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-messaging-compat.js"></script>
-<script>const APP_VERSION='0.36.8';
-const UI_REVISION=3670;
-const DASHBOARD_UI_REVISION=36701;
+<script>const APP_VERSION='0.36.8.1';
+const UI_REVISION=36811;
+const DASHBOARD_UI_REVISION=36801;
 const DASHBOARD_UI_STORAGE_KEY='onit-dashboard-ui-state-v1';
 window.ONIT_RUNTIME={version:APP_VERSION,uiRevision:UI_REVISION,dashboardUiRevision:DASHBOARD_UI_REVISION};
 const BACKEND_DATASETS=['USERS','CLIENTS','BRIEFS','ASSIGNMENTS','ITERATIONS','ACTIVITY_LOG','NOTIFICATIONS','REPORTS'];
@@ -2644,7 +2644,7 @@ function queueUiUpdate(release,source='release-check'){
   try{localStorage.setItem(UI_EXPECTED_KEY,remote)}catch(e){}
   if(source!=='broadcast'&&source!=='storage'&&source!=='service-worker')publishUiUpdateSignal(release);
   if(!safeToReloadForUpdate()&&uiUpdateToastVersion!==remote){uiUpdateToastVersion=remote;const dashboardOnly=Number(release&&release.dashboardUiRevision||0)>DASHBOARD_UI_REVISION&&compareUiVersions(remote,APP_VERSION)===0;showToast('ONIT is updating',dashboardOnly?'A newer dashboard UI is ready. Finish your current form/action; ONIT will repair it automatically.':`UI v${remote} is ready. Finish your current form/action; ONIT will switch automatically.`)}
-  if(safeToReloadForUpdate())setTimeout(()=>performFrontendRefresh(remote,false),50);
+  // v0.36.8.1 hotfix: release checks are passive. Never navigate/reload automatically mid-session.
   return true;
 }
 async function performFrontendRefresh(targetVersion,force=false){
@@ -2675,7 +2675,7 @@ async function checkFrontendRelease(force=false){
   if(!isHttpsApp()||navigator.onLine===false)return null;
   try{
     const release=await fetchFrontendRelease(),remote=String(release.version||'').trim();
-    if(remoteUiIsNewer(release)){queueUiUpdate(release,'release-check');if(force&&safeToReloadForUpdate())await performFrontendRefresh(remote,true);return release}
+    if(remoteUiIsNewer(release)){queueUiUpdate(release,'release-check');return release}
     if(remote&&compareUiVersions(remote,APP_VERSION)===0&&Number(release.uiRevision||0)<=UI_REVISION&&Number(release.dashboardUiRevision||0)<=DASHBOARD_UI_REVISION){
       pendingFrontendVersion='';pendingFrontendRelease=null;uiUpdateToastVersion='';
       try{if(localStorage.getItem(UI_EXPECTED_KEY)===remote)localStorage.removeItem(UI_EXPECTED_KEY)}catch(e){}
@@ -2683,7 +2683,7 @@ async function checkFrontendRelease(force=false){
     return release;
   }catch(e){console.warn('Frontend version check:',e);return null}
 }
-function processPendingUiUpdate(){if(pendingFrontendVersion&&safeToReloadForUpdate()&&!uiUpdateInFlight)performFrontendRefresh(pendingFrontendVersion,false)}
+function processPendingUiUpdate(){return false}
 async function forceFrontendUpdate(){
   if(uiDirtySections.size&&!await onitConfirm('You have an unfinished form. Reload ONIT and discard those unsaved changes?'))return;
   try{
@@ -2758,7 +2758,7 @@ if('serviceWorker' in navigator && isHttpsApp() && !isStagingEnvironment()){
       const d=e.data||{};
       if(d.type==='ONIT_UI_VERSION_ACTIVATED'&&d.version)acceptUiUpdateSignal({type:'ONIT_UI_UPDATE_AVAILABLE',version:d.version,uiRevision:d.uiRevision||0,dashboardUiRevision:d.dashboardUiRevision||0},'service-worker');
     });
-    navigator.serviceWorker.addEventListener('controllerchange',()=>{checkFrontendRelease(false);processPendingUiUpdate()});
+    navigator.serviceWorker.addEventListener('controllerchange',()=>{checkFrontendRelease(false)});
     checkFrontendRelease(false);
     setInterval(()=>{if(!document.hidden)checkFrontendRelease(false)},UI_RELEASE_CHECK_MS);
   }).catch(err=>console.warn('Service worker:',err)))
@@ -2772,19 +2772,19 @@ setInterval(()=>{const now=Date.now(),gap=firebaseRealtimeHealthy?60000:15000;if
 async function boot(){if(SESSION_TOKEN){document.getElementById('authGate').classList.add('hidden');document.getElementById('appShell').classList.remove('hidden');await loadFromGoogle(false);if(SESSION_TOKEN)return}document.getElementById('appShell').classList.add('hidden');document.getElementById('authGate').classList.remove('hidden');showAuthMode('signin')}
 document.addEventListener('DOMContentLoaded',()=>boot(),{once:true});
 </script>
-<script src="./dialog-system.js?v=0.36.8"></script>
-<script src="./authority-engine.js?v=0.36.8"></script>
-<script src="./sync-engine.js?v=0.36.8"></script>
-<script src="./release-guard.js?v=0.36.8"></script>
-<script src="./command-palette.js?v=0.36.8"></script>
-<script src="./autocare-module.js?v=0.36.8"></script>
-<script src="./cases-module.js?v=0.36.8"></script>
-<script src="./activation-command.js?v=0.36.8"></script>
-<script src="./ideas-dump.js?v=0.36.8"></script>
-<script src="./pulse-module.js?v=0.36.8"></script>
-<script src="./assist-traffic-module.js?v=0.36.8"></script>
-<script src="./core-intelligence.js?v=0.36.8"></script>
-<script src="./attention-loop.js?v=0.36.8"></script>
+<script src="./dialog-system.js?v=0.36.8.1"></script>
+<script src="./authority-engine.js?v=0.36.8.1"></script>
+<script src="./sync-engine.js?v=0.36.8.1"></script>
+<script src="./release-guard.js?v=0.36.8.1"></script>
+<script src="./command-palette.js?v=0.36.8.1"></script>
+<script src="./autocare-module.js?v=0.36.8.1"></script>
+<script src="./cases-module.js?v=0.36.8.1"></script>
+<script src="./activation-command.js?v=0.36.8.1"></script>
+<script src="./ideas-dump.js?v=0.36.8.1"></script>
+<script src="./pulse-module.js?v=0.36.8.1"></script>
+<script src="./assist-traffic-module.js?v=0.36.8.1"></script>
+<script src="./core-intelligence.js?v=0.36.8.1"></script>
+<script src="./attention-loop.js?v=0.36.8.1"></script>
 </body>
 </html>
 
