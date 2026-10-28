@@ -3,7 +3,7 @@
 'use strict';
 const VERSION='1.0.0';
 const RENDER_DELAY=120;
-const FULL_SYNC_COOLDOWN=900;
+const FULL_SYNC_COOLDOWN=5000;
 let renderTimer=null,fullSyncTimer=null,lastFullSyncAt=0,fullSyncQueued=false;
 const pendingSections=new Set();
 const stats={renders:0,fullSyncs:0,lastEvent:'',lastEventAt:0,lastFullSyncReason:'',lastFullSyncAt:0};

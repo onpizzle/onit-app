@@ -103,9 +103,9 @@ async function repairKnownIssue(kind,detail){
 function signalApiFailure(action,err,readOnly){
   recordIssue('API_'+String(action||'UNKNOWN').toUpperCase(),err);
   if(!readOnly||!online()||!signedIn())return;
-  if(/timed out|failed to fetch|network|load failed/i.test(shortMessage(err))){setTimeout(()=>runCheck(false),2500)}
+  if(/timed out|failed to fetch|network|load failed/i.test(shortMessage(err))){setTimeout(()=>{if(!document.hidden&&online())runCheck(false)},60000)}
 }
-function signalRealtimeFailure(err){try{firebaseRealtimeHealthy=false}catch(e){}recordIssue('REALTIME',err);setTimeout(()=>repairRealtime('Realtime connection became unhealthy.'),1800)}
+function signalRealtimeFailure(err){try{firebaseRealtimeHealthy=false}catch(e){}recordIssue('REALTIME_FALLBACK',err,'warning');lastHealth.realtime='FALLBACK'}
 function signalRealtimeHealthy(){try{firebaseRealtimeHealthy=true}catch(e){}lastHealth.realtime='CONNECTED'}
 function markHealthy(){try{localStorage.setItem(LAST_GOOD_KEY,String(APP_VERSION))}catch(e){}lastHealth.backend='OK';lastHealth.session=currentSessionStatus();lastHealth.permissions='SYNCED';lastHealth.checkedAt=now();refreshLocalSnapshot()}
 
@@ -117,7 +117,6 @@ async function runCheck(manual=false){
     if(signedIn())tasks.push(backendHealth());
     if(manual||now()-lastFrontendCheckAt>300000)tasks.push(frontendHealth());
     await Promise.allSettled(tasks);
-    if(signedIn()&&!firebaseRealtimeHealthy&&online())await repairRealtime('AutoCare health check found realtime fallback mode.');
     if('serviceWorker'in navigator&&isHttpsApp&&isHttpsApp()&&!navigator.serviceWorker.controller)await repairServiceWorker('AutoCare found no active service-worker controller.');
     refreshLocalSnapshot();
     if(lastBackendOkAt&&now()-lastBackendOkAt<HEALTH_INTERVAL_MS*2&&lastHealth.backend!=='DEGRADED')lastHealth.backend='OK';
@@ -127,7 +126,7 @@ async function runCheck(manual=false){
   }finally{checking=false}
 }
 function healthHeadline(){refreshLocalSnapshot();const bad=[lastHealth.network,lastHealth.backend,lastHealth.frontend,lastHealth.dashboardUi,lastHealth.realtime,lastHealth.permissions,lastHealth.release].filter(v=>!['OK','CURRENT','CONNECTED','SYNCED','VALID','IDLE'].includes(v));return bad.length?'AutoCare found something to watch. Open System Health for details.':'All core ONIT checks are healthy.'}
-function overallStatus(){refreshLocalSnapshot();if(!online())return'OFFLINE';if(['DEGRADED','MISMATCH','CHECK FAILED'].includes(lastHealth.backend)||lastHealth.dashboardUi==='MISMATCH'||lastHealth.dashboardUi==='UPDATE READY'||lastHealth.permissions==='MISMATCH'||lastHealth.release==='MISMATCH'||lastHealth.realtime==='FALLBACK')return'NEEDS ATTENTION';return'ACTIVE'}
+function overallStatus(){refreshLocalSnapshot();if(!online())return'OFFLINE';if(['DEGRADED','MISMATCH','CHECK FAILED'].includes(lastHealth.backend)||lastHealth.dashboardUi==='MISMATCH'||lastHealth.dashboardUi==='UPDATE READY'||lastHealth.permissions==='MISMATCH'||lastHealth.release==='MISMATCH')return'NEEDS ATTENTION';return'ACTIVE'}
 function autoCareMoreCardMarkup(){const status=overallStatus();return `<div class='morecard autocareCard' style='grid-column:1/-1'><div class='autocareCardTop'><div><h3>ONIT AUTOCARE <span class='autoCareBadge ${status==='ACTIVE'?'ok':status==='OFFLINE'?'neutral':'warn'}'>${escapeHTML(status)}</span></h3><div class='bigTiny'>Automatic health checks, safe retries, realtime recovery, permission resync and Global UI Sync across browser, mobile and desktop installs. It never rewrites production logic by itself.</div></div><div class='autoCarePulse ${status==='ACTIVE'?'ok':''}'></div></div><div class='autocareMini'><span>Frontend <b>${escapeHTML(lastHealth.frontend||'CHECKING')}</b></span><span>Dashboard UI <b>${escapeHTML(lastHealth.dashboardUi||'CHECKING')}</b></span><span>Backend <b>${escapeHTML(lastHealth.backend||'CHECKING')}</b></span><span>Realtime <b>${escapeHTML(currentRealtimeStatus())}</b></span><span>Permissions <b>${escapeHTML(lastHealth.permissions||'CHECKING')}</b></span><span>Release <b>${escapeHTML(lastHealth.release||'CHECKING')}</b></span></div><div class='actions'><button class='secondary linkbtn' onclick='runAutoCareCheck(true)'>RUN HEALTH CHECK</button><button class='secondary linkbtn' onclick='openAutoCareHealth()'>OPEN SYSTEM HEALTH</button></div></div>`}
 function healthRow(label,value,detail){return `<div class='autoCareHealthRow'><div><b>${escapeHTML(label)}</b>${detail?`<div class='bigTiny'>${escapeHTML(detail)}</div>`:''}</div><span class='autoCareState ${statusClass(value)}'>${escapeHTML(value)}</span></div>`}
 function ensureModal(){let el=document.getElementById('autoCareHealthModal');if(el)return el;el=document.createElement('div');el.id='autoCareHealthModal';el.className='modal hidden';el.setAttribute('role','dialog');el.setAttribute('aria-modal','true');el.onclick=e=>{if(e.target===el)closeAutoCareHealth()};el.innerHTML=`<div class='modalBox autoCareModalBox'><div class='modalTop'><div><div class='tiny'>ONIT AUTOCARE v${AUTOCARE_VERSION}</div><h2>SYSTEM HEALTH</h2></div><button class='secondary' onclick='closeAutoCareHealth()'>CLOSE</button></div><div id='autoCareHealthBody'></div></div>`;document.body.appendChild(el);return el}
