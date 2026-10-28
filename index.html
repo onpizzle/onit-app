@@ -40,7 +40,7 @@
 <link rel="preconnect" href="https://script.google.com">
 <link rel="dns-prefetch" href="//www.gstatic.com">
 <link rel="dns-prefetch" href="//script.google.com">
-<link rel="stylesheet" href="./dialog-system.css?v=0.37.3">
+<link rel="stylesheet" href="./dialog-system.css?v=0.37.4">
 <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
@@ -912,10 +912,10 @@ img,video,canvas,svg{max-width:100%}
 .reviewQueueNote{font-size:11px;color:#777;margin-top:6px}
 @media(max-width:760px){.reviewPreviewModal{padding:4px!important}.reviewPreviewModal .modalBox{width:100%!important;height:calc(100dvh - 8px)!important;max-height:none!important;border-radius:12px!important}.previewAssetStage{padding:5px}.previewFooter{padding:7px}.previewNav{justify-content:flex-start;overflow-x:auto;flex-wrap:nowrap}.previewNav .mini{white-space:nowrap}}
 </style>
-<link rel="stylesheet" href="./cases-module.css?v=0.37.3">
-<link rel="stylesheet" href="./activation-command.css?v=0.37.3">
-<link rel="stylesheet" href="./ideas-dump.css?v=0.37.3">
-<link rel="stylesheet" href="./pulse-module.css?v=0.37.3">
+<link rel="stylesheet" href="./cases-module.css?v=0.37.4">
+<link rel="stylesheet" href="./activation-command.css?v=0.37.4">
+<link rel="stylesheet" href="./ideas-dump.css?v=0.37.4">
+<link rel="stylesheet" href="./pulse-module.css?v=0.37.4">
 
 <style id="onit-mobile-nav-v0212">
 .navLabelMobile{display:none!important}
@@ -1029,8 +1029,8 @@ html.onitReduceMotion *,html.onitReduceMotion *::before,html.onitReduceMotion *:
   *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
 }
 </style>
-<link rel="stylesheet" href="./assist-traffic-module.css?v=0.37.3">
-<link rel="stylesheet" href="./core-intelligence.css?v=0.37.3">
+<link rel="stylesheet" href="./assist-traffic-module.css?v=0.37.4">
+<link rel="stylesheet" href="./core-intelligence.css?v=0.37.4">
 <style id="role-consistency-v0311">
 /* ONIT v0.31.2 — role authority + Digital Pulse access hardening */
 .radarMorningGrid .morningMetric b,
@@ -1043,11 +1043,11 @@ html.onitReduceMotion *,html.onitReduceMotion *::before,html.onitReduceMotion *:
 .radarLevel{color:#f2f2ee!important}
 </style>
 
-<link rel="stylesheet" href="./autocare-module.css?v=0.37.3">
-<link rel="stylesheet" href="./command-palette.css?v=0.37.3">
+<link rel="stylesheet" href="./autocare-module.css?v=0.37.4">
+<link rel="stylesheet" href="./command-palette.css?v=0.37.4">
 
-<link rel="stylesheet" href="./visual-contrast.css?v=0.37.3">
-<link rel="stylesheet" href="./attention-loop.css?v=0.37.3">
+<link rel="stylesheet" href="./visual-contrast.css?v=0.37.4">
+<link rel="stylesheet" href="./attention-loop.css?v=0.37.4">
 </head>
 <body>
 <a class="onitSkipLink" href="#mainContent">Skip to main content</a>
@@ -1239,9 +1239,9 @@ html.onitReduceMotion *,html.onitReduceMotion *::before,html.onitReduceMotion *:
 <div id="buzzerReceiveModal" class="modal hidden buzzerPopup" role="dialog" aria-modal="true" aria-labelledby="buzzerReceiveTitle"><div class="modalBox"><div class="buzzerPopupTop"><div class="buzzerPulse"></div><div class="tiny" style="color:#ff9a7d">ONIT BUZZER</div><h2 id="buzzerReceiveTitle">WHERE ARE WE ONIT?</h2><div id="buzzerFrom" class="buzzerFrom"></div></div><div class="buzzerPopupBody"><div id="buzzerBrief" class="buzzerBrief"></div><div id="buzzerResponseStage"><div class="buzzerResponses"><button class="primaryBuzzResponse" onclick="respondToBuzzer('Almost done')">ALMOST DONE</button><button onclick="respondToBuzzer('Still working')">STILL WORKING</button><button onclick="openMoreTimeOptions()">NEED MORE TIME</button><button onclick="respondBlockedBuzzer()">I'M BLOCKED</button></div></div></div></div></div>
 <div id="broadcastModal" class="modal hidden broadcastPopup" role="dialog" aria-modal="true" aria-labelledby="broadcastTitle"><div class="modalBox"><button class="broadcastClose" type="button" aria-label="Close announcement" title="Close" onclick="ackBroadcast()">×</button><div id="broadcastAttachment" class="broadcastAttachment"></div><div class="broadcastCopy"><div class="broadcastKicker">ONIT ANNOUNCEMENT</div><h2 id="broadcastTitle" class="broadcastTitle"></h2><div id="broadcastMessage" class="broadcastMessage"></div></div></div></div>
 <!-- Firebase SDK is lazy-loaded after the primary ONIT dashboard is visible. -->
-<script>const APP_VERSION='0.37.3';
-const UI_REVISION=3703;
-const DASHBOARD_UI_REVISION=37031;
+<script>const APP_VERSION='0.37.4';
+const UI_REVISION=3704;
+const DASHBOARD_UI_REVISION=37041;
 const DASHBOARD_UI_STORAGE_KEY='onit-dashboard-ui-state-v1';
 window.ONIT_RUNTIME={version:APP_VERSION,uiRevision:UI_REVISION,dashboardUiRevision:DASHBOARD_UI_REVISION};
 const BACKEND_DATASETS=['USERS','CLIENTS','BRIEFS','ASSIGNMENTS','ITERATIONS','ACTIVITY_LOG','NOTIFICATIONS','REPORTS'];
@@ -1456,7 +1456,8 @@ async function apiGet(action='bootstrap'){
   if(apiGetInflight.has(key))return apiGetInflight.get(key);
   const request=(async()=>{
     const url=API_URL+'?action='+encodeURIComponent(action)+'&token='+encodeURIComponent(SESSION_TOKEN);
-    try{const r=await fetchWithTimeout(url,{cache:'no-store'},20000);if(!r.ok)throw new Error('API '+r.status);const data=await r.json();if(data.success!==true)throw new Error(data.error||'Could not load ONIT backend.');return data}
+    const timeoutMs=action==='homeBootstrap'?15000:20000;
+    try{const r=await fetchWithTimeout(url,{cache:'no-store'},timeoutMs);if(!r.ok)throw new Error('API '+r.status);const data=await r.json();if(data.success!==true)throw new Error(data.error||'Could not load ONIT backend.');return data}
     catch(e){if(window.AutoCare)window.AutoCare.signalApiFailure(action,e,true);throw e}
   })();
   apiGetInflight.set(key,request);
@@ -1535,6 +1536,27 @@ async function handleSignUp(e){e.preventDefault();const password=document.getEle
 async function handleReset(e){e.preventDefault();const button=e.submitter||document.getElementById('resetSubmit'),stage=button.dataset.stage||'request';button.disabled=true;setBusy(true);try{if(stage==='request'){const res=await apiPost('requestPasswordReset',{email:document.getElementById('resetEmail').value,organisation:document.getElementById('resetOrganisation').value},false);showAuthMessage(((res.data||res).message||'If the account exists, a code was sent.')+' If it does not arrive within 2 minutes, ask your System Owner to confirm the exact email saved on your ONIT account.','ok');document.getElementById('resetCodeFields').classList.remove('hidden');button.textContent='RESET PASSWORD';button.dataset.stage='reset'}else{await apiPost('resetPassword',{email:document.getElementById('resetEmail').value,organisation:document.getElementById('resetOrganisation').value,code:document.getElementById('resetCode').value,password:document.getElementById('resetPassword').value},false);showAuthMode('signin');showAuthMessage('Password reset. You can sign in now.','ok')}}catch(err){showAuthMessage(err.message,'error')}finally{button.disabled=false;setBusy(false)}}
 async function handleSignOut(){try{if(SESSION_TOKEN)await apiPost('signOut',{})}catch(e){}clearSession();document.getElementById('appShell').classList.add('hidden');document.getElementById('authGate').classList.remove('hidden');showAuthMode('signin');showAuthMessage('Signed out.','ok')}
 function authError(err){return /session has expired|AUTH_REQUIRED|Session token/i.test(String(err&&err.message||err))}
+
+function applyHomeBootstrap(data){
+  if(!data||data.success!==true||!data.currentUser)return false;
+  backendVersion=data.version||backendVersion||'';serverOffset=data.serverTime?new Date(data.serverTime).getTime()-Date.now():serverOffset;
+  lastStateVersion=String(data.stateVersion||lastStateVersion||'');
+  organisations=data.organisations||[];users=data.users||[];pendingUsers=data.pendingUsers||[];accessDirectory=data.accessDirectory||[];securityInfo=data.security||null;
+  permissions=data.permissions||{};authority=data.authority||data.permissions||{};if(window.ONITAuthority)ONITAuthority.set(authority);
+  clients=data.clients||[];allAssignments=data.assignments||[];notifications=data.notifications||[];currentUser=data.currentUser||null;
+  CURRENT_USER_ID=rowVal(currentUser,'User ID')||CURRENT_USER_ID;ORG_ID=rowVal(currentUser,'Organisation ID')||ORG_ID;
+  localStorage.setItem('onit-user',CURRENT_USER_ID);localStorage.setItem('onit-org',ORG_ID);
+  briefs=(data.briefs||[]).map(sheetBriefToUI);
+  briefs.forEach(b=>{const as=allAssignments.filter(r=>sameBrief(r,b.code)&&String(rowVal(r,'Assignment Type','assignmentType')).toUpperCase()==='TO'&&String(rowVal(r,'Active','active')).toLowerCase()!=='false');if(as.length){b.assignee=as.map(r=>rowVal(r,'Full Name','fullName')||'Assigned team').join(' + ');b.assigneeUserId=rowVal(as[0],'User ID','userId');b.assigneeFullName=rowVal(as[0],'Full Name','fullName')||b.assignee}});
+  apiOnline=true;lastSuccessfulSyncAt=Date.now();updateLastSyncLabel(false);connectionNotice('');
+  applyPermissions();populateClients();populateAssignees();renderHome();renderNotifications();queuePendingBuzzers_();
+  showSyncChip('LOADING FULL WORKSPACE');
+  return true;
+}
+async function loadFastHome(){
+  if(!SESSION_TOKEN)return false;
+  try{const data=await apiGet('homeBootstrap');return applyHomeBootstrap(data)}catch(e){console.warn('ONIT fast Home bootstrap:',e);return false}
+}
 
 async function loadFromGoogle(strict=false,silent=false){
   if(!SESSION_TOKEN)return;
@@ -2891,22 +2913,22 @@ refreshInstallButton();
 
 setInterval(()=>{if(!document.getElementById('briefs').classList.contains('hidden'))renderBriefs();if(current&&!document.getElementById('detail').classList.contains('hidden')){const t=timeInfo(current),el=document.getElementById('dtimer');el.textContent=t.text;el.className='num '+t.cls}renderApprovalClocks()},1000);
 setInterval(()=>{const now=Date.now(),gap=firebaseRealtimeHealthy?300000:120000;if(now-lastFallbackPulseAt>=gap){lastFallbackPulseAt=now;checkForUpdates()}},5000);
-async function boot(){if(SESSION_TOKEN){document.getElementById('authGate').classList.add('hidden');document.getElementById('appShell').classList.remove('hidden');const cached=await readStartupSnapshot();if(cached&&restoreStartupState(cached)){loadFromGoogle(false,true);return}await loadFromGoogle(false);if(SESSION_TOKEN)return}document.getElementById('appShell').classList.add('hidden');document.getElementById('authGate').classList.remove('hidden');showAuthMode('signin')}
+async function boot(){if(SESSION_TOKEN){document.getElementById('authGate').classList.add('hidden');document.getElementById('appShell').classList.remove('hidden');const cached=await readStartupSnapshot();if(cached&&restoreStartupState(cached)){loadFromGoogle(false,true);return}const fast=await loadFastHome();if(fast){loadFromGoogle(false,true);return}await loadFromGoogle(false);if(SESSION_TOKEN)return}document.getElementById('appShell').classList.add('hidden');document.getElementById('authGate').classList.remove('hidden');showAuthMode('signin')}
 document.addEventListener('DOMContentLoaded',()=>boot(),{once:true});
 </script>
-<script src="./dialog-system.js?v=0.37.3"></script>
-<script src="./authority-engine.js?v=0.37.3"></script>
-<script src="./sync-engine.js?v=0.37.3"></script>
-<script src="./release-guard.js?v=0.37.3"></script>
-<script src="./command-palette.js?v=0.37.3"></script>
-<script src="./autocare-module.js?v=0.37.3"></script>
-<script src="./cases-module.js?v=0.37.3"></script>
-<script src="./activation-command.js?v=0.37.3"></script>
-<script src="./ideas-dump.js?v=0.37.3"></script>
-<script src="./pulse-module.js?v=0.37.3"></script>
-<script src="./assist-traffic-module.js?v=0.37.3"></script>
-<script src="./core-intelligence.js?v=0.37.3"></script>
-<script src="./attention-loop.js?v=0.37.3"></script>
+<script src="./dialog-system.js?v=0.37.4"></script>
+<script src="./authority-engine.js?v=0.37.4"></script>
+<script src="./sync-engine.js?v=0.37.4"></script>
+<script src="./release-guard.js?v=0.37.4"></script>
+<script src="./command-palette.js?v=0.37.4"></script>
+<script src="./autocare-module.js?v=0.37.4"></script>
+<script src="./cases-module.js?v=0.37.4"></script>
+<script src="./activation-command.js?v=0.37.4"></script>
+<script src="./ideas-dump.js?v=0.37.4"></script>
+<script src="./pulse-module.js?v=0.37.4"></script>
+<script src="./assist-traffic-module.js?v=0.37.4"></script>
+<script src="./core-intelligence.js?v=0.37.4"></script>
+<script src="./attention-loop.js?v=0.37.4"></script>
 </body>
 </html>
 
