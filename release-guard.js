@@ -1,7 +1,7 @@
-/* ONIT Production Release Guard v1.0 */
+/* ONIT Production Release Guard v1.0.1 */
 (function(){
 'use strict';
-const VERSION='1.0.0';let last={status:'CHECKING',checkedAt:0,issues:[],published:null,worker:null};
+const VERSION='1.0.1';let last={status:'CHECKING',checkedAt:0,issues:[],published:null,worker:null};
 function extract(text,re){const m=String(text||'').match(re);return m?m[1]:''}
 async function check(){
  const issues=[];let published=null,worker=null;
