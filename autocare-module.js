@@ -5,7 +5,7 @@ const AUTOCARE_VERSION='1.3.0';
 const ISSUE_KEY='onit-autocare-issues-v1';
 const REPAIR_KEY='onit-autocare-repairs-v1';
 const LAST_GOOD_KEY='onit-autocare-last-good-version';
-const HEALTH_INTERVAL_MS=120000;
+const HEALTH_INTERVAL_MS=180000;
 const REALTIME_REPAIR_COOLDOWN_MS=60000;
 const PERMISSION_REPAIR_COOLDOWN_MS=60000;
 const MAX_LOG=24;
@@ -40,6 +40,7 @@ function refreshLocalSnapshot(){lastHealth.network=online()?'OK':'OFFLINE';lastH
 
 async function backendHealth(){
   if(!signedIn())return null;
+  try{if(typeof lastSuccessfulSyncAt!=='undefined'&&lastSuccessfulSyncAt&&now()-lastSuccessfulSyncAt<120000){lastBackendOkAt=now();lastHealth.backend='OK';lastHealth.permissions='SYNCED';return{recentSync:true}}}catch(e){}
   try{if(typeof currentUser!=='undefined'&&!currentUser)return null}catch(e){}
   try{
     let data;
@@ -141,7 +142,7 @@ async function copyDiagnostics(){
   const value=JSON.stringify(payload,null,2);
   try{await navigator.clipboard.writeText(value);showToast('ONIT AutoCare','Diagnostics copied.');return true}catch(e){recordIssue('DIAGNOSTIC_COPY',e);return false}
 }
-function start(){if(timer)return;refreshLocalSnapshot();timer=setInterval(()=>{if(!document.hidden)runCheck(false)},HEALTH_INTERVAL_MS);setTimeout(()=>runCheck(false),3500)}
+function start(){if(timer)return;refreshLocalSnapshot();timer=setInterval(()=>{if(!document.hidden)runCheck(false)},HEALTH_INTERVAL_MS);setTimeout(()=>runCheck(false),30000)}
 function stop(){if(timer){clearInterval(timer);timer=null}}
 
 window.addEventListener('error',e=>{

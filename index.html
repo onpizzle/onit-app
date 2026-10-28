@@ -24,7 +24,7 @@
 <link rel="preconnect" href="https://script.google.com">
 <link rel="dns-prefetch" href="//www.gstatic.com">
 <link rel="dns-prefetch" href="//script.google.com">
-<link rel="stylesheet" href="./dialog-system.css?v=0.36.8">
+<link rel="stylesheet" href="./dialog-system.css?v=0.36.9">
 <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
@@ -896,10 +896,10 @@ img,video,canvas,svg{max-width:100%}
 .reviewQueueNote{font-size:11px;color:#777;margin-top:6px}
 @media(max-width:760px){.reviewPreviewModal{padding:4px!important}.reviewPreviewModal .modalBox{width:100%!important;height:calc(100dvh - 8px)!important;max-height:none!important;border-radius:12px!important}.previewAssetStage{padding:5px}.previewFooter{padding:7px}.previewNav{justify-content:flex-start;overflow-x:auto;flex-wrap:nowrap}.previewNav .mini{white-space:nowrap}}
 </style>
-<link rel="stylesheet" href="./cases-module.css?v=0.36.8">
-<link rel="stylesheet" href="./activation-command.css?v=0.36.8">
-<link rel="stylesheet" href="./ideas-dump.css?v=0.36.8">
-<link rel="stylesheet" href="./pulse-module.css?v=0.36.8">
+<link rel="stylesheet" href="./cases-module.css?v=0.36.9">
+<link rel="stylesheet" href="./activation-command.css?v=0.36.9">
+<link rel="stylesheet" href="./ideas-dump.css?v=0.36.9">
+<link rel="stylesheet" href="./pulse-module.css?v=0.36.9">
 
 <style id="onit-mobile-nav-v0212">
 .navLabelMobile{display:none!important}
@@ -1013,8 +1013,8 @@ html.onitReduceMotion *,html.onitReduceMotion *::before,html.onitReduceMotion *:
   *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
 }
 </style>
-<link rel="stylesheet" href="./assist-traffic-module.css?v=0.36.8">
-<link rel="stylesheet" href="./core-intelligence.css?v=0.36.8">
+<link rel="stylesheet" href="./assist-traffic-module.css?v=0.36.9">
+<link rel="stylesheet" href="./core-intelligence.css?v=0.36.9">
 <style id="role-consistency-v0311">
 /* ONIT v0.31.2 — role authority + Digital Pulse access hardening */
 .radarMorningGrid .morningMetric b,
@@ -1027,11 +1027,11 @@ html.onitReduceMotion *,html.onitReduceMotion *::before,html.onitReduceMotion *:
 .radarLevel{color:#f2f2ee!important}
 </style>
 
-<link rel="stylesheet" href="./autocare-module.css?v=0.36.8">
-<link rel="stylesheet" href="./command-palette.css?v=0.36.8">
+<link rel="stylesheet" href="./autocare-module.css?v=0.36.9">
+<link rel="stylesheet" href="./command-palette.css?v=0.36.9">
 
-<link rel="stylesheet" href="./visual-contrast.css?v=0.36.8">
-<link rel="stylesheet" href="./attention-loop.css?v=0.36.8">
+<link rel="stylesheet" href="./visual-contrast.css?v=0.36.9">
+<link rel="stylesheet" href="./attention-loop.css?v=0.36.9">
 </head>
 <body>
 <a class="onitSkipLink" href="#mainContent">Skip to main content</a>
@@ -1226,9 +1226,9 @@ html.onitReduceMotion *,html.onitReduceMotion *::before,html.onitReduceMotion *:
 <script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-messaging-compat.js"></script>
-<script>const APP_VERSION='0.36.8';
-const UI_REVISION=3670;
-const DASHBOARD_UI_REVISION=36701;
+<script>const APP_VERSION='0.36.9';
+const UI_REVISION=3690;
+const DASHBOARD_UI_REVISION=36901;
 const DASHBOARD_UI_STORAGE_KEY='onit-dashboard-ui-state-v1';
 window.ONIT_RUNTIME={version:APP_VERSION,uiRevision:UI_REVISION,dashboardUiRevision:DASHBOARD_UI_REVISION};
 const BACKEND_DATASETS=['USERS','CLIENTS','BRIEFS','ASSIGNMENTS','ITERATIONS','ACTIVITY_LOG','NOTIFICATIONS','REPORTS'];
@@ -1359,7 +1359,7 @@ function updateLastSyncLabel(stale=false){const el=document.getElementById('last
 function staleConnectionMessage(){return lastSuccessfulSyncAt?`Showing last synced data from ${syncClockText()}. Reconnecting…`:'ONIT could not refresh right now. Reconnecting…'}
 function clearRefreshRetry(){if(refreshRetryTimer){clearTimeout(refreshRetryTimer);refreshRetryTimer=null}refreshRetryAttempt=0;refreshRecoveryPending=false}
 function markFullSyncSuccess(){lastSuccessfulSyncAt=Date.now();try{localStorage.setItem('onit-last-sync',String(lastSuccessfulSyncAt))}catch(e){}clearRefreshRetry();updateLastSyncLabel(false);connectionNotice('')}
-function scheduleFullRefreshRetry(){refreshRecoveryPending=true;if(refreshRetryTimer||!SESSION_TOKEN)return;const delay=Math.min(15000*Math.pow(2,Math.min(refreshRetryAttempt,3)),120000);refreshRetryAttempt++;refreshRetryTimer=setTimeout(async()=>{refreshRetryTimer=null;if(!SESSION_TOKEN)return clearRefreshRetry();if(navigator.onLine===false||document.hidden){scheduleFullRefreshRetry();return}await loadFromGoogle(false,true)},delay)}
+function scheduleFullRefreshRetry(){refreshRecoveryPending=true;if(refreshRetryTimer||!SESSION_TOKEN)return;const delay=Math.min(30000*Math.pow(2,Math.min(refreshRetryAttempt,3)),180000);refreshRetryAttempt++;refreshRetryTimer=setTimeout(async()=>{refreshRetryTimer=null;if(!SESSION_TOKEN)return clearRefreshRetry();if(navigator.onLine===false||document.hidden){scheduleFullRefreshRetry();return}await loadFromGoogle(false,true)},delay)}
 async function recoverConnectionNow(){if(!SESSION_TOKEN||refreshInFlight||mutationBusy||navigator.onLine===false)return;refreshRecoveryPending=true;if(refreshRetryTimer){clearTimeout(refreshRetryTimer);refreshRetryTimer=null}await loadFromGoogle(false,true)}
 
 function sheetBriefToUI(r){return {
@@ -1377,24 +1377,30 @@ async function fetchWithTimeout(url,options={},timeoutMs=25000){
   finally{clearTimeout(timer)}
 }
 function apiRetryableError(err){return /timed out|failed to fetch|network|load failed|API 5\d\d|API 429/i.test(String(err&&err.message||err||''))}
+const apiGetInflight=new Map(),apiSafeReadInflight=new Map();
 async function apiGet(action='bootstrap'){
   if(!SESSION_TOKEN)throw new Error('AUTH_REQUIRED');
-  const url=API_URL+'?action='+encodeURIComponent(action)+'&token='+encodeURIComponent(SESSION_TOKEN);
-  let lastError=null;
-  for(let attempt=0;attempt<2;attempt++){
+  const key=String(action||'bootstrap');
+  if(apiGetInflight.has(key))return apiGetInflight.get(key);
+  const request=(async()=>{
+    const url=API_URL+'?action='+encodeURIComponent(action)+'&token='+encodeURIComponent(SESSION_TOKEN);
     try{const r=await fetchWithTimeout(url,{cache:'no-store'},20000);if(!r.ok)throw new Error('API '+r.status);const data=await r.json();if(data.success!==true)throw new Error(data.error||'Could not load ONIT backend.');return data}
-    catch(e){lastError=e;if(window.AutoCare)window.AutoCare.signalApiFailure(action,e,true);if(attempt===0&&apiRetryableError(e)){await sleep(650);continue}throw e}
-  }
-  throw lastError||new Error('Could not load ONIT backend.');
+    catch(e){if(window.AutoCare)window.AutoCare.signalApiFailure(action,e,true);throw e}
+  })();
+  apiGetInflight.set(key,request);
+  try{return await request}finally{if(apiGetInflight.get(key)===request)apiGetInflight.delete(key)}
 }
 async function apiPost(action,payload={},requiresAuth=true){
   const data={...payload};if(requiresAuth){if(!SESSION_TOKEN)throw new Error('AUTH_REQUIRED');data.sessionToken=SESSION_TOKEN}
-  const safeRead=SAFE_RETRY_POST_ACTIONS.has(action),attempts=safeRead?2:1,timeoutMs=action==='createOwnerBroadcast'?60000:30000;let lastError=null;
-  for(let attempt=0;attempt<attempts;attempt++){
+  const safeRead=SAFE_RETRY_POST_ACTIONS.has(action),attempts=safeRead?2:1,timeoutMs=action==='createOwnerBroadcast'?60000:30000;
+  const readKey=safeRead?action+'|'+JSON.stringify(payload||{}):'';
+  if(safeRead&&apiSafeReadInflight.has(readKey))return apiSafeReadInflight.get(readKey);
+  const request=(async()=>{let lastError=null;for(let attempt=0;attempt<attempts;attempt++){
     try{const r=await fetchWithTimeout(API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action,data})},timeoutMs);if(!r.ok)throw new Error('API '+r.status);const result=await r.json();if(!result.success)throw new Error(result.error||result.message||'API request failed');return result}
-    catch(e){lastError=e;if(window.AutoCare)window.AutoCare.signalApiFailure(action,e,safeRead);if(safeRead&&attempt===0&&apiRetryableError(e)){await sleep(650);continue}throw e}
-  }
-  throw lastError||new Error('API request failed');
+    catch(e){lastError=e;if(window.AutoCare)window.AutoCare.signalApiFailure(action,e,safeRead);if(safeRead&&attempt===0&&apiRetryableError(e)){await sleep(900);continue}throw e}
+  }throw lastError||new Error('API request failed')})();
+  if(safeRead)apiSafeReadInflight.set(readKey,request);
+  try{return await request}finally{if(safeRead&&apiSafeReadInflight.get(readKey)===request)apiSafeReadInflight.delete(readKey)}
 }
 function table(data,name){if(name==='ACTIVITY_LOG'&&Array.isArray(data.activity))return data.activity;return data[name]||data[name.toLowerCase()]||data.data?.[name]||data.data?.[name.toLowerCase()]||[]}
 function sleep(ms){return new Promise(r=>setTimeout(r,ms))}
@@ -2768,23 +2774,23 @@ if('serviceWorker' in navigator && isHttpsApp() && !isStagingEnvironment()){
 refreshInstallButton();
 
 setInterval(()=>{if(!document.getElementById('briefs').classList.contains('hidden'))renderBriefs();if(current&&!document.getElementById('detail').classList.contains('hidden')){const t=timeInfo(current),el=document.getElementById('dtimer');el.textContent=t.text;el.className='num '+t.cls}renderApprovalClocks()},1000);
-setInterval(()=>{const now=Date.now(),gap=firebaseRealtimeHealthy?60000:15000;if(now-lastFallbackPulseAt>=gap){lastFallbackPulseAt=now;checkForUpdates()}},5000);
+setInterval(()=>{const now=Date.now(),gap=firebaseRealtimeHealthy?180000:60000;if(now-lastFallbackPulseAt>=gap){lastFallbackPulseAt=now;checkForUpdates()}},5000);
 async function boot(){if(SESSION_TOKEN){document.getElementById('authGate').classList.add('hidden');document.getElementById('appShell').classList.remove('hidden');await loadFromGoogle(false);if(SESSION_TOKEN)return}document.getElementById('appShell').classList.add('hidden');document.getElementById('authGate').classList.remove('hidden');showAuthMode('signin')}
 document.addEventListener('DOMContentLoaded',()=>boot(),{once:true});
 </script>
-<script src="./dialog-system.js?v=0.36.8"></script>
-<script src="./authority-engine.js?v=0.36.8"></script>
-<script src="./sync-engine.js?v=0.36.8"></script>
-<script src="./release-guard.js?v=0.36.8"></script>
-<script src="./command-palette.js?v=0.36.8"></script>
-<script src="./autocare-module.js?v=0.36.8"></script>
-<script src="./cases-module.js?v=0.36.8"></script>
-<script src="./activation-command.js?v=0.36.8"></script>
-<script src="./ideas-dump.js?v=0.36.8"></script>
-<script src="./pulse-module.js?v=0.36.8"></script>
-<script src="./assist-traffic-module.js?v=0.36.8"></script>
-<script src="./core-intelligence.js?v=0.36.8"></script>
-<script src="./attention-loop.js?v=0.36.8"></script>
+<script src="./dialog-system.js?v=0.36.9"></script>
+<script src="./authority-engine.js?v=0.36.9"></script>
+<script src="./sync-engine.js?v=0.36.9"></script>
+<script src="./release-guard.js?v=0.36.9"></script>
+<script src="./command-palette.js?v=0.36.9"></script>
+<script src="./autocare-module.js?v=0.36.9"></script>
+<script src="./cases-module.js?v=0.36.9"></script>
+<script src="./activation-command.js?v=0.36.9"></script>
+<script src="./ideas-dump.js?v=0.36.9"></script>
+<script src="./pulse-module.js?v=0.36.9"></script>
+<script src="./assist-traffic-module.js?v=0.36.9"></script>
+<script src="./core-intelligence.js?v=0.36.9"></script>
+<script src="./attention-loop.js?v=0.36.9"></script>
 </body>
 </html>
 
