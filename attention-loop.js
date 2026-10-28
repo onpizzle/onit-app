@@ -1,4 +1,4 @@
-/* ONIT v0.36.3 — Persistent Brief Attention Loop */
+/* ONIT v0.36.4 — Persistent Brief Attention Loop */
 (function(){
   const VERSION='0.1.0',SNOOZE_MS=10*60*1000,CHECK_MS=60*1000;
   let promptBusy=false,bootDeepLinkHandled=false,lastVisualSignature='';

@@ -4,6 +4,8 @@ let v030TrafficTab='jobbag';
 let v030Assist={active:false,sessionId:'',targetUserId:'',targetName:'',target:null,tab:'dashboard'};
 let v030ShownHandover='';
 let v030ShownCompletion='';
+let v0365TeamFilter='all';
+let v0365TeamSort='name';
 const v030BaseApiPost=apiPost;
 const v030BaseLoadFromGoogle=loadFromGoogle;
 const v030BaseRenderHome=renderHome;
@@ -76,8 +78,30 @@ function v030MaybeShowHandover(){if(v030Data.pendingForMe?.length){const h=v030D
 async function v030RespondHandover(response,button){const id=v030ById('v030HandoverResponseModal').dataset.id,note=v030ById('v030HandoverResponseNote').value.trim();if(response!=='ACCEPT'&&!note)return onitAlert('Add a short reason or alternative.');const old=button.textContent;try{button.disabled=true;button.textContent='SENDING…';await v030BaseApiPost('trafficRespondHandover',{handoverId:id,response,note});v030ById('v030HandoverResponseModal').classList.add('hidden');await v030LoadData(false);showToast('Handover response sent',response==='ACCEPT'?'Traffic and the current owner have been notified.':'Traffic has your response.')}catch(e){onitAlert(e.message)}finally{button.disabled=false;button.textContent=old}}
 async function v030CompleteHandover(button){const id=v030ById('v030HandoverCompleteModal').dataset.id,note=v030ById('v030HandoverNote').value.trim(),workingLink=v030ById('v030HandoverLink').value.trim();if(!note)return onitAlert('Add a short handover note.');const old=button.textContent;try{button.disabled=true;button.textContent='TRANSFERRING…';await v030BaseApiPost('trafficCompleteHandover',{handoverId:id,note,workingLink});v030ById('v030HandoverCompleteModal').classList.add('hidden');await loadFromGoogle(true,true);showToast('Handover complete','The new assignee now owns the work and has been notified.')}catch(e){onitAlert(e.message)}finally{button.disabled=false;button.textContent=old}}
 
-function v030TeamCard(w){const u=v030UserById(w.userId),open=teamOpenCount(w),busy=open>0,status=busy?'WORKING':'AVAILABLE',dot=busy?(w.overdueCount?'redbg':'orangebg'):'',assist=isOwner()&&u&&permissionProfile(u)!=='ORG_OWNER'?`<button class='secondary v030AssistButton' onclick="v030StartAssist('${encodeURIComponent(w.userId)}')">ASSIST USER</button>`:'',traffic=isTrafficManagerUser()&&open?`<button class='secondary' onclick="v030OpenPersonWork('${encodeURIComponent(w.userId)}')">MANAGE WORK</button>`:'';return `<article class='card v030TeamCard'><div class='person'><div class='v030PersonMain'><div class='avatar' data-avatar-user='${escapeHTML(w.userId)}'>${escapeHTML(initials(w.fullName||''))}</div><div><b>${escapeHTML(w.fullName||'Team member')}</b><div class='tiny'>${escapeHTML(w.position||w.department||'')}</div></div></div><span class='v030TeamStatus'><i class='dot ${dot}'></i>${status}</span></div><div class='v030TeamStats'><span><b>${open}</b> open</span><span><b>${Number(w.overdueCount||0)}</b> overdue</span></div>${w.nextDeadline?`<div class='tiny'>Next deadline: ${escapeHTML(formatDateTime(w.nextDeadline))}</div>`:''}<div class='actions'>${assist}${traffic}</div></article>`}
-function v030RenderTeam(){const host=v030ById('teamGrid');if(!host)return;host.innerHTML=teamWorkload.length?teamWorkload.map(v030TeamCard).join(''):`<div class='empty'>No team data yet.</div>`;hydrateProfilePhotos()}
+function v0365TeamRows(){
+  let rows=(teamWorkload||[]).slice();
+  if(v0365TeamFilter==='available')rows=rows.filter(w=>Number(w.activeCount||0)<=0);
+  if(v0365TeamFilter==='working')rows=rows.filter(w=>Number(w.activeCount||0)>0);
+  if(v0365TeamSort==='workload')rows.sort((a,b)=>(teamOpenCount(b)-teamOpenCount(a))||String(a.fullName||'').localeCompare(String(b.fullName||'')));
+  else if(v0365TeamSort==='status')rows.sort((a,b)=>(Number(b.activeCount||0)>0?1:0)-(Number(a.activeCount||0)>0?1:0)||String(a.fullName||'').localeCompare(String(b.fullName||'')));
+  else rows.sort((a,b)=>String(a.fullName||'').localeCompare(String(b.fullName||'')));
+  return rows;
+}
+function v0365TeamCounts(){const all=(teamWorkload||[]).length,working=(teamWorkload||[]).filter(w=>Number(w.activeCount||0)>0).length;return{all,working,available:Math.max(0,all-working)}}
+function v0365SetTeamFilter(filter){v0365TeamFilter=filter||'all';v030RenderTeam()}
+function v0365SetTeamSort(sort){v0365TeamSort=sort||'name';v030RenderTeam()}
+function v0365RenderTeamControls(){
+  const host=v030ById('teamFilterBar'),sort=v030ById('teamSort'),c=v0365TeamCounts();if(!host)return;
+  host.innerHTML=[['all','All',c.all],['available','Available',c.available],['working','Working',c.working]].map(([id,label,n])=>`<button class='teamFilterPill ${v0365TeamFilter===id?'active':''}' onclick="v0365SetTeamFilter('${id}')"><span>${label}</span><b>${n}</b></button>`).join('');
+  if(sort&&sort.value!==v0365TeamSort)sort.value=v0365TeamSort;
+}
+function v0365ToggleTeamActions(event,encoded){event?.stopPropagation();const panel=v030ById('teamActions-'+encoded);if(!panel)return;panel.classList.toggle('hidden');const btn=event?.currentTarget;if(btn)btn.classList.toggle('open',!panel.classList.contains('hidden'))}
+function v0365StatIcon(kind){return kind==='late'?`<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 7.5v5l3 1.8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>`:`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3.8h7l3 3V20H7z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M14 3.8V7h3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>`}
+function v030TeamCard(w){
+  const u=v030UserById(w.userId),open=teamOpenCount(w),busy=Number(w.activeCount||0)>0,status=busy?'Working':'Available',encoded=encodeURIComponent(String(w.userId||'')),assist=isOwner()&&u&&permissionProfile(u)!=='ORG_OWNER'?`<button class='secondary v030AssistButton' onclick="event.stopPropagation();v030StartAssist('${encoded}')">ASSIST USER</button>`:'',traffic=isTrafficManagerUser()&&open?`<button class='secondary' onclick="event.stopPropagation();v030OpenPersonWork('${encoded}')">MANAGE WORK</button>`:'',extra=(assist||traffic||w.nextDeadline)?`<div class='teamProActionTray hidden' id='teamActions-${encoded}'>${w.nextDeadline?`<div class='teamProDeadline'><span>Next deadline</span><b>${escapeHTML(formatDateTime(w.nextDeadline))}</b></div>`:''}${assist||traffic?`<div class='teamProActionButtons'>${assist}${traffic}</div>`:''}</div>`:'';
+  return `<article class='teamProCard ${busy?'isWorking':'isAvailable'}'><div class='teamProTop'><div class='teamProIdentity'><div class='avatar teamProAvatar' data-avatar-user='${escapeHTML(w.userId)}'>${escapeHTML(initials(w.fullName||''))}</div><div class='teamProName'><b>${escapeHTML(w.fullName||'Team member')}</b><span>${escapeHTML(w.position||w.department||'')}</span></div></div><div class='teamProStatusWrap'><span class='teamProStatus ${busy?'working':'available'}'><i></i>${status}</span><button class='teamProChevron' aria-label='Show team member details' onclick="v0365ToggleTeamActions(event,'${encoded}')">›</button></div></div><div class='teamProDivider'></div><div class='teamProStats'><div class='teamProMetric'><span class='teamProMetricIcon'>${v0365StatIcon('open')}</span><div><b>${open}</b><span>Open tasks</span></div></div><div class='teamProMetric teamProMetricLate'><span class='teamProMetricIcon'>${v0365StatIcon('late')}</span><div><b>${Number(w.overdueCount||0)}</b><span>Overdue</span></div></div></div>${extra}</article>`;
+}
+function v030RenderTeam(){const host=v030ById('teamGrid');if(!host)return;v0365RenderTeamControls();const rows=v0365TeamRows();host.innerHTML=rows.length?rows.map(v030TeamCard).join(''):`<div class='empty'>No team members match this view.</div>`;hydrateProfilePhotos()}
 renderTeam=v030RenderTeam;
 function v030OpenPersonWork(encoded){const id=decodeURIComponent(encoded),rows=v030InMotionRows().filter(x=>String(x.userId)===String(id));if(!rows.length)return onitAlert('No active work is currently in motion for this person.');v030TrafficTab='motion';show('home');setTimeout(()=>{v030RenderTrafficCommand();v030ById('trafficCommandRoot')?.scrollIntoView({behavior:'smooth',block:'start'})},80)}
 

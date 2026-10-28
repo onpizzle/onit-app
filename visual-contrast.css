@@ -23,3 +23,21 @@ a:hover{text-decoration:underline}
 
 button,[role="button"]{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 .onitDialogBtn.primary,.onitDialogBtn.primary *{color:#fff!important}
+
+/* ONIT v0.36.4 — leadership response controls */
+.leadershipResponseBox{margin:0 0 14px;padding:18px;border:1px solid #e2ded8;border-radius:16px;background:#fff;color:#171717!important}
+.leadershipResponseBox *{color:#171717!important}
+.leadershipResponseKicker{font-size:9px;font-weight:950;letter-spacing:.14em;margin-bottom:5px}
+.leadershipResponseBox h3{font-size:20px;margin:0 0 5px}
+.leadershipResponseBox p{font-size:12px;line-height:1.5;margin:0;color:#555!important}
+.leadershipResponseActions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.leadershipResponseActions button{min-height:44px;border-radius:10px;padding:10px 16px;font-weight:950;border:1px solid #171717;cursor:pointer}
+.leadershipApprove{background:#178d50!important;border-color:#178d50!important;color:#fff!important}
+.leadershipApprove *{color:#fff!important}
+.leadershipSendBack{background:#d93632!important;border-color:#d93632!important;color:#fff!important}
+.leadershipSendBack *{color:#fff!important}
+.leadershipComment{background:#171717!important;border-color:#171717!important;color:#fff!important}
+.leadershipComment *{color:#fff!important}
+.leadershipResponseLatest{margin-top:12px;border-radius:10px;padding:10px 12px;font-size:11px;line-height:1.45;border:1px solid #ddd;background:#f7f6f3}
+.leadershipResponseLatest div{margin-top:5px}
+@media(max-width:760px){.leadershipResponseActions{display:grid;grid-template-columns:1fr}.leadershipResponseActions button{width:100%}}
