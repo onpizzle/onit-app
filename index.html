@@ -40,7 +40,7 @@
 <link rel="preconnect" href="https://script.google.com">
 <link rel="dns-prefetch" href="//www.gstatic.com">
 <link rel="dns-prefetch" href="//script.google.com">
-<link rel="stylesheet" href="./dialog-system.css?v=0.37.2">
+<link rel="stylesheet" href="./dialog-system.css?v=0.37.3">
 <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
@@ -912,10 +912,10 @@ img,video,canvas,svg{max-width:100%}
 .reviewQueueNote{font-size:11px;color:#777;margin-top:6px}
 @media(max-width:760px){.reviewPreviewModal{padding:4px!important}.reviewPreviewModal .modalBox{width:100%!important;height:calc(100dvh - 8px)!important;max-height:none!important;border-radius:12px!important}.previewAssetStage{padding:5px}.previewFooter{padding:7px}.previewNav{justify-content:flex-start;overflow-x:auto;flex-wrap:nowrap}.previewNav .mini{white-space:nowrap}}
 </style>
-<link rel="stylesheet" href="./cases-module.css?v=0.37.2">
-<link rel="stylesheet" href="./activation-command.css?v=0.37.2">
-<link rel="stylesheet" href="./ideas-dump.css?v=0.37.2">
-<link rel="stylesheet" href="./pulse-module.css?v=0.37.2">
+<link rel="stylesheet" href="./cases-module.css?v=0.37.3">
+<link rel="stylesheet" href="./activation-command.css?v=0.37.3">
+<link rel="stylesheet" href="./ideas-dump.css?v=0.37.3">
+<link rel="stylesheet" href="./pulse-module.css?v=0.37.3">
 
 <style id="onit-mobile-nav-v0212">
 .navLabelMobile{display:none!important}
@@ -1029,8 +1029,8 @@ html.onitReduceMotion *,html.onitReduceMotion *::before,html.onitReduceMotion *:
   *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
 }
 </style>
-<link rel="stylesheet" href="./assist-traffic-module.css?v=0.37.2">
-<link rel="stylesheet" href="./core-intelligence.css?v=0.37.2">
+<link rel="stylesheet" href="./assist-traffic-module.css?v=0.37.3">
+<link rel="stylesheet" href="./core-intelligence.css?v=0.37.3">
 <style id="role-consistency-v0311">
 /* ONIT v0.31.2 — role authority + Digital Pulse access hardening */
 .radarMorningGrid .morningMetric b,
@@ -1043,11 +1043,11 @@ html.onitReduceMotion *,html.onitReduceMotion *::before,html.onitReduceMotion *:
 .radarLevel{color:#f2f2ee!important}
 </style>
 
-<link rel="stylesheet" href="./autocare-module.css?v=0.37.2">
-<link rel="stylesheet" href="./command-palette.css?v=0.37.2">
+<link rel="stylesheet" href="./autocare-module.css?v=0.37.3">
+<link rel="stylesheet" href="./command-palette.css?v=0.37.3">
 
-<link rel="stylesheet" href="./visual-contrast.css?v=0.37.2">
-<link rel="stylesheet" href="./attention-loop.css?v=0.37.2">
+<link rel="stylesheet" href="./visual-contrast.css?v=0.37.3">
+<link rel="stylesheet" href="./attention-loop.css?v=0.37.3">
 </head>
 <body>
 <a class="onitSkipLink" href="#mainContent">Skip to main content</a>
@@ -1238,13 +1238,10 @@ html.onitReduceMotion *,html.onitReduceMotion *::before,html.onitReduceMotion *:
 <div id="buzzerComposeModal" class="modal hidden buzzerCompose" onclick="if(event.target===this)closeBuzzerComposer()"><div class="modalBox"><div class="modalTop"><b>BUZZER</b><button class="secondary" onclick="closeBuzzerComposer()">CLOSE</button></div><div class="buzzerHero"><div class="tiny" style="color:#ff8a69">QUICK PROGRESS NUDGE</div><h2>Where are we ONIT?</h2><p>Select a person and the live brief they are working on. You can select several people only when they are on the same brief.</p></div><div class="field"><label>WHO DO YOU WANT TO BUZZ?</label><select id="buzzerTargets" class="buzzerTargetSelect" multiple></select><div class="buzzerNote">Each line shows the person, active job and current status. Same person + same brief has a 20-minute cooldown.</div></div><div class="actions"><button class="new" onclick="sendBuzzerNow(this)">SEND BUZZER</button></div></div></div>
 <div id="buzzerReceiveModal" class="modal hidden buzzerPopup" role="dialog" aria-modal="true" aria-labelledby="buzzerReceiveTitle"><div class="modalBox"><div class="buzzerPopupTop"><div class="buzzerPulse"></div><div class="tiny" style="color:#ff9a7d">ONIT BUZZER</div><h2 id="buzzerReceiveTitle">WHERE ARE WE ONIT?</h2><div id="buzzerFrom" class="buzzerFrom"></div></div><div class="buzzerPopupBody"><div id="buzzerBrief" class="buzzerBrief"></div><div id="buzzerResponseStage"><div class="buzzerResponses"><button class="primaryBuzzResponse" onclick="respondToBuzzer('Almost done')">ALMOST DONE</button><button onclick="respondToBuzzer('Still working')">STILL WORKING</button><button onclick="openMoreTimeOptions()">NEED MORE TIME</button><button onclick="respondBlockedBuzzer()">I'M BLOCKED</button></div></div></div></div></div>
 <div id="broadcastModal" class="modal hidden broadcastPopup" role="dialog" aria-modal="true" aria-labelledby="broadcastTitle"><div class="modalBox"><button class="broadcastClose" type="button" aria-label="Close announcement" title="Close" onclick="ackBroadcast()">×</button><div id="broadcastAttachment" class="broadcastAttachment"></div><div class="broadcastCopy"><div class="broadcastKicker">ONIT ANNOUNCEMENT</div><h2 id="broadcastTitle" class="broadcastTitle"></h2><div id="broadcastMessage" class="broadcastMessage"></div></div></div></div>
-<script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-messaging-compat.js"></script>
-<script>const APP_VERSION='0.37.2';
-const UI_REVISION=3702;
-const DASHBOARD_UI_REVISION=37021;
+<!-- Firebase SDK is lazy-loaded after the primary ONIT dashboard is visible. -->
+<script>const APP_VERSION='0.37.3';
+const UI_REVISION=3703;
+const DASHBOARD_UI_REVISION=37031;
 const DASHBOARD_UI_STORAGE_KEY='onit-dashboard-ui-state-v1';
 window.ONIT_RUNTIME={version:APP_VERSION,uiRevision:UI_REVISION,dashboardUiRevision:DASHBOARD_UI_REVISION};
 const BACKEND_DATASETS=['USERS','CLIENTS','BRIEFS','ASSIGNMENTS','ITERATIONS','ACTIVITY_LOG','NOTIFICATIONS','REPORTS'];
@@ -1369,6 +1366,65 @@ function setBusy(on){
 }
 function showSyncChip(label='SYNCING'){const el=document.getElementById('onitSyncChip');if(!el)return;el.textContent=label;el.classList.add('show');clearTimeout(syncChipTimer);syncChipTimer=setTimeout(()=>el.classList.remove('show'),1400)}
 function runWhenIdle(fn,timeout=900){if('requestIdleCallback' in window)return requestIdleCallback(()=>fn(),{timeout});return setTimeout(fn,60)}
+
+// ===== Startup performance v0.37.3 =====
+// Firebase is an enhancement, not a boot dependency. Load it only after the core dashboard is usable.
+let firebaseSdkPromise=null;
+function loadExternalScriptOnce(src){
+  return new Promise((resolve,reject)=>{
+    const existing=[...document.scripts].find(x=>x.src===src);
+    if(existing){if(existing.dataset.loaded==='1'||existing.readyState==='complete')return resolve();existing.addEventListener('load',()=>resolve(),{once:true});existing.addEventListener('error',()=>reject(new Error('Could not load '+src)),{once:true});return}
+    const script=document.createElement('script');script.src=src;script.async=true;
+    script.addEventListener('load',()=>{script.dataset.loaded='1';resolve()},{once:true});
+    script.addEventListener('error',()=>reject(new Error('Could not load '+src)),{once:true});
+    document.head.appendChild(script);
+  })
+}
+async function ensureFirebaseSdkLoaded(){
+  if(typeof firebase!=='undefined'&&firebase.apps)return true;
+  if(firebaseSdkPromise)return firebaseSdkPromise;
+  firebaseSdkPromise=(async()=>{
+    const base='https://www.gstatic.com/firebasejs/13.0.0/';
+    await loadExternalScriptOnce(base+'firebase-app-compat.js');
+    await Promise.all([
+      loadExternalScriptOnce(base+'firebase-auth-compat.js'),
+      loadExternalScriptOnce(base+'firebase-firestore-compat.js'),
+      loadExternalScriptOnce(base+'firebase-messaging-compat.js')
+    ]);
+    return typeof firebase!=='undefined';
+  })().catch(err=>{firebaseSdkPromise=null;throw err});
+  return firebaseSdkPromise;
+}
+
+// Returning users get the last confirmed ONIT state immediately while the fresh Apps Script sync runs quietly.
+const STARTUP_CACHE_DB='onit-startup-cache-v1',STARTUP_CACHE_STORE='snapshots',STARTUP_CACHE_MAX_AGE=48*60*60*1000;
+let startupSnapshotRestored=false,startupSnapshotAt=0;
+function startupSnapshotKey(){return `${String(ORG_ID||localStorage.getItem('onit-org')||'')}:${String(CURRENT_USER_ID||localStorage.getItem('onit-user')||'')}`}
+function openStartupCacheDb(){
+  return new Promise((resolve,reject)=>{if(!('indexedDB'in window))return resolve(null);const req=indexedDB.open(STARTUP_CACHE_DB,1);req.onupgradeneeded=()=>{const db=req.result;if(!db.objectStoreNames.contains(STARTUP_CACHE_STORE))db.createObjectStore(STARTUP_CACHE_STORE,{keyPath:'key'})};req.onsuccess=()=>resolve(req.result);req.onerror=()=>reject(req.error)});
+}
+async function readStartupSnapshot(){
+  const key=startupSnapshotKey();if(!key||key===':')return null;
+  try{const db=await openStartupCacheDb();if(!db)return null;const row=await new Promise((resolve,reject)=>{const tx=db.transaction(STARTUP_CACHE_STORE,'readonly'),req=tx.objectStore(STARTUP_CACHE_STORE).get(key);req.onsuccess=()=>resolve(req.result||null);req.onerror=()=>reject(req.error)});db.close();if(!row||!row.at||Date.now()-Number(row.at)>STARTUP_CACHE_MAX_AGE)return null;return row}catch(e){console.warn('ONIT startup cache read:',e);return null}
+}
+async function writeStartupSnapshot(){
+  if(!SESSION_TOKEN||!CURRENT_USER_ID||!ORG_ID||!currentUser)return;
+  const payload={key:startupSnapshotKey(),at:Date.now(),appVersion:APP_VERSION,backendVersion,lastStateVersion,organisationId:ORG_ID,userId:CURRENT_USER_ID,data:{organisations,users,pendingUsers,accessDirectory,securityInfo,permissions,authority,clients,allAssignments,notifications,buzzers,reports,dataExports,teamWorkload,reportSummary,homeAnalytics,currentUser,briefs}};
+  try{const db=await openStartupCacheDb();if(!db)return;await new Promise((resolve,reject)=>{const tx=db.transaction(STARTUP_CACHE_STORE,'readwrite');tx.objectStore(STARTUP_CACHE_STORE).put(payload);tx.oncomplete=()=>resolve();tx.onerror=()=>reject(tx.error)});db.close()}catch(e){console.warn('ONIT startup cache write:',e)}
+}
+async function clearStartupSnapshot(){
+  const key=startupSnapshotKey();if(!key||key===':')return;
+  try{const db=await openStartupCacheDb();if(!db)return;await new Promise((resolve,reject)=>{const tx=db.transaction(STARTUP_CACHE_STORE,'readwrite');tx.objectStore(STARTUP_CACHE_STORE).delete(key);tx.oncomplete=()=>resolve();tx.onerror=()=>reject(tx.error)});db.close()}catch(e){}
+}
+function restoreStartupState(row){
+  const d=row&&row.data;if(!d||!d.currentUser)return false;
+  organisations=d.organisations||[];users=d.users||[];pendingUsers=d.pendingUsers||[];accessDirectory=d.accessDirectory||[];securityInfo=d.securityInfo||null;permissions=d.permissions||{};authority=d.authority||d.permissions||{};clients=d.clients||[];allAssignments=d.allAssignments||[];notifications=d.notifications||[];buzzers=d.buzzers||[];reports=d.reports||[];dataExports=d.dataExports||[];teamWorkload=d.teamWorkload||[];reportSummary=d.reportSummary||null;homeAnalytics=d.homeAnalytics||null;currentUser=d.currentUser||null;briefs=d.briefs||[];
+  CURRENT_USER_ID=rowVal(currentUser,'User ID')||CURRENT_USER_ID;ORG_ID=rowVal(currentUser,'Organisation ID')||ORG_ID;backendVersion=row.backendVersion||backendVersion;lastStateVersion=String(row.lastStateVersion||lastStateVersion||'');lastSuccessfulSyncAt=Number(row.at||Date.now());startupSnapshotAt=lastSuccessfulSyncAt;startupSnapshotRestored=true;apiOnline=navigator.onLine!==false;
+  try{if(window.ONITAuthority)ONITAuthority.set(authority)}catch(e){}
+  applyPermissions();populateClients();populateAssignees();renderHome();renderNotifications();queuePendingBuzzers_();updateLastSyncLabel(true);showSyncChip('SYNCING LATEST');
+  runWhenIdle(()=>{try{renderBriefFilters();renderBriefs();renderArchive();renderTeam();renderMore()}catch(e){}},700);
+  return true;
+}
 function connectionNotice(message){let el=document.getElementById('connectionNotice');if(!el){el=document.createElement('div');el.id='connectionNotice';el.className='notice';el.setAttribute('role','status');const main=document.querySelector('#appShell main');if(main)main.prepend(el)}if(el){el.textContent=message||'';el.hidden=!message}}
 function syncClockText(ts=lastSuccessfulSyncAt){if(!ts)return '—';try{return new Date(ts).toLocaleTimeString('en-NG',{hour:'2-digit',minute:'2-digit',hour12:true,timeZone:'Africa/Lagos'})}catch(e){return new Date(ts).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}}
 function updateLastSyncLabel(stale=false){const el=document.getElementById('lastSyncLabel');if(!el)return;el.textContent=lastSuccessfulSyncAt?`LAST SYNCED ${syncClockText()}`:'LAST SYNCED —';el.classList.toggle('stale',!!stale)}
@@ -1449,8 +1505,10 @@ function queuePendingBuzzers_(){
   const now=Date.now();buzzerQueue=buzzers.filter(b=>String(b.status||rowVal(b,'Status')||'')==='Pending'&&new Date(b.expiresAt||rowVal(b,'Expires At')||0).getTime()>now).sort((a,z)=>new Date(a.sentAt||rowVal(a,'Sent At')||0)-new Date(z.sentAt||rowVal(z,'Sent At')||0));showNextBuzzer();
 }
 async function startFirebaseRealtime(){
-  if(firebaseStarting||firebaseUnsubs.length||!SESSION_TOKEN||!CURRENT_USER_ID||!ORG_ID||typeof firebase==='undefined')return;firebaseStarting=true;
+  if(firebaseStarting||firebaseUnsubs.length||!SESSION_TOKEN||!CURRENT_USER_ID||!ORG_ID)return;firebaseStarting=true;
   try{
+    await ensureFirebaseSdkLoaded();
+    if(typeof firebase==='undefined')throw new Error('Firebase SDK unavailable');
     if(!firebase.apps.length)firebaseApp=firebase.initializeApp(FIREBASE_CONFIG);else firebaseApp=firebase.app();firebaseDb=firebase.firestore();
     let authUser=firebase.auth().currentUser;if(!authUser){const cred=await firebase.auth().signInAnonymously();authUser=cred.user;}
     await apiPost('bindFirebaseIdentity',{firebaseUid:authUser.uid});
@@ -1467,7 +1525,7 @@ async function startFirebaseRealtime(){
 }
 
 function saveSession(result){const d=result.data||result;if(!d.sessionToken)throw new Error('No session token returned.');SESSION_TOKEN=d.sessionToken;CURRENT_USER_ID=rowVal(d.user,'User ID');ORG_ID=rowVal(d.organisation,'Organisation ID');localStorage.setItem('onit-session',SESSION_TOKEN);localStorage.setItem('onit-user',CURRENT_USER_ID);localStorage.setItem('onit-org',ORG_ID);announcedNotifications=new Set(JSON.parse(localStorage.getItem(announcedKey(CURRENT_USER_ID))||'[]'));loadPendingBriefSounds_();}
-function clearSession(){clearRefreshRetry();stopFirebaseRealtime();try{if(typeof firebase!=='undefined'&&firebase.auth().currentUser)firebase.auth().signOut().catch(()=>{})}catch(e){}SESSION_TOKEN='';CURRENT_USER_ID='';ORG_ID='';currentUser=null;current=null;localStorage.removeItem('onit-session');localStorage.removeItem('onit-user');localStorage.removeItem('onit-org');}
+function clearSession(){clearRefreshRetry();stopFirebaseRealtime();clearStartupSnapshot().catch(()=>{});try{if(typeof firebase!=='undefined'&&firebase.auth().currentUser)firebase.auth().signOut().catch(()=>{})}catch(e){}SESSION_TOKEN='';CURRENT_USER_ID='';ORG_ID='';currentUser=null;current=null;localStorage.removeItem('onit-session');localStorage.removeItem('onit-user');localStorage.removeItem('onit-org');}
 function showAuthMessage(message,type=''){const el=document.getElementById('authMessage');el.textContent=message||'';el.className='authMessage'+(message?' '+type:' hidden')}
 function showAuthMode(mode){showAuthMessage('');['signInForm','signUpForm','resetForm'].forEach(id=>document.getElementById(id).classList.add('hidden'));document.getElementById('signInTab').classList.toggle('active',mode==='signin');document.getElementById('signUpTab').classList.toggle('active',mode==='signup');document.getElementById('signInForm').classList.toggle('hidden',mode!=='signin');document.getElementById('signUpForm').classList.toggle('hidden',mode!=='signup');if(mode==='signup')updateSignupMode();if(mode==='reset')document.getElementById('resetForm').classList.remove('hidden')}
 function updateSignupMode(){const code=(document.getElementById('signupCode')?.value||'').trim(),owner=/^OWNER-/i.test(code),fields=document.getElementById('staffIdentityFields'),hint=document.getElementById('ownerSignupHint'),position=document.getElementById('signupPosition');if(fields)fields.classList.toggle('hidden',owner);if(hint)hint.classList.toggle('hidden',!owner);if(position)position.required=!owner}
@@ -1512,6 +1570,7 @@ async function loadFromGoogle(strict=false,silent=false){
         if(!document.getElementById('data').classList.contains('hidden')&&!preserve.has('data'))renderDataPage();
         if(current){current=briefs.find(b=>b.code===current.code)||null;if(current){if(!preserve.has('detail'))renderDetail()}else show('home')}
         if(!silent)uiDirtySections.clear();
+        runWhenIdle(()=>writeStartupSnapshot(),1200);
         if(window.AutoCare)window.AutoCare.markHealthy();
         return;
       }catch(e){lastError=e;if(authError(e))throw e;if(attempt<maxAttempts-1){await sleep(800*(attempt+1));continue}throw e}
@@ -2238,8 +2297,9 @@ async function respondToBuzzer(response,detail=''){
 }
 async function enablePushNotifications(){
   if(!('Notification'in window)||!('serviceWorker'in navigator))return onitAlert('Outside-ONIT alerts are not supported in this browser.');
-  if(typeof firebase==='undefined'||!firebase.messaging)return onitAlert('Firebase Messaging is not available yet.');
   try{
+    await ensureFirebaseSdkLoaded();
+    if(typeof firebase==='undefined'||!firebase.messaging)return onitAlert('Firebase Messaging is not available yet.');
     const permission=await Notification.requestPermission();if(permission!=='granted')return onitAlert('Notifications were not enabled. You can change this later in your browser settings.');
     const configRes=await apiPost('getPushConfig',{}),cfg=configRes.data||configRes;if(!cfg.enabled||!cfg.vapidKey)return onitAlert('Web Push is not fully configured yet. The System Owner needs to add the Firebase Web Push public key to ONIT.');
     if(!firebase.apps.length)firebaseApp=firebase.initializeApp(FIREBASE_CONFIG);else firebaseApp=firebase.app();firebaseMessaging=firebase.messaging();
@@ -2831,22 +2891,22 @@ refreshInstallButton();
 
 setInterval(()=>{if(!document.getElementById('briefs').classList.contains('hidden'))renderBriefs();if(current&&!document.getElementById('detail').classList.contains('hidden')){const t=timeInfo(current),el=document.getElementById('dtimer');el.textContent=t.text;el.className='num '+t.cls}renderApprovalClocks()},1000);
 setInterval(()=>{const now=Date.now(),gap=firebaseRealtimeHealthy?300000:120000;if(now-lastFallbackPulseAt>=gap){lastFallbackPulseAt=now;checkForUpdates()}},5000);
-async function boot(){if(SESSION_TOKEN){document.getElementById('authGate').classList.add('hidden');document.getElementById('appShell').classList.remove('hidden');await loadFromGoogle(false);if(SESSION_TOKEN)return}document.getElementById('appShell').classList.add('hidden');document.getElementById('authGate').classList.remove('hidden');showAuthMode('signin')}
+async function boot(){if(SESSION_TOKEN){document.getElementById('authGate').classList.add('hidden');document.getElementById('appShell').classList.remove('hidden');const cached=await readStartupSnapshot();if(cached&&restoreStartupState(cached)){loadFromGoogle(false,true);return}await loadFromGoogle(false);if(SESSION_TOKEN)return}document.getElementById('appShell').classList.add('hidden');document.getElementById('authGate').classList.remove('hidden');showAuthMode('signin')}
 document.addEventListener('DOMContentLoaded',()=>boot(),{once:true});
 </script>
-<script src="./dialog-system.js?v=0.37.2"></script>
-<script src="./authority-engine.js?v=0.37.2"></script>
-<script src="./sync-engine.js?v=0.37.2"></script>
-<script src="./release-guard.js?v=0.37.2"></script>
-<script src="./command-palette.js?v=0.37.2"></script>
-<script src="./autocare-module.js?v=0.37.2"></script>
-<script src="./cases-module.js?v=0.37.2"></script>
-<script src="./activation-command.js?v=0.37.2"></script>
-<script src="./ideas-dump.js?v=0.37.2"></script>
-<script src="./pulse-module.js?v=0.37.2"></script>
-<script src="./assist-traffic-module.js?v=0.37.2"></script>
-<script src="./core-intelligence.js?v=0.37.2"></script>
-<script src="./attention-loop.js?v=0.37.2"></script>
+<script src="./dialog-system.js?v=0.37.3"></script>
+<script src="./authority-engine.js?v=0.37.3"></script>
+<script src="./sync-engine.js?v=0.37.3"></script>
+<script src="./release-guard.js?v=0.37.3"></script>
+<script src="./command-palette.js?v=0.37.3"></script>
+<script src="./autocare-module.js?v=0.37.3"></script>
+<script src="./cases-module.js?v=0.37.3"></script>
+<script src="./activation-command.js?v=0.37.3"></script>
+<script src="./ideas-dump.js?v=0.37.3"></script>
+<script src="./pulse-module.js?v=0.37.3"></script>
+<script src="./assist-traffic-module.js?v=0.37.3"></script>
+<script src="./core-intelligence.js?v=0.37.3"></script>
+<script src="./attention-loop.js?v=0.37.3"></script>
 </body>
 </html>
 

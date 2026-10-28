@@ -1,8 +1,8 @@
 {
-  "version": "0.37.2",
-  "build": "0.37.2",
-  "uiRevision": 3702,
-  "dashboardUiRevision": 37021,
+  "version": "0.37.3",
+  "build": "0.37.3",
+  "uiRevision": 3703,
+  "dashboardUiRevision": 37031,
   "mandatoryUiSync": true,
   "universalDashboardUi": true,
   "authorityEngineVersion": "1.0.0",
@@ -12,8 +12,8 @@
   "dialogSystemVersion": "1.0.0",
   "workflowControlVersion": "1.0.0",
   "activationCommandVersion": "0.1.0",
-  "label": "ONIT v0.37.2 — Full stability audit + sync coalescing",
-  "releasedAt": "2026-10-28T09:55:00+01:00",
+  "label": "ONIT v0.37.3 \u2014 startup performance + instant warm start",
+  "releasedAt": "2026-10-28T10:45:00+01:00",
   "ideasDumpVersion": "0.1.1",
   "visualContrastVersion": "1.0.3",
   "attentionLoopVersion": "0.1.1",
@@ -26,5 +26,8 @@
   "backgroundSyncGuardVersion": "1.0.0",
   "stableFallbackVersion": "1.0.0",
   "stagingRetirementPolicyVersion": "2.0.0",
-  "stabilityAudit": "full-sync-coalescing-v1"
+  "stabilityAudit": "full-sync-coalescing-v1",
+  "startupPerformanceVersion": "1.0.0",
+  "firebaseLazyLoadVersion": "1.0.0",
+  "startupSnapshotVersion": "1.0.0"
 }
