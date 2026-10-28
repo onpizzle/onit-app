@@ -12,7 +12,7 @@ async function check(){
  try{if(published&&Number(published.dashboardUiRevision||0)!==Number(window.DASHBOARD_UI_REVISION||DASHBOARD_UI_REVISION))issues.push('Dashboard revision mismatch')}catch(e){}
  if(published&&worker&&String(published.version)!==String(worker.version))issues.push('Service worker version mismatch');
  if(published&&worker&&Number(published.dashboardUiRevision||0)!==Number(worker.dashboardUiRevision||0))issues.push('Service worker dashboard revision mismatch');
- last={status:issues.length?'MISMATCH':'OK',checkedAt:Date.now(),issues,published,worker,version:VERSION,environment:/test|staging|preview/i.test(location.hostname)?'STAGING':'PRODUCTION'};
+ last={status:issues.length?'MISMATCH':'OK',checkedAt:Date.now(),issues,published,worker,version:VERSION,environment:location.origin==='https://onit-cases-test.onrender.com'?'STAGING':'PRODUCTION'};
  try{window.dispatchEvent(new CustomEvent('onit:release-health',{detail:last}))}catch(e){}
  return last;
 }

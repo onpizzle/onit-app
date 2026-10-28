@@ -16,7 +16,7 @@ function setNav(){const n=nav();if(!n)return;n.classList.toggle('hiddenByRole',!
 async function refreshCapabilities(force=false){
   if(typeof SESSION_TOKEN==='undefined'||!SESSION_TOKEN||typeof CURRENT_USER_ID==='undefined'||!CURRENT_USER_ID)return clear();
   if(!force&&state.cap&&Date.now()-state.lastCapabilityAt<300000)return state.cap;
-  try{state.cap=await api('CASES_CAPABILITIES');state.lastCapabilityAt=Date.now();setNav();
+  try{state.cap=await once('capabilities',()=>api('CASES_CAPABILITIES'));state.lastCapabilityAt=Date.now();setNav();
     if(!allowed()&&!document.getElementById('cases')?.classList.contains('hidden')){show('home');showToast('Cases access','Your Cases access is not active.');}
     return state.cap;
   }catch(e){state.cap=null;setNav();return null}
@@ -121,9 +121,9 @@ async function toggleGrant(userId,grant){const reason=(await onitPrompt(grant?'O
 async function openTab(tab){if(tab===state.tab&&state.busy)return;const seq=++state.navSeq;state.tab=tab;markTabActive(tab);showTabLoading(tab);state.busy=true;try{await render();}finally{if(seq===state.navSeq)state.busy=false}}
 async function refresh(){state.navSeq++;state.lastCasesAt=0;state.caseCache={};state.intelCache={};state.accessCache=null;showTabLoading(state.tab);await refreshCapabilities(true);await render()}
 function applyCapabilities(){refreshCapabilities(true).then(()=>setNav())}
-const originalApply=window.applyPermissions;if(typeof originalApply==='function')window.applyPermissions=function(){const r=originalApply.apply(this,arguments);setTimeout(()=>refreshCapabilities(false),1600);return r};
+const originalApply=window.applyPermissions;if(typeof originalApply==='function')window.applyPermissions=function(){const r=originalApply.apply(this,arguments);setTimeout(()=>refreshCapabilities(false),7000);return r};
 const originalShow=window.show;if(typeof originalShow==='function')window.show=function(id,btn){if(id==='cases'&&!allowed()){refreshCapabilities(true).then(()=>{if(allowed())originalShow.call(window,id,btn);else showToast('Cases','Cases is locked for this account.')});return}const r=originalShow.apply(this,arguments);if(id==='cases')render();return r};
 window.addEventListener('focus',()=>{if(typeof SESSION_TOKEN!=='undefined'&&SESSION_TOKEN)refreshCapabilities()});setInterval(()=>{if(typeof SESSION_TOKEN!=='undefined'&&SESSION_TOKEN)refreshCapabilities()},300000);
 window.CasesModule={render,refresh,refreshCapabilities,applyCapabilities,openTab,newCase,selectCase,linkBrief,addMember,addEvidence,addMetric,importMetrics,importClientJson,saveStudio,exportCase,review,togglePilot,toggleGrant};
-setTimeout(()=>{if(typeof SESSION_TOKEN!=='undefined'&&SESSION_TOKEN)refreshCapabilities(false)},7000);
+setTimeout(()=>{if(typeof SESSION_TOKEN!=='undefined'&&SESSION_TOKEN)refreshCapabilities(false)},12000);
 })();

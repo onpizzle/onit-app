@@ -1,7 +1,7 @@
 /* ONIT Ideas Dump — agency signal intelligence v0.1.1 */
 (function(){
 'use strict';
-const state={cap:null,tab:'intelligence',dashboard:null,signals:null,signalsPromise:null,detail:null,opportunity:null,compose:false,filters:{query:'',brand:'',signalType:'',route:''},lastLoad:0};
+const state={cap:null,capPromise:null,tab:'intelligence',dashboard:null,signals:null,signalsPromise:null,detail:null,opportunity:null,compose:false,filters:{query:'',brand:'',signalType:'',route:''},lastLoad:0};
 const esc=v=>typeof escapeHTML==='function'?escapeHTML(String(v==null?'':v)):String(v==null?'':v).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 const safeUrl=v=>{try{const u=new URL(String(v||''),location.href);return (u.protocol==='http:'||u.protocol==='https:')?u.href:''}catch(e){return''}};
 const val=(o,...ks)=>{for(const k of ks){if(o&&o[k]!==undefined&&o[k]!==null&&o[k]!=='')return o[k]}return ''};
@@ -23,12 +23,14 @@ function brandOptions(selected=''){const names=[...new Set((typeof clients!=='un
 function typeOptions(selected='Observation'){return ['Observation','Consumer Behaviour','Culture / Trend','Opportunity','Idea'].map(x=>`<option ${selected===x?'selected':''}>${x}</option>`).join('')}
 function routeOptions(selected=''){return ['','General','Creative','Strategy','Digital','Activation','Product / Business','Client Service'].map(x=>`<option value='${esc(x)}' ${selected===x?'selected':''}>${esc(x||'Let ONIT infer route')}</option>`).join('')}
 async function init(force=false){
-  if(typeof SESSION_TOKEN==='undefined'||!SESSION_TOKEN||typeof CURRENT_USER_ID==='undefined'||!CURRENT_USER_ID){state.cap=null;nav()?.classList.add('hiddenByRole');mobileNav()?.classList.add('hiddenByRole');return}
-  if(!force&&state.cap&&Date.now()-state.lastLoad<20000)return;
-  try{state.cap=await api('IDEAS_CAPABILITIES');state.lastLoad=Date.now();nav()?.classList.toggle('hiddenByRole',!allowed());mobileNav()?.classList.toggle('hiddenByRole',!allowed())}catch(e){state.cap=null;nav()?.classList.add('hiddenByRole');mobileNav()?.classList.add('hiddenByRole')}
+  if(typeof SESSION_TOKEN==='undefined'||!SESSION_TOKEN||typeof CURRENT_USER_ID==='undefined'||!CURRENT_USER_ID){state.cap=null;state.capPromise=null;nav()?.classList.add('hiddenByRole');mobileNav()?.classList.add('hiddenByRole');return null}
+  if(!force&&state.cap&&Date.now()-state.lastLoad<300000)return state.cap;
+  if(state.capPromise)return state.capPromise;
+  state.capPromise=api('IDEAS_CAPABILITIES').then(cap=>{state.cap=cap;state.lastLoad=Date.now();nav()?.classList.toggle('hiddenByRole',!allowed());mobileNav()?.classList.toggle('hiddenByRole',!allowed());return cap}).catch(e=>{if(!state.cap){nav()?.classList.add('hiddenByRole');mobileNav()?.classList.add('hiddenByRole')}return state.cap}).finally(()=>{state.capPromise=null});
+  return state.capPromise;
 }
 async function refresh(){state.dashboard=null;state.signals=null;state.signalsPromise=null;state.detail=null;await init(true);loading();await render()}
-async function render(){const el=root();if(!el)return;if(!state.cap)await init();else if(Date.now()-state.lastLoad>=20000)init(true);if(!allowed()){el.innerHTML=shell(`<div class='ideasEmpty'>Ideas Dump is available only to active ONIT staff.</div>`);return}try{if(state.compose)return renderCompose();if(state.detail)return renderDetail();if(state.opportunity)return renderOpportunityDetail();if(state.tab==='intelligence')return renderIntelligence();if(state.tab==='signals')return renderSignals();return renderOpportunities()}catch(e){el.innerHTML=shell(`<div class='ideasEmpty'><b>Ideas Dump could not load.</b><br>${esc(e.message)}</div>`)} }
+async function render(){const el=root();if(!el)return;if(!state.cap)await init();else if(Date.now()-state.lastLoad>=300000)init(false);if(!allowed()){el.innerHTML=shell(`<div class='ideasEmpty'>Ideas Dump is available only to active ONIT staff.</div>`);return}try{if(state.compose)return renderCompose();if(state.detail)return renderDetail();if(state.opportunity)return renderOpportunityDetail();if(state.tab==='intelligence')return renderIntelligence();if(state.tab==='signals')return renderSignals();return renderOpportunities()}catch(e){el.innerHTML=shell(`<div class='ideasEmpty'><b>Ideas Dump could not load.</b><br>${esc(e.message)}</div>`)} }
 async function loadDashboard(force=false){if(force||!state.dashboard)state.dashboard=await api('IDEAS_DASHBOARD');return state.dashboard}
 function prefetchSignals(){if(state.signals||state.signalsPromise)return state.signalsPromise;state.signalsPromise=api('IDEAS_LIST',state.filters).then(d=>{state.signals=d.signals||[];state.signalsPromise=null;return state.signals}).catch(e=>{state.signalsPromise=null;return null});return state.signalsPromise}
 async function loadSignals(){if(state.signals)return state.signals;if(state.signalsPromise){const warmed=await state.signalsPromise;if(warmed)return warmed}state.signalsPromise=api('IDEAS_LIST',state.filters).then(d=>d.signals||[]);try{state.signals=await state.signalsPromise;return state.signals}finally{state.signalsPromise=null}}
@@ -62,8 +64,8 @@ async function sendSignalToCases(id){const caseId=(await onitPrompt('Case ID to 
 async function sendOpportunityToCases(){const caseId=(await onitPrompt('Case ID to receive this proactive origin: ',val(state.opportunity,'Linked Case ID'))||'').trim();if(!caseId)return;try{await api('IDEAS_SEND_TO_CASES',{opportunityId:val(state.opportunity,'Opportunity ID'),caseId});showToast('Ideas Dump',`Origin opportunity added to ${caseId}.`);state.dashboard=null;await openOpportunity(val(state.opportunity,'Opportunity ID'))}catch(e){onitAlert(e.message)}}
 function closeOpportunity(){state.opportunity=null;state.tab='opportunities';render()}
 async function openTab(tab){state.tab=tab;state.compose=false;state.detail=null;state.opportunity=null;paintTabSelection();if(tab==='signals')prefetchSignals();await new Promise(resolve=>requestAnimationFrame(()=>resolve()));await render()}
-const oldApply=window.applyPermissions;if(typeof oldApply==='function')window.applyPermissions=function(){const r=oldApply.apply(this,arguments);setTimeout(()=>init(true),0);return r};
+const oldApply=window.applyPermissions;if(typeof oldApply==='function')window.applyPermissions=function(){const r=oldApply.apply(this,arguments);setTimeout(()=>init(false),4500);return r};
 const oldShow=window.show;if(typeof oldShow==='function')window.show=function(id,btn){const r=oldShow.apply(this,arguments);if(id==='ideas')render();return r};
 window.IdeasDump={render,refresh,openTab,openDrop,cancelDrop,submitSignal,applyFilters,openSignal,closeDetail,addEvidence,developPattern,developSignals,openOpportunity,closeOpportunity,setOpportunityStatus,linkOpportunity,linkSignal,sendSignalToCases,sendOpportunityToCases};
-setTimeout(()=>init(true),400);
+setTimeout(()=>{if(typeof SESSION_TOKEN!=='undefined'&&SESSION_TOKEN)init(false)},6500);
 })();

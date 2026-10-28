@@ -33,7 +33,7 @@ function currentFrontendStatus(release){try{const remote=String(release&&release
 function currentDashboardUiStatus(release){try{const local=typeof window.getDashboardUiHealth==='function'?window.getDashboardUiHealth():null,published=Number(release&&release.dashboardUiRevision||0),running=typeof DASHBOARD_UI_REVISION!=='undefined'?Number(DASHBOARD_UI_REVISION):0;if(published&&published>running)return'UPDATE READY';if(local&&local.healthy===false)return'MISMATCH';return running?'CURRENT':'UNKNOWN'}catch(e){return'UNKNOWN'}}
 function currentRealtimeStatus(){try{if(!signedIn())return'IDLE';if(!online())return'OFFLINE';return firebaseRealtimeHealthy?'CONNECTED':'FALLBACK'}catch(e){return'UNKNOWN'}}
 function currentSessionStatus(){return signedIn()?'VALID':'SIGNED OUT'}
-function currentServiceWorkerStatus(){if(!('serviceWorker'in navigator))return'UNAVAILABLE';if(!location.protocol.startsWith('http'))return'LOCAL';return navigator.serviceWorker.controller?'ACTIVE':'STARTING'}
+function currentServiceWorkerStatus(){if(typeof isStagingEnvironment==='function'&&isStagingEnvironment())return'BROWSER ONLY';if(!('serviceWorker'in navigator))return'UNAVAILABLE';if(!location.protocol.startsWith('http'))return'LOCAL';return navigator.serviceWorker.controller?'ACTIVE':'STARTING'}
 function frontendDashboardMode(){try{return typeof dashboardMode==='function'?dashboardMode():'UNKNOWN'}catch(e){return'UNKNOWN'}}
 function backendModeFromPermissions(){try{return String((authority&&authority.dashboardMode)||(permissions&&permissions.dashboardMode)||'').toUpperCase()||'UNKNOWN'}catch(e){return'UNKNOWN'}}
 function refreshLocalSnapshot(){lastHealth.network=online()?'OK':'OFFLINE';lastHealth.realtime=currentRealtimeStatus();lastHealth.session=currentSessionStatus();lastHealth.serviceWorker=currentServiceWorkerStatus();if(typeof window.getDashboardUiHealth==='function'&&signedIn()){const d=window.getDashboardUiHealth();if(d&&d.healthy===false&&d.mountedRevision)lastHealth.dashboardUi='MISMATCH';else if(d&&d.revision)lastHealth.dashboardUi='CURRENT'}try{const rg=window.ONITReleaseGuard&&ONITReleaseGuard.diagnostics?ONITReleaseGuard.diagnostics():null;lastHealth.release=rg?(rg.status==='OK'?'OK':rg.status):lastHealth.release}catch(e){}try{lastHealth.sync=window.ONITSync?'ACTIVE':'UNKNOWN'}catch(e){}if(!lastHealth.checkedAt)lastHealth.checkedAt=now();return lastHealth}
@@ -59,7 +59,7 @@ async function backendHealth(){
     if(data.modules&&data.modules.digitalPulse&&window.DigitalPulse&&typeof window.DigitalPulse.refreshCapabilities==='function'&&now()-lastPulseCapabilitySyncAt>300000){try{lastPulseCapabilitySyncAt=now();await window.DigitalPulse.refreshCapabilities(true)}catch(e){recordIssue('PULSE_CAPABILITY_SYNC',e)}}
     if(data.stateVersion&&typeof lastStateVersion!=='undefined'&&lastStateVersion&&String(data.stateVersion)!==String(lastStateVersion)&&safeForRepair()){
       recordRepair('STATE_RESYNC','Backend state changed; Unified Sync is refreshing ONIT data.');
-      if(window.ONITSync)ONITSync.emit('STATE_CHANGED',{reason:'autocare-state-version'});else await loadFromGoogle(false,true);
+      if(window.ONITSync)ONITSync.emit('STATE_CHANGED',{reason:'autocare-state-version',stateVersion:String(data.stateVersion||'')});else await loadFromGoogle(false,true);
     }
     return data;
   }catch(e){lastHealth.backend='DEGRADED';recordIssue('BACKEND_HEALTH',e);signalApiFailure('autocare',e,true);return null}
@@ -88,6 +88,7 @@ async function repairRealtime(reason){
   try{stopFirebaseRealtime();await new Promise(r=>setTimeout(r,350));await startFirebaseRealtime();recordRepair('REALTIME_RECONNECT',reason||'Realtime listeners restarted.');refreshLocalSnapshot();return true}catch(e){recordIssue('REALTIME_REPAIR',e);return false}
 }
 async function repairServiceWorker(reason){
+  if(typeof isStagingEnvironment==='function'&&isStagingEnvironment())return false;
   if(!('serviceWorker'in navigator)||!online())return false;
   try{const regs=await navigator.serviceWorker.getRegistrations();await Promise.all(regs.map(r=>r.update().catch(()=>null)));try{navigator.serviceWorker.controller&&navigator.serviceWorker.controller.postMessage({type:'AUTOCARE_REFRESH_STATIC'})}catch(e){}recordRepair('SERVICE_WORKER_REFRESH',reason||'Service worker update and static-cache refresh requested.');lastHealth.serviceWorker=currentServiceWorkerStatus();return true}catch(e){recordIssue('SERVICE_WORKER_REPAIR',e);return false}
 }

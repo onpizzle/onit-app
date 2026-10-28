@@ -1,7 +1,7 @@
 /* ONIT Activation Command private pilot v0.1.0 */
 (function(){
 'use strict';
-const state={cap:null,tab:'command',dashboard:null,readiness:null,selected:null,detail:null,access:null,lastCapAt:0,busy:false,uploadedEvidence:[]};
+const state={cap:null,tab:'command',dashboard:null,readiness:null,selected:null,detail:null,access:null,lastCapAt:0,capPromise:null,busy:false,uploadedEvidence:[]};
 const esc=v=>typeof escapeHTML==='function'?escapeHTML(String(v==null?'':v)):String(v==null?'':v).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 const val=(o,...ks)=>{for(const k of ks){if(o&&o[k]!==undefined&&o[k]!==null&&o[k]!=='')return o[k]}return ''};
 const num=v=>Number(v||0)||0;
@@ -11,11 +11,13 @@ function root(){return document.getElementById('activationRoot')}
 function nav(){return document.getElementById('navActivation')}
 function mobileNav(){return document.getElementById('mobileMoreActivation')}
 function setNav(){const show=allowed();nav()?.classList.toggle('hiddenByRole',!show);mobileNav()?.classList.toggle('hiddenByRole',!show)}
-function clear(){state.cap=null;state.dashboard=null;state.readiness=null;state.selected=null;state.detail=null;state.access=null;setNav()}
+function clear(){state.cap=null;state.capPromise=null;state.dashboard=null;state.readiness=null;state.selected=null;state.detail=null;state.access=null;setNav()}
 async function refreshCapabilities(force=false){
   if(typeof SESSION_TOKEN==='undefined'||!SESSION_TOKEN||typeof CURRENT_USER_ID==='undefined'||!CURRENT_USER_ID){clear();return null}
   if(!force&&state.cap&&Date.now()-state.lastCapAt<300000)return state.cap;
-  try{state.cap=await api('ACTIVATION_CAPABILITIES');state.lastCapAt=Date.now();setNav();if(!allowed()&&!document.getElementById('activation')?.classList.contains('hidden')){show('home');showToast('Activation Command','Your Activation Command access is not active.')}return state.cap}catch(e){state.cap=null;setNav();return null}
+  if(state.capPromise)return state.capPromise;
+  state.capPromise=api('ACTIVATION_CAPABILITIES').then(cap=>{state.cap=cap;state.lastCapAt=Date.now();setNav();if(!allowed()&&!document.getElementById('activation')?.classList.contains('hidden')){show('home');showToast('Activation Command','Your Activation Command access is not active.')}return state.cap}).catch(e=>{state.cap=null;setNav();return null}).finally(()=>{state.capPromise=null});
+  return state.capPromise
 }
 function tabs(){const rows=[['command','Command'],['readiness','Readiness'],['budget','Budget & Assets'],['field','Field Ops'],['evidence','Evidence Pack']];if(owner())rows.push(['access','Access Control']);return `<div class='activationSubnav'>${rows.map(x=>`<button class='${state.tab===x[0]?'active':''}' onclick="ActivationCommand.openTab('${x[0]}')">${x[1]}</button>`).join('')}</div>`}
 function shell(body,title='Activation Command',sub='Readiness when quiet. Command when live.'){
@@ -88,9 +90,9 @@ async function togglePilot(){const next=!enabled();if(!await onitConfirm(next?'E
 async function toggleGrant(userId,grant){const reason=(await onitPrompt(grant?'Reason / Activation role note:':'Reason for revoke:','Activation Team Member')||'').trim();try{await api(grant?'ACTIVATION_OWNER_GRANT':'ACTIVATION_OWNER_REVOKE',{targetUserId:userId,reason});await refreshCapabilities(true);await renderAccess();showToast('Activation Command',grant?'Activation Team Member added.':'Activation access revoked.')}catch(e){onitAlert(e.message)}}
 async function openTab(tab){state.tab=tab;loading(({command:'Activation Command',readiness:'Activation Readiness',budget:'Budget & Assets',field:'Field Ops',evidence:'Evidence Pack',access:'Access Control'})[tab]||'Activation Command');await render()}
 async function refresh(){state.dashboard=null;state.readiness=null;state.detail=null;state.access=null;await refreshCapabilities(true);loading('Activation Command');await render()}
-const originalApply=window.applyPermissions;if(typeof originalApply==='function')window.applyPermissions=function(){const r=originalApply.apply(this,arguments);setTimeout(()=>refreshCapabilities(false),2400);return r};
+const originalApply=window.applyPermissions;if(typeof originalApply==='function')window.applyPermissions=function(){const r=originalApply.apply(this,arguments);setTimeout(()=>refreshCapabilities(false),10000);return r};
 const originalShow=window.show;if(typeof originalShow==='function')window.show=function(id,btn){if(id==='activation'&&!allowed()){refreshCapabilities(true).then(()=>{if(allowed())originalShow.call(window,id,btn);else showToast('Activation Command','Activation Command is private and locked for this account.')});return}const r=originalShow.apply(this,arguments);if(id==='activation')render();return r};
 window.addEventListener('focus',()=>{if(typeof SESSION_TOKEN!=='undefined'&&SESSION_TOKEN)refreshCapabilities()});setInterval(()=>{if(typeof SESSION_TOKEN!=='undefined'&&SESSION_TOKEN)refreshCapabilities()},300000);
 window.ActivationCommand={render,refresh,refreshCapabilities,openTab,createActivation,selectActivation,setStatus,addVendor,addVenue,addFieldPerson,addBudgetLine,updateBudgetActual,addClientAsset,updateClientAsset,uploadEvidence,addFieldLog,editCloseout,sendToCases,togglePilot,toggleGrant,openIdeaSignal,openIdeaOpportunity};
-setTimeout(()=>{if(typeof SESSION_TOKEN!=='undefined'&&SESSION_TOKEN)refreshCapabilities(false)},9000);
+setTimeout(()=>{if(typeof SESSION_TOKEN!=='undefined'&&SESSION_TOKEN)refreshCapabilities(false)},15000);
 })();
