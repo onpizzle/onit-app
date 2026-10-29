@@ -1,7 +1,7 @@
-/* ONIT Production Release Guard v1.0.1 */
+/* ONIT Production Release Guard v1.1 — diagnostics only */
 (function(){
 'use strict';
-const VERSION='1.0.1';let last={status:'CHECKING',checkedAt:0,issues:[],published:null,worker:null};
+const VERSION='1.1.0';let last={status:'CHECKING',checkedAt:0,issues:[],published:null,worker:null};
 function extract(text,re){const m=String(text||'').match(re);return m?m[1]:''}
 async function check(){
  const issues=[];let published=null,worker=null;
@@ -18,5 +18,5 @@ async function check(){
 }
 function diagnostics(){return last}
 window.ONITReleaseGuard={version:VERSION,check,diagnostics};
-document.addEventListener('DOMContentLoaded',()=>{setTimeout(check,800);setInterval(()=>{if(!document.hidden)check()},5*60*1000)},{once:true});
+
 })();
