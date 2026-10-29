@@ -1,29 +1,45 @@
+// Handle clicks before Firebase Messaging imports so FCM cannot overwrite ONIT routing.
+self.addEventListener('notificationclick',event=>{
+  event.notification.close();
+  const data=(event.notification&&event.notification.data)||{};
+  const fcm=(data.FCM_MSG&&data.FCM_MSG.data)||{};
+  const link=(data.FCM_MSG&&data.FCM_MSG.fcmOptions&&data.FCM_MSG.fcmOptions.link)||'';
+  const url=data.url||fcm.url||link||'./';
+  event.waitUntil(clients.matchAll({type:'window',includeUncontrolled:true}).then(list=>{
+    for(const c of list){
+      if('focus' in c){
+        try{c.navigate(url)}catch(e){}
+        return c.focus();
+      }
+    }
+    return clients.openWindow?clients.openWindow(url):null;
+  }));
+});
+
 importScripts('https://www.gstatic.com/firebasejs/13.0.0/firebase-app-compat.js');
 importScripts('https://www.gstatic.com/firebasejs/13.0.0/firebase-messaging-compat.js');
 
 const FIREBASE_CONFIG={apiKey:'AIzaSyAmpqFDMfo6zAorD-f14hTQnSNFDFU6VHM',authDomain:'onit-backend-api.firebaseapp.com',projectId:'onit-backend-api',storageBucket:'onit-backend-api.firebasestorage.app',messagingSenderId:'1052909191157',appId:'1:1052909191157:web:392c4a50b453deb5ebeabc'};
-try{firebase.initializeApp(FIREBASE_CONFIG);firebase.messaging();}catch(e){}
+let messaging=null;
+try{firebase.initializeApp(FIREBASE_CONFIG);messaging=firebase.messaging();}catch(e){}
 
-const UI_VERSION='0.36.8.7';
-const UI_REVISION=36817;
+const UI_VERSION='0.36.8.8';
+const UI_REVISION=36818;
 const DASHBOARD_UI_REVISION=36801;
-const CACHE='onit-v0.36.8.7-closed-app-proof';
+const CACHE='onit-v0.36.8.8-reliable-closed-push';
 const STATIC=['./offline.html','./manifest.webmanifest','./icons/icon-192.png','./icons/icon-512.png','./icons/apple-touch-icon.png','./assets/onit-logo-horizontal.png','./assets/onit-logo-full.png','./icons/favicon-32.png','./cases-module.css','./cases-module.js','./activation-command.css','./activation-command.js','./ideas-dump.css','./ideas-dump.js','./visual-contrast.css','./pulse-module.css','./pulse-module.js','./assist-traffic-module.css','./assist-traffic-module.js','./core-intelligence.css','./core-intelligence.js','./autocare-module.css','./autocare-module.js','./authority-engine.js','./sync-engine.js','./release-guard.js','./command-palette.css','./command-palette.js','./dialog-system.css','./dialog-system.js','./attention-loop.css','./attention-loop.js'];
 
+// Notification+data messages are displayed automatically by FCM in the background.
+// Keep this callback only as a fallback for any legacy data-only message.
 try{
-  const messaging=firebase.messaging();
-  messaging.onBackgroundMessage(payload=>{
-    const n=payload.notification||{},d=payload.data||{},title=n.title||d.title||(d.type==='BUZZER'?'ONIT BUZZER':'ONIT');
+  if(messaging)messaging.onBackgroundMessage(payload=>{
+    if(payload&&payload.notification)return;
+    const d=(payload&&payload.data)||{},title=d.title||(d.type==='BUZZER'?'ONIT BUZZER':'ONIT');
     const urgent=d.type==='BUZZER'||d.type==='BRIEF_ALERT'||String(d.actionRequired||'')==='true'||['OWNER_BROADCAST','APPROVAL_REQUIRED','TEAM_LEAD_APPROVAL_REQUIRED','REVISION','HANDOVER_RECEIVED','DATA_EXPORT_APPROVAL','AUTO_ESCALATION_TRAFFIC','AUTO_ESCALATION_APPROVAL','AUTO_ESCALATION_TEAM_LEAD'].includes(String(d.notificationType||''));
     const tag=d.notificationId?'onit-'+d.notificationId:d.buzzerId?'onit-buzzer-'+d.buzzerId:d.briefCode?'onit-'+(d.type||'update')+'-'+d.briefCode:'onit-update';
-    const options={body:n.body||d.body||d.message||'You have a new ONIT update.',icon:'./icons/icon-192.png',badge:'./icons/favicon-32.png',tag,renotify:urgent,requireInteraction:urgent,silent:false,vibrate:urgent?[180,80,180,80,320]:[120,60,120],data:{url:d.url||'./',type:d.type||'',notificationType:d.notificationType||'',notificationId:d.notificationId||'',briefCode:d.briefCode||'',buzzerId:d.buzzerId||''}};
-    self.registration.showNotification(title,options);
+    return self.registration.showNotification(title,{body:d.body||d.message||'You have a new ONIT update.',icon:'./icons/icon-192.png',badge:'./icons/favicon-32.png',tag,renotify:urgent,requireInteraction:urgent,silent:false,data:{url:d.url||'./',type:d.type||'',notificationType:d.notificationType||'',notificationId:d.notificationId||'',briefCode:d.briefCode||'',buzzerId:d.buzzerId||''}});
   });
 }catch(e){}
-self.addEventListener('notificationclick',event=>{
-  event.notification.close();const url=(event.notification.data&&event.notification.data.url)||'./';
-  event.waitUntil(clients.matchAll({type:'window',includeUncontrolled:true}).then(list=>{for(const c of list){if('focus'in c){try{c.navigate(url)}catch(e){}return c.focus()}}return clients.openWindow?clients.openWindow(url):null}));
-});
 
 async function cacheFreshStatic(){
   const c=await caches.open(CACHE);

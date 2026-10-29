@@ -24,7 +24,7 @@
 <link rel="preconnect" href="https://script.google.com">
 <link rel="dns-prefetch" href="//www.gstatic.com">
 <link rel="dns-prefetch" href="//script.google.com">
-<link rel="stylesheet" href="./dialog-system.css?v=0.36.8.7">
+<link rel="stylesheet" href="./dialog-system.css?v=0.36.8.8">
 <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
@@ -896,10 +896,10 @@ img,video,canvas,svg{max-width:100%}
 .reviewQueueNote{font-size:11px;color:#777;margin-top:6px}
 @media(max-width:760px){.reviewPreviewModal{padding:4px!important}.reviewPreviewModal .modalBox{width:100%!important;height:calc(100dvh - 8px)!important;max-height:none!important;border-radius:12px!important}.previewAssetStage{padding:5px}.previewFooter{padding:7px}.previewNav{justify-content:flex-start;overflow-x:auto;flex-wrap:nowrap}.previewNav .mini{white-space:nowrap}}
 </style>
-<link rel="stylesheet" href="./cases-module.css?v=0.36.8.7">
-<link rel="stylesheet" href="./activation-command.css?v=0.36.8.7">
-<link rel="stylesheet" href="./ideas-dump.css?v=0.36.8.7">
-<link rel="stylesheet" href="./pulse-module.css?v=0.36.8.7">
+<link rel="stylesheet" href="./cases-module.css?v=0.36.8.8">
+<link rel="stylesheet" href="./activation-command.css?v=0.36.8.8">
+<link rel="stylesheet" href="./ideas-dump.css?v=0.36.8.8">
+<link rel="stylesheet" href="./pulse-module.css?v=0.36.8.8">
 
 <style id="onit-mobile-nav-v0212">
 .navLabelMobile{display:none!important}
@@ -1013,8 +1013,8 @@ html.onitReduceMotion *,html.onitReduceMotion *::before,html.onitReduceMotion *:
   *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
 }
 </style>
-<link rel="stylesheet" href="./assist-traffic-module.css?v=0.36.8.7">
-<link rel="stylesheet" href="./core-intelligence.css?v=0.36.8.7">
+<link rel="stylesheet" href="./assist-traffic-module.css?v=0.36.8.8">
+<link rel="stylesheet" href="./core-intelligence.css?v=0.36.8.8">
 <style id="role-consistency-v0311">
 /* ONIT v0.31.2 — role authority + Digital Pulse access hardening */
 .radarMorningGrid .morningMetric b,
@@ -1027,11 +1027,11 @@ html.onitReduceMotion *,html.onitReduceMotion *::before,html.onitReduceMotion *:
 .radarLevel{color:#f2f2ee!important}
 </style>
 
-<link rel="stylesheet" href="./autocare-module.css?v=0.36.8.7">
-<link rel="stylesheet" href="./command-palette.css?v=0.36.8.7">
+<link rel="stylesheet" href="./autocare-module.css?v=0.36.8.8">
+<link rel="stylesheet" href="./command-palette.css?v=0.36.8.8">
 
-<link rel="stylesheet" href="./visual-contrast.css?v=0.36.8.7">
-<link rel="stylesheet" href="./attention-loop.css?v=0.36.8.7">
+<link rel="stylesheet" href="./visual-contrast.css?v=0.36.8.8">
+<link rel="stylesheet" href="./attention-loop.css?v=0.36.8.8">
 </head>
 <body>
 <a class="onitSkipLink" href="#mainContent">Skip to main content</a>
@@ -1226,7 +1226,7 @@ html.onitReduceMotion *,html.onitReduceMotion *::before,html.onitReduceMotion *:
 <script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-messaging-compat.js"></script>
-<script>const APP_VERSION='0.36.8.7';
+<script>const APP_VERSION='0.36.8.8';
 const UI_REVISION=36817;
 const DASHBOARD_UI_REVISION=36801;
 const DASHBOARD_UI_STORAGE_KEY='onit-dashboard-ui-state-v1';
@@ -2232,8 +2232,8 @@ async function testOutsidePush(){
   try{
     const res=await apiPost('scheduleClosedPushTest',{}),d=res.data||res;
     if(d.scheduled){
-      showToast('Closed-app test armed',`Close ONIT completely now. The system alert will be sent in about ${d.delaySeconds||20} seconds.`);
-      onitAlert(`CLOSED-APP TEST ARMED\n\nClose ONIT completely now.\n\nA real system notification will be sent in about ${d.delaySeconds||20} seconds. Do not leave ONIT open for this test.`);
+      showToast('Closed-app test armed',`Close ONIT completely now. ONIT has armed a real background system push; delivery can take longer than the minimum delay.`);
+      onitAlert(`CLOSED-APP TEST ARMED\n\nClose ONIT completely now.\n\nA real Firebase notification-payload message is armed for this device. Delivery may take longer than the minimum trigger delay.`);
     }else onitAlert('Could not schedule the closed-app test. '+(d.error||'This device may need to register again.'));
   }catch(e){onitAlert('Could not schedule the closed-app push test. '+e.message)}
 }
@@ -2483,7 +2483,7 @@ async function approveDataExportRequest(id){if(!await onitConfirm('Approve this 
 async function downloadDataExport(id){
   try{setBusy(true);const res=await apiPost('getDataExportPdf',{exportId:decodeURIComponent(id)}),d=res.data||res;if(!d.base64)throw new Error('No PDF was returned.');const url=URL.createObjectURL(base64ToBlob(d.base64,d.mimeType||'application/pdf')),a=document.createElement('a');a.href=url;a.download=d.fileName||'ONIT-data-export.pdf';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),5000)}catch(e){onitAlert('Could not download PDF. '+e.message)}finally{setBusy(false)}
 }
-function renderMore(){if(!currentUser)return;const names=backendAccess();let html=`<div class='moregrid'><div class='morecard'><h3>MY PROFILE</h3><div class='profileRow'><div class='avatar large' data-avatar-user='${escapeHTML(CURRENT_USER_ID)}'>${escapeHTML(initials(currentUserName()))}</div><div><b>${escapeHTML(currentUserName())}${isOwner()?` <span class='ownerBadge'>SYSTEM OWNER</span>`:''}</b><div class='bigTiny'>${escapeHTML(positionOf(currentUser)||'Position not set')}<br>${escapeHTML(departmentOf(currentUser)||'Department not set')}<br>${escapeHTML(rowVal(currentUser,'Email')||'Email not added yet')}</div></div></div><div class='field'><label>PROFILE PICTURE</label><input type='file' accept='image/jpeg,image/png,image/webp' onchange='uploadProfilePhoto(this)'><div class='tiny'>JPG, PNG or WebP • ONIT optimises the image automatically</div></div><button class='secondary linkbtn' onclick='handleSignOut()'>SIGN OUT</button></div><div class='morecard'><h3>NOTIFICATIONS</h3><div class='switchrow'><div><b>Notification sound</b><div class='bigTiny'>A distinct, louder ONIT brief alert plays whenever a new brief lands. Other alerts use the standard chime. Sound is ON by default unless you switch it off.</div></div><input type='checkbox' ${notificationSoundEnabled()?'checked':''} onchange='toggleSoundPreference(this)'></div><div class='actions'><button class='secondary linkbtn' onclick='testNotificationSound()'>TEST IN-APP SOUND</button><button class='secondary linkbtn' onclick='enablePushNotifications()'>ENABLE OUTSIDE-ONIT ALERTS</button><button class='secondary linkbtn' onclick='testOutsidePush()' ${pushNotificationStatus_()==='ON'?'':'disabled'}>TEST CLOSED-APP ALERT</button></div><div class='pushStatus ${audioReady?'on':'off'}'>In-app brief sound: ${audioReady?'ARMED':'WAITING FOR FIRST TAP'}</div><div class='pushStatus ${pushNotificationStatus_()==='ON'?'on':'off'}'>Closed/background alerts: ${pushNotificationStatus_()}</div><div class='bigTiny' style='margin-top:6px'>Each device must enable alerts once. TEST CLOSED-APP ALERT gives you about 20 seconds to close ONIT before the real system push is sent. When ONIT is closed, the operating system controls the notification sound/volume. On iPhone/iPad, install ONIT to the Home Screen before enabling alerts.</div></div><div class='morecard onitA11yCard'><h3>ACCESSIBILITY</h3><div class='switchrow'><div><b>Reduce motion</b><div class='bigTiny'>Minimises interface transitions and animated feedback. ONIT also respects your device Reduce Motion setting.</div></div><input type='checkbox' aria-label='Reduce motion' ${onitReducedMotionEnabled()?'checked':''} onchange='toggleOnitReducedMotion(this)'></div><div class='onitA11yStatus'>Keyboard focus, larger mobile tap targets and screen-reader status updates are always on.</div></div><div class='morecard'><h3>ORGANISATION</h3><b>${escapeHTML(rowVal(organisations[0],'Organisation Name')||'Organisation')}</b><div class='bigTiny'>Creative • Account Management • Strategy • Digital • Activation • HR • Accounts</div></div><div class='morecard'><h3>ACCESS</h3><div class='bigTiny'>Create briefs: <b>${canCreateBrief()?'YES':'NO'}</b><br>Review work: <b>${canReview()?'YES':'NO'}</b><br>Final approval: <b>${canApprove()?'YES':'NO'}</b><br>Backend datasets: <b>${isOwner()?'ALL':names.length}</b></div></div>`;
+function renderMore(){if(!currentUser)return;const names=backendAccess();let html=`<div class='moregrid'><div class='morecard'><h3>MY PROFILE</h3><div class='profileRow'><div class='avatar large' data-avatar-user='${escapeHTML(CURRENT_USER_ID)}'>${escapeHTML(initials(currentUserName()))}</div><div><b>${escapeHTML(currentUserName())}${isOwner()?` <span class='ownerBadge'>SYSTEM OWNER</span>`:''}</b><div class='bigTiny'>${escapeHTML(positionOf(currentUser)||'Position not set')}<br>${escapeHTML(departmentOf(currentUser)||'Department not set')}<br>${escapeHTML(rowVal(currentUser,'Email')||'Email not added yet')}</div></div></div><div class='field'><label>PROFILE PICTURE</label><input type='file' accept='image/jpeg,image/png,image/webp' onchange='uploadProfilePhoto(this)'><div class='tiny'>JPG, PNG or WebP • ONIT optimises the image automatically</div></div><button class='secondary linkbtn' onclick='handleSignOut()'>SIGN OUT</button></div><div class='morecard'><h3>NOTIFICATIONS</h3><div class='switchrow'><div><b>Notification sound</b><div class='bigTiny'>A distinct, louder ONIT brief alert plays whenever a new brief lands. Other alerts use the standard chime. Sound is ON by default unless you switch it off.</div></div><input type='checkbox' ${notificationSoundEnabled()?'checked':''} onchange='toggleSoundPreference(this)'></div><div class='actions'><button class='secondary linkbtn' onclick='testNotificationSound()'>TEST IN-APP SOUND</button><button class='secondary linkbtn' onclick='enablePushNotifications()'>ENABLE OUTSIDE-ONIT ALERTS</button><button class='secondary linkbtn' onclick='testOutsidePush()' ${pushNotificationStatus_()==='ON'?'':'disabled'}>TEST CLOSED-APP ALERT</button></div><div class='pushStatus ${audioReady?'on':'off'}'>In-app brief sound: ${audioReady?'ARMED':'WAITING FOR FIRST TAP'}</div><div class='pushStatus ${pushNotificationStatus_()==='ON'?'on':'off'}'>Closed/background alerts: ${pushNotificationStatus_()}</div><div class='bigTiny' style='margin-top:6px'>Each device must enable alerts once. TEST CLOSED-APP ALERT gives you after you close ONIT to close ONIT before the real system push is sent. When ONIT is closed, the operating system controls the notification sound/volume. On iPhone/iPad, install ONIT to the Home Screen before enabling alerts.</div></div><div class='morecard onitA11yCard'><h3>ACCESSIBILITY</h3><div class='switchrow'><div><b>Reduce motion</b><div class='bigTiny'>Minimises interface transitions and animated feedback. ONIT also respects your device Reduce Motion setting.</div></div><input type='checkbox' aria-label='Reduce motion' ${onitReducedMotionEnabled()?'checked':''} onchange='toggleOnitReducedMotion(this)'></div><div class='onitA11yStatus'>Keyboard focus, larger mobile tap targets and screen-reader status updates are always on.</div></div><div class='morecard'><h3>ORGANISATION</h3><b>${escapeHTML(rowVal(organisations[0],'Organisation Name')||'Organisation')}</b><div class='bigTiny'>Creative • Account Management • Strategy • Digital • Activation • HR • Accounts</div></div><div class='morecard'><h3>ACCESS</h3><div class='bigTiny'>Create briefs: <b>${canCreateBrief()?'YES':'NO'}</b><br>Review work: <b>${canReview()?'YES':'NO'}</b><br>Final approval: <b>${canApprove()?'YES':'NO'}</b><br>Backend datasets: <b>${isOwner()?'ALL':names.length}</b></div></div>`;
   if(isOwner()&&securityInfo){html+=`<div class='morecard' style='grid-column:1/-1'><h3>ORGANISATION SECURITY <span class='ownerBadge'>OWNER ONLY</span></h3><div class='bigTiny'>Share the Join Code only with authorised staff. Backend data is never granted automatically by this code.</div><div class='securityCode'>${escapeHTML(securityInfo.inviteCode||'—')}</div><div class='actions'><button class='secondary' onclick='regenerateJoinCode()'>REGENERATE JOIN CODE</button><button class='secondary' onclick='toggleSignupAccess()'>${securityInfo.signupsEnabled?'DISABLE':'ENABLE'} SIGNUPS</button></div></div>`}
   if(isOwner()){html+=ownerBroadcastMarkup()}
   if(isOwner()){
@@ -2821,19 +2821,19 @@ setInterval(()=>{const now=Date.now(),gap=firebaseRealtimeHealthy?60000:15000;if
 async function boot(){if(SESSION_TOKEN){document.getElementById('authGate').classList.add('hidden');document.getElementById('appShell').classList.remove('hidden');await loadFromGoogle(false);if(SESSION_TOKEN)return}document.getElementById('appShell').classList.add('hidden');document.getElementById('authGate').classList.remove('hidden');showAuthMode('signin')}
 document.addEventListener('DOMContentLoaded',()=>boot(),{once:true});
 </script>
-<script src="./dialog-system.js?v=0.36.8.7"></script>
-<script src="./authority-engine.js?v=0.36.8.7"></script>
-<script src="./sync-engine.js?v=0.36.8.7"></script>
-<script src="./release-guard.js?v=0.36.8.7"></script>
-<script src="./command-palette.js?v=0.36.8.7"></script>
-<script src="./autocare-module.js?v=0.36.8.7"></script>
-<script src="./cases-module.js?v=0.36.8.7"></script>
-<script src="./activation-command.js?v=0.36.8.7"></script>
-<script src="./ideas-dump.js?v=0.36.8.7"></script>
-<script src="./pulse-module.js?v=0.36.8.7"></script>
-<script src="./assist-traffic-module.js?v=0.36.8.7"></script>
-<script src="./core-intelligence.js?v=0.36.8.7"></script>
-<script src="./attention-loop.js?v=0.36.8.7"></script>
+<script src="./dialog-system.js?v=0.36.8.8"></script>
+<script src="./authority-engine.js?v=0.36.8.8"></script>
+<script src="./sync-engine.js?v=0.36.8.8"></script>
+<script src="./release-guard.js?v=0.36.8.8"></script>
+<script src="./command-palette.js?v=0.36.8.8"></script>
+<script src="./autocare-module.js?v=0.36.8.8"></script>
+<script src="./cases-module.js?v=0.36.8.8"></script>
+<script src="./activation-command.js?v=0.36.8.8"></script>
+<script src="./ideas-dump.js?v=0.36.8.8"></script>
+<script src="./pulse-module.js?v=0.36.8.8"></script>
+<script src="./assist-traffic-module.js?v=0.36.8.8"></script>
+<script src="./core-intelligence.js?v=0.36.8.8"></script>
+<script src="./attention-loop.js?v=0.36.8.8"></script>
 </body>
 </html>
 
