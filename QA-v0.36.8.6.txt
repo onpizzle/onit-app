@@ -3,5 +3,5 @@ PASS - TEST SYSTEM ALERT present in Settings renderer
 PASS - testOutsidePush() calls backend action testPushNotification
 PASS - device push token persisted locally after successful registration
 PASS - service worker/cache version bumped to v0.36.8.7
-PASS - version.json aligned to v0.36.8.7 / UI revision 36817
+PASS - version.json aligned to v0.36.8.7 / UI revision 36819
 Backend required: v0.31.11

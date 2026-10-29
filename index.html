@@ -24,7 +24,7 @@
 <link rel="preconnect" href="https://script.google.com">
 <link rel="dns-prefetch" href="//www.gstatic.com">
 <link rel="dns-prefetch" href="//script.google.com">
-<link rel="stylesheet" href="./dialog-system.css?v=0.36.8.8">
+<link rel="stylesheet" href="./dialog-system.css?v=0.36.9.0">
 <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
@@ -896,10 +896,10 @@ img,video,canvas,svg{max-width:100%}
 .reviewQueueNote{font-size:11px;color:#777;margin-top:6px}
 @media(max-width:760px){.reviewPreviewModal{padding:4px!important}.reviewPreviewModal .modalBox{width:100%!important;height:calc(100dvh - 8px)!important;max-height:none!important;border-radius:12px!important}.previewAssetStage{padding:5px}.previewFooter{padding:7px}.previewNav{justify-content:flex-start;overflow-x:auto;flex-wrap:nowrap}.previewNav .mini{white-space:nowrap}}
 </style>
-<link rel="stylesheet" href="./cases-module.css?v=0.36.8.8">
-<link rel="stylesheet" href="./activation-command.css?v=0.36.8.8">
-<link rel="stylesheet" href="./ideas-dump.css?v=0.36.8.8">
-<link rel="stylesheet" href="./pulse-module.css?v=0.36.8.8">
+<link rel="stylesheet" href="./cases-module.css?v=0.36.9.0">
+<link rel="stylesheet" href="./activation-command.css?v=0.36.9.0">
+<link rel="stylesheet" href="./ideas-dump.css?v=0.36.9.0">
+<link rel="stylesheet" href="./pulse-module.css?v=0.36.9.0">
 
 <style id="onit-mobile-nav-v0212">
 .navLabelMobile{display:none!important}
@@ -1013,8 +1013,8 @@ html.onitReduceMotion *,html.onitReduceMotion *::before,html.onitReduceMotion *:
   *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
 }
 </style>
-<link rel="stylesheet" href="./assist-traffic-module.css?v=0.36.8.8">
-<link rel="stylesheet" href="./core-intelligence.css?v=0.36.8.8">
+<link rel="stylesheet" href="./assist-traffic-module.css?v=0.36.9.0">
+<link rel="stylesheet" href="./core-intelligence.css?v=0.36.9.0">
 <style id="role-consistency-v0311">
 /* ONIT v0.31.2 — role authority + Digital Pulse access hardening */
 .radarMorningGrid .morningMetric b,
@@ -1027,11 +1027,11 @@ html.onitReduceMotion *,html.onitReduceMotion *::before,html.onitReduceMotion *:
 .radarLevel{color:#f2f2ee!important}
 </style>
 
-<link rel="stylesheet" href="./autocare-module.css?v=0.36.8.8">
-<link rel="stylesheet" href="./command-palette.css?v=0.36.8.8">
+<link rel="stylesheet" href="./autocare-module.css?v=0.36.9.0">
+<link rel="stylesheet" href="./command-palette.css?v=0.36.9.0">
 
-<link rel="stylesheet" href="./visual-contrast.css?v=0.36.8.8">
-<link rel="stylesheet" href="./attention-loop.css?v=0.36.8.8">
+<link rel="stylesheet" href="./visual-contrast.css?v=0.36.9.0">
+<link rel="stylesheet" href="./attention-loop.css?v=0.36.9.0">
 </head>
 <body>
 <a class="onitSkipLink" href="#mainContent">Skip to main content</a>
@@ -1226,8 +1226,8 @@ html.onitReduceMotion *,html.onitReduceMotion *::before,html.onitReduceMotion *:
 <script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-messaging-compat.js"></script>
-<script>const APP_VERSION='0.36.8.8';
-const UI_REVISION=36817;
+<script>const APP_VERSION='0.36.9.0';
+const UI_REVISION=36900;
 const DASHBOARD_UI_REVISION=36801;
 const DASHBOARD_UI_STORAGE_KEY='onit-dashboard-ui-state-v1';
 window.ONIT_RUNTIME={version:APP_VERSION,uiRevision:UI_REVISION,dashboardUiRevision:DASHBOARD_UI_REVISION};
@@ -2639,118 +2639,71 @@ function makeId(){return crypto.randomUUID?crypto.randomUUID():Array.from(crypto
 
 
 
-// ===== Global UI Sync + self-healing frontend update manager =====
-const UI_RELEASE_CHECK_MS=60000;
-const UI_PENDING_RETRY_MS=2000;
-const UI_AUTO_APPLY_IDLE_MS=8000;
-const UI_RELOAD_GUARD_TTL_MS=5*60*1000;
-const UI_SIGNAL_KEY='onit-ui-release-signal-v1';
+// ===== Passive frontend release monitor (v0.36.9.0) =====
+// Production rule: detect a newer UI, but NEVER auto-refresh an active session.
+// This prevents update loops and lets the user finish work safely.
+const UI_RELEASE_CHECK_MS=5*60*1000;
+const UI_SIGNAL_KEY='onit-ui-release-signal-v2';
+const UI_NOTICE_KEY='onit-ui-release-notice-v2';
 const UI_EXPECTED_KEY='onit-ui-expected-version-v1';
 const UI_RELOAD_GUARD_KEY='onit-ui-reload-guard-v1';
-let pendingFrontendVersion='',pendingFrontendRelease=null,uiUpdateInFlight=false,uiUpdateToastVersion='';
-let lastUiActivityAt=Date.now();
-let uiUpdateChannel=null;
-['pointerdown','keydown','input','touchstart'].forEach(type=>window.addEventListener(type,()=>{lastUiActivityAt=Date.now()},{capture:true,passive:true}));
-try{if('BroadcastChannel'in window)uiUpdateChannel=new BroadcastChannel('onit-ui-release-v1')}catch(e){}
+let pendingFrontendVersion='',pendingFrontendRelease=null,uiUpdateToastVersion='';
 function versionNumbers(v){return String(v||'').trim().split(/[.+-]/).slice(0,4).map(x=>Number(String(x).replace(/\D/g,''))||0)}
 function compareUiVersions(a,b){const aa=versionNumbers(a),bb=versionNumbers(b),n=Math.max(aa.length,bb.length,3);for(let i=0;i<n;i++){const d=(aa[i]||0)-(bb[i]||0);if(d)return d>0?1:-1}return 0}
-function remoteUiIsNewer(release){const remote=String(release&&release.version||'').trim();if(!remote)return false;const rev=Number(release&&release.uiRevision||0),dashRev=Number(release&&release.dashboardUiRevision||0);if(dashRev&&typeof DASHBOARD_UI_REVISION!=='undefined'&&dashRev>DASHBOARD_UI_REVISION)return true;if(rev&&typeof UI_REVISION!=='undefined'&&rev>UI_REVISION)return true;return compareUiVersions(remote,APP_VERSION)>0}
-function safeToReloadForUpdate(){return !mutationBusy&&uiDirtySections.size===0}
-function publishUiUpdateSignal(release){
-  const payload={type:'ONIT_UI_UPDATE_AVAILABLE',version:String(release&&release.version||''),uiRevision:Number(release&&release.uiRevision||0),dashboardUiRevision:Number(release&&release.dashboardUiRevision||0),at:Date.now()};
-  try{localStorage.setItem(UI_SIGNAL_KEY,JSON.stringify(payload))}catch(e){}
-  try{uiUpdateChannel&&uiUpdateChannel.postMessage(payload)}catch(e){}
+function remoteUiIsNewer(release){
+  const remote=String(release&&release.version||'').trim();if(!remote)return false;
+  const cmp=compareUiVersions(remote,APP_VERSION);if(cmp!==0)return cmp>0;
+  const rev=Number(release&&release.uiRevision||0),dashRev=Number(release&&release.dashboardUiRevision||0);
+  return rev>UI_REVISION||dashRev>DASHBOARD_UI_REVISION;
 }
 async function fetchFrontendRelease(){
   const u=new URL('./version.json',location.href);u.searchParams.set('_ui_check',Date.now());u.searchParams.set('running',APP_VERSION);
   const r=await fetch(u.toString(),{cache:'no-store',headers:{'Cache-Control':'no-cache, no-store, must-revalidate','Pragma':'no-cache'}});
-  if(!r.ok)throw new Error('Version check '+r.status);
-  return r.json();
+  if(!r.ok)throw new Error('Version check '+r.status);return r.json();
+}
+function releaseNoticeId(release){return [String(release&&release.version||''),Number(release&&release.uiRevision||0),Number(release&&release.dashboardUiRevision||0)].join('|')}
+function clearStaleUiUpdateState(){
+  pendingFrontendVersion='';pendingFrontendRelease=null;uiUpdateToastVersion='';
+  try{localStorage.removeItem(UI_EXPECTED_KEY);localStorage.removeItem(UI_RELOAD_GUARD_KEY);localStorage.removeItem('onit-ui-release-signal-v1')}catch(e){}
 }
 function queueUiUpdate(release,source='release-check'){
   const remote=String(release&&release.version||'').trim();if(!remote||!remoteUiIsNewer(release))return false;
   pendingFrontendVersion=remote;pendingFrontendRelease=release;
-  try{localStorage.setItem(UI_EXPECTED_KEY,remote)}catch(e){}
-  if(source!=='broadcast'&&source!=='storage'&&source!=='service-worker')publishUiUpdateSignal(release);
-  if(!safeToReloadForUpdate()&&uiUpdateToastVersion!==remote){uiUpdateToastVersion=remote;const dashboardOnly=Number(release&&release.dashboardUiRevision||0)>DASHBOARD_UI_REVISION&&compareUiVersions(remote,APP_VERSION)===0;showToast('ONIT is updating',dashboardOnly?'A newer dashboard UI is ready. Finish your current form/action; ONIT will repair it automatically.':`UI v${remote} is ready. Finish your current form/action; ONIT will switch automatically.`)}
-  // v0.36.8.4: detect immediately, but apply only when the session is idle and has no unsaved work.
-  return true;
-}
-async function performFrontendRefresh(targetVersion,force=false){
-  targetVersion=String(targetVersion||pendingFrontendVersion||'').trim();
-  const targetRevision=Number(pendingFrontendRelease&&pendingFrontendRelease.uiRevision||0),targetDashboardRevision=Number(pendingFrontendRelease&&pendingFrontendRelease.dashboardUiRevision||0);
-  const versionNewer=!!targetVersion&&compareUiVersions(targetVersion,APP_VERSION)>0;
-  const revisionNewer=!!targetVersion&&compareUiVersions(targetVersion,APP_VERSION)===0&&targetRevision>UI_REVISION;
-  const dashboardRevisionNewer=!!targetVersion&&compareUiVersions(targetVersion,APP_VERSION)===0&&targetDashboardRevision>DASHBOARD_UI_REVISION;
-  if(!versionNewer&&!revisionNewer&&!dashboardRevisionNewer){pendingFrontendVersion='';pendingFrontendRelease=null;return false}
-  if(uiUpdateInFlight)return false;
-  if(!force&&!safeToReloadForUpdate()){pendingFrontendVersion=targetVersion;return false}
-  uiUpdateInFlight=true;
-  try{
-    try{localStorage.setItem(UI_EXPECTED_KEY,targetVersion);localStorage.setItem(UI_RELOAD_GUARD_KEY,JSON.stringify({from:APP_VERSION,to:targetVersion,at:Date.now()}))}catch(e){}
-    try{window.AutoCare&&AutoCare.recordRepair&&AutoCare.recordRepair(targetDashboardRevision>DASHBOARD_UI_REVISION?'DASHBOARD_UI_SYNC':'GLOBAL_UI_SYNC',targetDashboardRevision>DASHBOARD_UI_REVISION&&compareUiVersions(targetVersion,APP_VERSION)===0?`Repairing dashboard UI r${DASHBOARD_UI_REVISION} → r${targetDashboardRevision}`:`Updating ONIT UI ${APP_VERSION} → ${targetVersion}`)}catch(e){}
-    if('serviceWorker'in navigator){
-      try{navigator.serviceWorker.controller&&navigator.serviceWorker.controller.postMessage({type:'ONIT_UI_SYNC_NOW',targetVersion})}catch(e){}
-      const regs=await navigator.serviceWorker.getRegistrations();
-      await Promise.all(regs.map(async reg=>{try{await reg.update();if(reg.waiting)reg.waiting.postMessage({type:'SKIP_WAITING'})}catch(e){}}));
-    }
-    if('caches'in window){const keys=await caches.keys();await Promise.all(keys.filter(k=>k.startsWith('onit-')).map(k=>caches.delete(k)))}
-  }catch(e){console.warn('ONIT Global UI Sync preparation:',e)}
-  const url=new URL(location.href);url.searchParams.set('onit_ui',targetVersion);if(targetRevision)url.searchParams.set('ui_rev',String(targetRevision));if(targetDashboardRevision)url.searchParams.set('dashboard_rev',String(targetDashboardRevision));url.searchParams.set('_ui_refresh',Date.now());url.hash='';
-  location.replace(url.toString());
+  const noticeId=releaseNoticeId(release);let already='';try{already=localStorage.getItem(UI_NOTICE_KEY)||''}catch(e){}
+  if(already!==noticeId){
+    try{localStorage.setItem(UI_NOTICE_KEY,noticeId)}catch(e){}
+    uiUpdateToastVersion=noticeId;
+    showToast('ONIT update available',`UI v${remote} is ready. ONIT will not refresh automatically. Close and reopen the app when convenient.`);
+  }
   return true;
 }
 async function checkFrontendRelease(force=false){
   if(!isHttpsApp()||navigator.onLine===false)return null;
   try{
-    const release=await fetchFrontendRelease(),remote=String(release.version||'').trim();
+    const release=await fetchFrontendRelease();
     if(remoteUiIsNewer(release)){queueUiUpdate(release,'release-check');return release}
-    if(remote&&compareUiVersions(remote,APP_VERSION)===0&&Number(release.uiRevision||0)<=UI_REVISION&&Number(release.dashboardUiRevision||0)<=DASHBOARD_UI_REVISION){
-      pendingFrontendVersion='';pendingFrontendRelease=null;uiUpdateToastVersion='';
-      try{if(localStorage.getItem(UI_EXPECTED_KEY)===remote)localStorage.removeItem(UI_EXPECTED_KEY)}catch(e){}
-    }
+    clearStaleUiUpdateState();
     return release;
   }catch(e){console.warn('Frontend version check:',e);return null}
 }
-function recentUiReloadGuardBlocks(targetVersion){
-  try{
-    const guard=JSON.parse(localStorage.getItem(UI_RELOAD_GUARD_KEY)||'null');
-    return !!(guard&&guard.from===APP_VERSION&&guard.to===targetVersion&&Date.now()-Number(guard.at||0)<UI_RELOAD_GUARD_TTL_MS);
-  }catch(e){return false}
-}
-async function processPendingUiUpdate(){
-  const target=String(pendingFrontendVersion||'').trim();
-  if(!target||!pendingFrontendRelease)return false;
-  if(!remoteUiIsNewer(pendingFrontendRelease)){pendingFrontendVersion='';pendingFrontendRelease=null;return false}
-  if(document.hidden||navigator.onLine===false||uiUpdateInFlight||!safeToReloadForUpdate())return false;
-  if(Date.now()-lastUiActivityAt<UI_AUTO_APPLY_IDLE_MS)return false;
-  if(recentUiReloadGuardBlocks(target)){
-    const key=target+'-guarded';
-    if(uiUpdateToastVersion!==key){uiUpdateToastVersion=key;showToast('ONIT update ready',`UI v${target} is available. Close and reopen ONIT if this device does not switch automatically.`)}
-    return false;
-  }
-  uiUpdateToastVersion=target;
-  showToast('Updating ONIT',`Switching this device to UI v${target}.`);
-  return performFrontendRefresh(target,false);
+// Kept for compatibility with older modules. It intentionally never reloads.
+async function processPendingUiUpdate(){return false}
+async function performFrontendRefresh(){return false}
+function acceptUiUpdateSignal(data,source){
+  if(!data||data.type!=='ONIT_UI_UPDATE_AVAILABLE')return;
+  const release={version:String(data.version||''),uiRevision:Number(data.uiRevision||0),dashboardUiRevision:Number(data.dashboardUiRevision||0)};
+  if(remoteUiIsNewer(release))queueUiUpdate(release,source);
 }
 async function forceFrontendUpdate(){
   if(uiDirtySections.size&&!await onitConfirm('You have an unfinished form. Reload ONIT and discard those unsaved changes?'))return;
   try{
     if('serviceWorker'in navigator){const regs=await navigator.serviceWorker.getRegistrations();await Promise.all(regs.map(async reg=>{try{await reg.unregister()}catch(e){}}))}
     if('caches'in window){const keys=await caches.keys();await Promise.all(keys.filter(k=>k.startsWith('onit-')).map(k=>caches.delete(k)))}
-    try{localStorage.removeItem(UI_RELOAD_GUARD_KEY)}catch(e){}
+    try{localStorage.removeItem(UI_NOTICE_KEY);localStorage.removeItem(UI_EXPECTED_KEY);localStorage.removeItem(UI_RELOAD_GUARD_KEY);localStorage.removeItem(UI_SIGNAL_KEY);localStorage.removeItem('onit-ui-release-signal-v1')}catch(e){}
   }catch(e){}
-  let remote=APP_VERSION;try{const release=await fetchFrontendRelease();remote=String(release.version||APP_VERSION)}catch(e){}
-  const url=new URL(location.href);url.search='';url.hash='';url.searchParams.set('repair','1');url.searchParams.set('onit_ui',remote);url.searchParams.set('t',Date.now());location.replace(url.toString())
+  const url=new URL(location.href);url.search='';url.hash='';url.searchParams.set('repair','1');url.searchParams.set('t',Date.now());location.replace(url.toString())
 }
-function acceptUiUpdateSignal(data,source){
-  if(!data||data.type!=='ONIT_UI_UPDATE_AVAILABLE')return;
-  const release={version:String(data.version||''),uiRevision:Number(data.uiRevision||0),dashboardUiRevision:Number(data.dashboardUiRevision||0)};
-  if(remoteUiIsNewer(release))queueUiUpdate(release,source);
-}
-try{if(uiUpdateChannel)uiUpdateChannel.onmessage=e=>acceptUiUpdateSignal(e.data,'broadcast')}catch(e){}
-window.addEventListener('storage',e=>{if(e.key!==UI_SIGNAL_KEY||!e.newValue)return;try{acceptUiUpdateSignal(JSON.parse(e.newValue),'storage')}catch(err){}});
-setInterval(processPendingUiUpdate,UI_PENDING_RETRY_MS);
+try{clearStaleUiUpdateState()}catch(e){}
 
 // ===== Installable app / near-real-time shell =====
 let deferredInstallPrompt=null,lastFocusRefresh=0;
@@ -2821,19 +2774,19 @@ setInterval(()=>{const now=Date.now(),gap=firebaseRealtimeHealthy?60000:15000;if
 async function boot(){if(SESSION_TOKEN){document.getElementById('authGate').classList.add('hidden');document.getElementById('appShell').classList.remove('hidden');await loadFromGoogle(false);if(SESSION_TOKEN)return}document.getElementById('appShell').classList.add('hidden');document.getElementById('authGate').classList.remove('hidden');showAuthMode('signin')}
 document.addEventListener('DOMContentLoaded',()=>boot(),{once:true});
 </script>
-<script src="./dialog-system.js?v=0.36.8.8"></script>
-<script src="./authority-engine.js?v=0.36.8.8"></script>
-<script src="./sync-engine.js?v=0.36.8.8"></script>
-<script src="./release-guard.js?v=0.36.8.8"></script>
-<script src="./command-palette.js?v=0.36.8.8"></script>
-<script src="./autocare-module.js?v=0.36.8.8"></script>
-<script src="./cases-module.js?v=0.36.8.8"></script>
-<script src="./activation-command.js?v=0.36.8.8"></script>
-<script src="./ideas-dump.js?v=0.36.8.8"></script>
-<script src="./pulse-module.js?v=0.36.8.8"></script>
-<script src="./assist-traffic-module.js?v=0.36.8.8"></script>
-<script src="./core-intelligence.js?v=0.36.8.8"></script>
-<script src="./attention-loop.js?v=0.36.8.8"></script>
+<script src="./dialog-system.js?v=0.36.9.0"></script>
+<script src="./authority-engine.js?v=0.36.9.0"></script>
+<script src="./sync-engine.js?v=0.36.9.0"></script>
+<script src="./release-guard.js?v=0.36.9.0"></script>
+<script src="./command-palette.js?v=0.36.9.0"></script>
+<script src="./autocare-module.js?v=0.36.9.0"></script>
+<script src="./cases-module.js?v=0.36.9.0"></script>
+<script src="./activation-command.js?v=0.36.9.0"></script>
+<script src="./ideas-dump.js?v=0.36.9.0"></script>
+<script src="./pulse-module.js?v=0.36.9.0"></script>
+<script src="./assist-traffic-module.js?v=0.36.9.0"></script>
+<script src="./core-intelligence.js?v=0.36.9.0"></script>
+<script src="./attention-loop.js?v=0.36.9.0"></script>
 </body>
 </html>
 
