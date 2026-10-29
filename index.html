@@ -24,7 +24,7 @@
 <link rel="preconnect" href="https://script.google.com">
 <link rel="dns-prefetch" href="//www.gstatic.com">
 <link rel="dns-prefetch" href="//script.google.com">
-<link rel="stylesheet" href="./dialog-system.css?v=0.37.0">
+<link rel="stylesheet" href="./dialog-system.css?v=0.37.1">
 <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
@@ -901,10 +901,10 @@ img,video,canvas,svg{max-width:100%}
 .reviewQueueNote{font-size:11px;color:#777;margin-top:6px}
 @media(max-width:760px){.reviewPreviewModal{padding:4px!important}.reviewPreviewModal .modalBox{width:100%!important;height:calc(100dvh - 8px)!important;max-height:none!important;border-radius:12px!important}.previewAssetStage{padding:5px}.previewFooter{padding:7px}.previewNav{justify-content:flex-start;overflow-x:auto;flex-wrap:nowrap}.previewNav .mini{white-space:nowrap}}
 </style>
-<link rel="stylesheet" href="./cases-module.css?v=0.37.0">
-<link rel="stylesheet" href="./activation-command.css?v=0.37.0">
-<link rel="stylesheet" href="./ideas-dump.css?v=0.37.0">
-<link rel="stylesheet" href="./pulse-module.css?v=0.37.0">
+<link rel="stylesheet" href="./cases-module.css?v=0.37.1">
+<link rel="stylesheet" href="./activation-command.css?v=0.37.1">
+<link rel="stylesheet" href="./ideas-dump.css?v=0.37.1">
+<link rel="stylesheet" href="./pulse-module.css?v=0.37.1">
 
 <style id="onit-mobile-nav-v0212">
 .navLabelMobile{display:none!important}
@@ -1018,8 +1018,8 @@ html.onitReduceMotion *,html.onitReduceMotion *::before,html.onitReduceMotion *:
   *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
 }
 </style>
-<link rel="stylesheet" href="./assist-traffic-module.css?v=0.37.0">
-<link rel="stylesheet" href="./core-intelligence.css?v=0.37.0">
+<link rel="stylesheet" href="./assist-traffic-module.css?v=0.37.1">
+<link rel="stylesheet" href="./core-intelligence.css?v=0.37.1">
 <style id="role-consistency-v0311">
 /* ONIT v0.31.2 — role authority + Digital Pulse access hardening */
 .radarMorningGrid .morningMetric b,
@@ -1032,11 +1032,11 @@ html.onitReduceMotion *,html.onitReduceMotion *::before,html.onitReduceMotion *:
 .radarLevel{color:#f2f2ee!important}
 </style>
 
-<link rel="stylesheet" href="./autocare-module.css?v=0.37.0">
-<link rel="stylesheet" href="./command-palette.css?v=0.37.0">
+<link rel="stylesheet" href="./autocare-module.css?v=0.37.1">
+<link rel="stylesheet" href="./command-palette.css?v=0.37.1">
 
-<link rel="stylesheet" href="./visual-contrast.css?v=0.37.0">
-<link rel="stylesheet" href="./attention-loop.css?v=0.37.0">
+<link rel="stylesheet" href="./visual-contrast.css?v=0.37.1">
+<link rel="stylesheet" href="./attention-loop.css?v=0.37.1">
 </head>
 <body>
 <a class="onitSkipLink" href="#mainContent">Skip to main content</a>
@@ -1231,9 +1231,9 @@ html.onitReduceMotion *,html.onitReduceMotion *::before,html.onitReduceMotion *:
 <script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-messaging-compat.js"></script>
-<script>const APP_VERSION='0.37.0';
-const UI_REVISION=37000;
-const DASHBOARD_UI_REVISION=37001;
+<script>const APP_VERSION='0.37.1';
+const UI_REVISION=37100;
+const DASHBOARD_UI_REVISION=37101;
 const DASHBOARD_UI_STORAGE_KEY='onit-dashboard-ui-state-v1';
 window.ONIT_RUNTIME={version:APP_VERSION,uiRevision:UI_REVISION,dashboardUiRevision:DASHBOARD_UI_REVISION};
 const BACKEND_DATASETS=['USERS','CLIENTS','BRIEFS','ASSIGNMENTS','ITERATIONS','ACTIVITY_LOG','NOTIFICATIONS','REPORTS'];
@@ -2648,7 +2648,7 @@ function renderMore(){if(!currentUser)return;const names=backendAccess();let htm
   if(isOwner()||dashboardMode()==='LEADERSHIP'){html+=`<div class='morecard leadershipReportCard' style='grid-column:1/-1'><h3>LEADERSHIP OPERATIONS REPORT</h3><div class='bigTiny'>Download one current PDF covering workload, overdue jobs, review bottlenecks, turnaround time, Traffic pressure and department utilisation.</div><div class='actions'><button class='new' onclick='downloadLeadershipReport(this)'>DOWNLOAD LEADERSHIP REPORT</button></div></div>`}
   html+=dataExportRequestsMarkup();
   if(typeof autoCareMoreCardMarkup==='function')html+=autoCareMoreCardMarkup();
-  html+=isStagingEnvironment()?`<div class='morecard' style='grid-column:1/-1'><h3>STAGING • BROWSER ONLY</h3><div class='bigTiny'>This test environment cannot be installed as ONIT. Use it only in the browser. Install the production app from https://onit-d5sr.onrender.com/.</div><div class='actions'><button class='secondary linkbtn' onclick="window.open('https://onit-d5sr.onrender.com/','_blank','noopener')">OPEN PRODUCTION ONIT</button></div></div>`:`<div class='morecard' style='grid-column:1/-1'><h3>INSTALL / UPDATE ONIT</h3><div class='bigTiny'>Install ONIT on this device for quick access. ONIT prioritises session stability. Published UI updates apply on a normal close/reopen, or when you explicitly choose Check / Repair Update. AutoCare never reloads an active work session.</div><div class='actions'><button class='secondary linkbtn' onclick='installOnit()'>INSTALL ON THIS DEVICE</button><button class='secondary linkbtn' onclick='forceFrontendUpdate()'>CHECK / REPAIR UPDATE</button></div></div>`;
+  html+=isStagingEnvironment()?`<div class='morecard' style='grid-column:1/-1'><h3>STAGING • BROWSER ONLY</h3><div class='bigTiny'>This test environment cannot be installed as ONIT. Use it only in the browser. Install ONIT only from the current production Cloudflare Pages address.</div><div class='actions'><button class='secondary linkbtn' onclick="window.open(productionOnitUrl(),'_blank','noopener')">OPEN PRODUCTION ONIT</button></div></div>`:`<div class='morecard' style='grid-column:1/-1'><h3>INSTALL / UPDATE ONIT</h3><div class='bigTiny'>Install ONIT on this device for quick access. ONIT prioritises session stability. Published UI updates apply on a normal close/reopen, or when you explicitly choose Check / Repair Update. AutoCare never reloads an active work session.</div><div class='actions'><button class='secondary linkbtn' onclick='installOnit()'>INSTALL ON THIS DEVICE</button><button class='secondary linkbtn' onclick='forceFrontendUpdate()'>CHECK / REPAIR UPDATE</button></div></div>`;
   html+=`<div class='morecard' style='grid-column:1/-1'><div class='streamlineAbout'><div><h3>ABOUT ONIT</h3><div class='bigTiny'>Frontend v${APP_VERSION} • Dashboard UI r${DASHBOARD_UI_REVISION} • Authority v1 • Sync v1 • Backend ${backendVersion||'checking…'}</div></div><button class='secondary linkbtn' onclick="showToast('ONIT','Work. People. Attention. Proof.')">VIEW DETAILS</button></div></div></div>`;document.getElementById('moreContent').innerHTML=html;hydrateProfilePhotos()}
 async function approvePending(id){
   const targetUserId=decodeURIComponent(id),target=pendingUsers.find(u=>String(rowVal(u,'User ID'))===String(targetUserId)),name=target?rowVal(target,'Full Name'):'The member';
@@ -2826,14 +2826,15 @@ function isStandalone(){return window.matchMedia?.('(display-mode: standalone)')
 function isIOS(){return /iphone|ipad|ipod/i.test(navigator.userAgent)}
 function isHttpsApp(){return location.protocol==='https:'||['localhost','127.0.0.1'].includes(location.hostname)}
 function isStagingEnvironment(){return window.ONIT_IS_STAGING===true||String(location.hostname||'').toLowerCase()==='onit-cases-test.onrender.com'}
+function productionOnitUrl(){const configured=String(window.ONIT_PRODUCTION_ORIGIN||'').trim();if(configured)return configured.replace(/\/$/,'')+'/';return location.origin.replace(/\/$/,'')+'/'}
 async function retireStagingInstall_(){if(!isStagingEnvironment())return;deferredInstallPrompt=null;try{if('serviceWorker'in navigator){const regs=await navigator.serviceWorker.getRegistrations();await Promise.all(regs.map(r=>r.unregister().catch(()=>false)))}}catch(e){}try{if('caches'in window){const keys=await caches.keys();await Promise.all(keys.filter(k=>String(k).startsWith('onit-')).map(k=>caches.delete(k)))}}catch(e){}}
 function refreshInstallButton(){const b=document.getElementById('installBtn');if(!b)return;const show=!isStandalone()&&!isStagingEnvironment();b.classList.toggle('hidden',!show);b.textContent=isIOS()?'ADD TO HOME':'INSTALL'}
 window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();if(isStagingEnvironment()){deferredInstallPrompt=null;refreshInstallButton();return}deferredInstallPrompt=e;refreshInstallButton()});
 document.addEventListener('DOMContentLoaded',initialiseOnitPolish,{once:true});
-document.addEventListener('DOMContentLoaded',()=>{if(!isStagingEnvironment())return;document.body.classList.add('onit-staging-browser-only');if(isStandalone()){const note=document.createElement('div');note.className='stagingInstallRetired';note.innerHTML="<b>STAGING INSTALL RETIRED</b><span>Staging is browser-only. Open the production ONIT app for normal use.</span><button type='button' onclick=\"location.href='https://onit-d5sr.onrender.com/'\">OPEN PRODUCTION</button>";document.body.appendChild(note)}},{once:true});
+document.addEventListener('DOMContentLoaded',()=>{if(!isStagingEnvironment())return;document.body.classList.add('onit-staging-browser-only');if(isStandalone()){const note=document.createElement('div');note.className='stagingInstallRetired';note.innerHTML="<b>STAGING INSTALL RETIRED</b><span>Staging is browser-only. Open the production ONIT app for normal use.</span><button type='button' onclick=\"location.href=productionOnitUrl()\">OPEN PRODUCTION</button>";document.body.appendChild(note)}},{once:true});
 window.addEventListener('appinstalled',()=>{deferredInstallPrompt=null;refreshInstallButton();if(!isStagingEnvironment())showToast('ONIT installed','ONIT is now available like an app on this device. Published UI updates apply on a normal close/reopen.')});
 async function installOnit(){
-  if(isStagingEnvironment())return onitAlert('Staging is browser-only. Install ONIT only from the production address: https://onit-d5sr.onrender.com/');
+  if(isStagingEnvironment())return onitAlert('Staging is browser-only. Install ONIT only from the current production Cloudflare Pages address.');
   if(isStandalone())return showToast('ONIT','Already installed on this device.');
   if(!isHttpsApp()){
     onitAlert('ONIT can only install directly from its secure online address. This copy is running from a local file. Once ONIT is published to its HTTPS address, this same INSTALL button will install it directly.');
@@ -2895,19 +2896,19 @@ async function boot(){
 }
 document.addEventListener('DOMContentLoaded',()=>boot(),{once:true});
 </script>
-<script src="./dialog-system.js?v=0.37.0"></script>
-<script src="./authority-engine.js?v=0.37.0"></script>
-<script src="./sync-engine.js?v=0.37.0"></script>
-<script src="./release-guard.js?v=0.37.0"></script>
-<script src="./command-palette.js?v=0.37.0"></script>
-<script src="./autocare-module.js?v=0.37.0"></script>
-<script src="./cases-module.js?v=0.37.0"></script>
-<script src="./activation-command.js?v=0.37.0"></script>
-<script src="./ideas-dump.js?v=0.37.0"></script>
-<script src="./pulse-module.js?v=0.37.0"></script>
-<script src="./assist-traffic-module.js?v=0.37.0"></script>
-<script src="./core-intelligence.js?v=0.37.0"></script>
-<script src="./attention-loop.js?v=0.37.0"></script>
+<script src="./dialog-system.js?v=0.37.1"></script>
+<script src="./authority-engine.js?v=0.37.1"></script>
+<script src="./sync-engine.js?v=0.37.1"></script>
+<script src="./release-guard.js?v=0.37.1"></script>
+<script src="./command-palette.js?v=0.37.1"></script>
+<script src="./autocare-module.js?v=0.37.1"></script>
+<script src="./cases-module.js?v=0.37.1"></script>
+<script src="./activation-command.js?v=0.37.1"></script>
+<script src="./ideas-dump.js?v=0.37.1"></script>
+<script src="./pulse-module.js?v=0.37.1"></script>
+<script src="./assist-traffic-module.js?v=0.37.1"></script>
+<script src="./core-intelligence.js?v=0.37.1"></script>
+<script src="./attention-loop.js?v=0.37.1"></script>
 </body>
 </html>
 
