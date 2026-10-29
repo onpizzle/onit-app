@@ -7,7 +7,6 @@ let v030ShownCompletion='';
 let v0365TeamFilter='all';
 let v0365TeamSort='name';
 const v030BaseApiPost=apiPost;
-const v030BaseLoadFromGoogle=loadFromGoogle;
 const v030BaseRenderHome=renderHome;
 const v030BaseShow=show;
 
@@ -36,7 +35,8 @@ async function v030LoadData(silent=true){
   try{const r=await v030BaseApiPost('trafficCommandData',{}),d=r.data||r;v030Data={available:true,canManageTraffic:!!d.canManageTraffic,jobBag:d.jobBag||[],handovers:d.handovers||[],pendingForMe:d.pendingForMe||[],handoverToComplete:d.handoverToComplete||[]};v030RenderTrafficCommand();v030MaybeShowHandover();}
   catch(e){v030Data={available:false,canManageTraffic:false,jobBag:[],handovers:[],pendingForMe:[],handoverToComplete:[]};if(!/Unknown POST action/i.test(String(e.message||''))&&!silent)console.warn('ONIT v0.30 data',e)}
 }
-loadFromGoogle=async function(strict=false,silent=false){const out=await v030BaseLoadFromGoogle(strict,silent);v030EnsureUi();await v030LoadData(true);v030RenderTeam();v030RenderAssistBanner();return out}
+async function v030WorkspaceRefresh(){try{v030EnsureUi();await v030LoadData(true);v030RenderTeam();v030RenderAssistBanner()}catch(e){console.warn('Traffic/Assist workspace refresh:',e)}}
+window.addEventListener('onit:workspace-ready',()=>v030WorkspaceRefresh());
 
 apiPost=async function(action,payload={},requiresAuth=true){
   const preIds=action==='createBrief'?(payload.assigneeUserIds||[payload.assigneeUserId].filter(Boolean)).filter(Boolean):[];
@@ -121,5 +121,5 @@ async function v030SubmitAssistBrief(button){const choices=v030ById('v030AssistC
 renderHome=function(){v030BaseRenderHome();v030RenderTrafficCommand()}
 show=function(id,btn){v030EnsureUi();return v030BaseShow(id,btn)}
 
-function v030Init(){v030EnsureUi();v030RenderAssistBanner();if(SESSION_TOKEN)v030LoadData(true);v030RenderTeam()}
+function v030Init(){v030EnsureUi();v030RenderAssistBanner();v030RenderTeam()}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',v030Init,{once:true});else v030Init();

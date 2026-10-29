@@ -90,7 +90,7 @@ async function openTab(tab){state.tab=tab;loading(({command:'Activation Command'
 async function refresh(){state.dashboard=null;state.readiness=null;state.detail=null;state.access=null;await refreshCapabilities(true);loading('Activation Command');await render()}
 const originalApply=window.applyPermissions;if(typeof originalApply==='function')window.applyPermissions=function(){const r=originalApply.apply(this,arguments);setTimeout(()=>refreshCapabilities(true),0);return r};
 const originalShow=window.show;if(typeof originalShow==='function')window.show=function(id,btn){if(id==='activation'&&!allowed()){refreshCapabilities(true).then(()=>{if(allowed())originalShow.call(window,id,btn);else showToast('Activation Command','Activation Command is private and locked for this account.')});return}const r=originalShow.apply(this,arguments);if(id==='activation')render();return r};
-window.addEventListener('focus',()=>{if(typeof SESSION_TOKEN!=='undefined'&&SESSION_TOKEN)refreshCapabilities()});setInterval(()=>{if(typeof SESSION_TOKEN!=='undefined'&&SESSION_TOKEN)refreshCapabilities()},60000);
+setInterval(()=>{if(!document.hidden&&typeof SESSION_TOKEN!=='undefined'&&SESSION_TOKEN)refreshCapabilities()},300000);
 window.ActivationCommand={render,refresh,refreshCapabilities,openTab,createActivation,selectActivation,setStatus,addVendor,addVenue,addFieldPerson,addBudgetLine,updateBudgetActual,addClientAsset,updateClientAsset,uploadEvidence,addFieldLog,editCloseout,sendToCases,togglePilot,toggleGrant,openIdeaSignal,openIdeaOpportunity};
 setTimeout(()=>refreshCapabilities(true),300);
 })();

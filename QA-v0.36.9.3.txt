@@ -1,0 +1,23 @@
+ONIT v0.36.9.3 — FINAL VALIDATION
+
+Frontend JS syntax: PASS
+Inline index scripts: PASS
+Apps Script backend static syntax audit (v0.31.14): PASS
+Frontend API literal action coverage: 101 checked / 0 missing backend matches
+Index local JS references: PASS / 0 missing
+Global loadFromGoogle overrides outside core: 0
+Automatic location.reload calls: 0
+Service worker clients.claim runtime calls: 0
+Service worker skipWaiting runtime calls: 0 (comment only)
+location.replace calls: 1 / manual installed-app repair only
+Known Apps Script backends health-verified at runtime before startup: YES
+Fallback backend selection: YES
+Explicit backend recovery card: YES
+Fake cached-data reconnect message without a real snapshot: REMOVED
+Traffic/Assist core loader override: REMOVED
+Pulse core loader wrapper: REMOVED
+Cases/Activation capability polling: 5 min, hidden-tab guarded
+Digital Pulse quiet polling: 5 min, hidden-tab guarded
+Version alignment: index/version.json/service worker = v0.36.9.3 / 36930
+Backend remains: v0.31.14
+Database schema checked through connected ONIT Google Sheet: core tabs/headers present

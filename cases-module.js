@@ -123,7 +123,7 @@ async function refresh(){state.navSeq++;state.lastCasesAt=0;state.caseCache={};s
 function applyCapabilities(){refreshCapabilities(true).then(()=>setNav())}
 const originalApply=window.applyPermissions;if(typeof originalApply==='function')window.applyPermissions=function(){const r=originalApply.apply(this,arguments);setTimeout(()=>refreshCapabilities(true),0);return r};
 const originalShow=window.show;if(typeof originalShow==='function')window.show=function(id,btn){if(id==='cases'&&!allowed()){refreshCapabilities(true).then(()=>{if(allowed())originalShow.call(window,id,btn);else showToast('Cases','Cases is locked for this account.')});return}const r=originalShow.apply(this,arguments);if(id==='cases')render();return r};
-window.addEventListener('focus',()=>{if(typeof SESSION_TOKEN!=='undefined'&&SESSION_TOKEN)refreshCapabilities()});setInterval(()=>{if(typeof SESSION_TOKEN!=='undefined'&&SESSION_TOKEN)refreshCapabilities()},60000);
+setInterval(()=>{if(!document.hidden&&typeof SESSION_TOKEN!=='undefined'&&SESSION_TOKEN)refreshCapabilities()},300000);
 window.CasesModule={render,refresh,refreshCapabilities,applyCapabilities,openTab,newCase,selectCase,linkBrief,addMember,addEvidence,addMetric,importMetrics,importClientJson,saveStudio,exportCase,review,togglePilot,toggleGrant};
 setTimeout(()=>refreshCapabilities(true),250);
 })();

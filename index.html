@@ -24,7 +24,7 @@
 <link rel="preconnect" href="https://script.google.com">
 <link rel="dns-prefetch" href="//www.gstatic.com">
 <link rel="dns-prefetch" href="//script.google.com">
-<link rel="stylesheet" href="./dialog-system.css?v=0.36.9.2">
+<link rel="stylesheet" href="./dialog-system.css?v=0.36.9.3">
 <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
@@ -896,10 +896,10 @@ img,video,canvas,svg{max-width:100%}
 .reviewQueueNote{font-size:11px;color:#777;margin-top:6px}
 @media(max-width:760px){.reviewPreviewModal{padding:4px!important}.reviewPreviewModal .modalBox{width:100%!important;height:calc(100dvh - 8px)!important;max-height:none!important;border-radius:12px!important}.previewAssetStage{padding:5px}.previewFooter{padding:7px}.previewNav{justify-content:flex-start;overflow-x:auto;flex-wrap:nowrap}.previewNav .mini{white-space:nowrap}}
 </style>
-<link rel="stylesheet" href="./cases-module.css?v=0.36.9.2">
-<link rel="stylesheet" href="./activation-command.css?v=0.36.9.2">
-<link rel="stylesheet" href="./ideas-dump.css?v=0.36.9.2">
-<link rel="stylesheet" href="./pulse-module.css?v=0.36.9.2">
+<link rel="stylesheet" href="./cases-module.css?v=0.36.9.3">
+<link rel="stylesheet" href="./activation-command.css?v=0.36.9.3">
+<link rel="stylesheet" href="./ideas-dump.css?v=0.36.9.3">
+<link rel="stylesheet" href="./pulse-module.css?v=0.36.9.3">
 
 <style id="onit-mobile-nav-v0212">
 .navLabelMobile{display:none!important}
@@ -1013,8 +1013,8 @@ html.onitReduceMotion *,html.onitReduceMotion *::before,html.onitReduceMotion *:
   *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
 }
 </style>
-<link rel="stylesheet" href="./assist-traffic-module.css?v=0.36.9.2">
-<link rel="stylesheet" href="./core-intelligence.css?v=0.36.9.2">
+<link rel="stylesheet" href="./assist-traffic-module.css?v=0.36.9.3">
+<link rel="stylesheet" href="./core-intelligence.css?v=0.36.9.3">
 <style id="role-consistency-v0311">
 /* ONIT v0.31.2 — role authority + Digital Pulse access hardening */
 .radarMorningGrid .morningMetric b,
@@ -1027,11 +1027,11 @@ html.onitReduceMotion *,html.onitReduceMotion *::before,html.onitReduceMotion *:
 .radarLevel{color:#f2f2ee!important}
 </style>
 
-<link rel="stylesheet" href="./autocare-module.css?v=0.36.9.2">
-<link rel="stylesheet" href="./command-palette.css?v=0.36.9.2">
+<link rel="stylesheet" href="./autocare-module.css?v=0.36.9.3">
+<link rel="stylesheet" href="./command-palette.css?v=0.36.9.3">
 
-<link rel="stylesheet" href="./visual-contrast.css?v=0.36.9.2">
-<link rel="stylesheet" href="./attention-loop.css?v=0.36.9.2">
+<link rel="stylesheet" href="./visual-contrast.css?v=0.36.9.3">
+<link rel="stylesheet" href="./attention-loop.css?v=0.36.9.3">
 </head>
 <body>
 <a class="onitSkipLink" href="#mainContent">Skip to main content</a>
@@ -1226,13 +1226,43 @@ html.onitReduceMotion *,html.onitReduceMotion *::before,html.onitReduceMotion *:
 <script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-messaging-compat.js"></script>
-<script>const APP_VERSION='0.36.9.2';
-const UI_REVISION=36920;
+<script>const APP_VERSION='0.36.9.3';
+const UI_REVISION=36930;
 const DASHBOARD_UI_REVISION=36801;
 const DASHBOARD_UI_STORAGE_KEY='onit-dashboard-ui-state-v1';
 window.ONIT_RUNTIME={version:APP_VERSION,uiRevision:UI_REVISION,dashboardUiRevision:DASHBOARD_UI_REVISION};
 const BACKEND_DATASETS=['USERS','CLIENTS','BRIEFS','ASSIGNMENTS','ITERATIONS','ACTIVITY_LOG','NOTIFICATIONS','REPORTS'];
-const API_URL='https://script.google.com/macros/s/AKfycbyLVpsQLFCpQWRIvRndw66sghmu5rtK31cuthS7hXjJ--lf703mJPIbJ2zpLDIlH76b/exec';
+const BACKEND_MIN_VERSION='0.31.13';
+const BACKEND_SELECTION_KEY='onit-backend-selection-v1';
+const BACKEND_URL_CANDIDATES=[
+  {id:'primary',label:'Primary ONIT backend',url:'https://script.google.com/macros/s/AKfycbyLVpsQLFCpQWRIvRndw66sghmu5rtK31cuthS7hXjJ--lf703mJPIbJ2zpLDIlH76b/exec'},
+  {id:'legacy',label:'Alternate ONIT backend',url:'https://script.google.com/macros/s/AKfycbyY98jKIh2ls8jKsB5w2H7YG3Okj61AoIkt3-2x0LBnvRVwDgBhrQnVr1Ghfu04J7YB/exec'}
+];
+let API_URL=BACKEND_URL_CANDIDATES[0].url;
+let backendResolution=null,backendResolveInFlight=null,backendLastHealthAt=0,backendLastError=null;
+function backendCandidateFor(url){return BACKEND_URL_CANDIDATES.find(x=>x.url===url)||null}
+function backendCandidateOrder(){const saved=localStorage.getItem(BACKEND_SELECTION_KEY)||'';const rows=[];const add=x=>{if(x&&!rows.some(r=>r.url===x.url))rows.push(x)};add(backendCandidateFor(saved));BACKEND_URL_CANDIDATES.forEach(add);return rows}
+function backendStatusText(){if(!backendResolution)return 'Backend not verified';return `${backendResolution.label} • v${backendResolution.version||'unknown'}`}
+async function probeBackendCandidate(candidate){
+  const url=candidate.url+'?action=health&t='+Date.now();
+  const r=await fetchWithTimeout(url,{cache:'no-store',redirect:'follow'},18000);
+  if(!r.ok)throw new Error('HTTP '+r.status);
+  const data=await r.json();
+  if(!data||data.success!==true||String(data.app||'').toUpperCase()!=='ONIT')throw new Error('Not an ONIT backend');
+  const version=String(data.version||data.build||'0.0.0');
+  if(!versionAtLeast(version,BACKEND_MIN_VERSION))throw new Error(`backend v${version} is below required v${BACKEND_MIN_VERSION}`);
+  return {id:candidate.id,label:candidate.label,url:candidate.url,version,status:data.status||'online',checkedAt:Date.now()}
+}
+function backendRecoveryHost(){let el=document.getElementById('backendRecoveryCard');if(el)return el;const main=document.querySelector('#appShell main');if(!main)return null;el=document.createElement('div');el.id='backendRecoveryCard';el.style.cssText='margin:18px 26px 0;padding:20px;border:1px solid #d8d5ce;border-radius:16px;background:#fff;box-shadow:0 12px 36px rgba(0,0,0,.08);display:none';main.prepend(el);return el}
+function hideBackendRecovery(){const el=document.getElementById('backendRecoveryCard');if(el)el.style.display='none'}
+function showBackendRecovery(error){const el=backendRecoveryHost();if(!el)return;const detail=String(error&&error.message||error||'ONIT could not verify the backend.');el.innerHTML=`<div style="font-size:12px;font-weight:900;letter-spacing:.08em">ONIT CONNECTION CHECK</div><h2 style="margin:7px 0 6px;font-size:22px">The app is open, but the backend is not verified.</h2><p style="margin:0 0 12px;line-height:1.45">ONIT will not keep showing an empty dashboard or repeatedly reboot. ${escapeHTML(detail)}</p><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="new" type="button" onclick="retryBackendStartup()">RETRY BACKEND</button><button class="secondary" type="button" onclick="handleSignOut()">SIGN OUT</button></div><div class="tiny" style="margin-top:10px">Expected backend: ONIT v${BACKEND_MIN_VERSION}+ • ${escapeHTML(location.hostname)}</div>`;el.style.display='block';connectionNotice('')}
+async function ensureBackendResolved(force=false){
+  if(!force&&backendResolution&&Date.now()-backendLastHealthAt<5*60*1000)return backendResolution;
+  if(backendResolveInFlight&&!force)return backendResolveInFlight;
+  const work=(async()=>{const errors=[];for(const candidate of backendCandidateOrder()){try{const ok=await probeBackendCandidate(candidate);API_URL=ok.url;backendResolution=ok;backendLastHealthAt=Date.now();backendLastError=null;localStorage.setItem(BACKEND_SELECTION_KEY,ok.url);window.ONIT_BACKEND_STATUS={ok:true,label:ok.label,version:ok.version};hideBackendRecovery();return ok}catch(e){errors.push(`${candidate.label}: ${e.message||e}`)}}const err=new Error(errors.join(' • ')||'No ONIT backend responded.');backendResolution=null;backendLastHealthAt=0;backendLastError=err;window.ONIT_BACKEND_STATUS={ok:false,error:err.message};throw err})();
+  backendResolveInFlight=work;try{return await work}finally{if(backendResolveInFlight===work)backendResolveInFlight=null}
+}
+async function retryBackendStartup(){try{setBusy(true);await ensureBackendResolved(true);hideBackendRecovery();if(!SESSION_TOKEN)return;const fast=await loadFastHome();if(!fast)await loadFromGoogle(false,false)}catch(e){showBackendRecovery(e)}finally{setBusy(false)}}
 const SAFE_RETRY_POST_ACTIONS=new Set(['getFilePreview','getBriefAttachmentPreview','getBriefAttachmentDownload','getBackendDataset','getProfilePhoto','getBroadcastFile','getOwnerBroadcastStatus','markNotificationsRead','getPushConfig','CASES_CAPABILITIES','CASES_OWNER_GRANTS','CASES_LIST','CASES_GET','CASES_INTELLIGENCE','ACTIVATION_CAPABILITIES','ACTIVATION_OWNER_GRANTS','ACTIVATION_DASHBOARD','ACTIVATION_READINESS','ACTIVATION_LIST','ACTIVATION_GET','IDEAS_CAPABILITIES','IDEAS_DASHBOARD','IDEAS_LIST','IDEAS_GET','IDEAS_ACTIVATION_OPPORTUNITIES','PULSE_CAPABILITIES','PULSE_DASHBOARD','PULSE_REPORT','trafficCommandData','PULSE_CASE_CANDIDATES']);
 let ORG_ID=localStorage.getItem('onit-org')||'';
 const MAX_FILE_BYTES=20*1024*1024;
@@ -1354,6 +1384,7 @@ function setBusy(on){
 }
 function showSyncChip(label='SYNCING'){const el=document.getElementById('onitSyncChip');if(!el)return;el.textContent=label;el.classList.add('show');clearTimeout(syncChipTimer);syncChipTimer=setTimeout(()=>el.classList.remove('show'),1400)}
 function runWhenIdle(fn,timeout=900){if('requestIdleCallback' in window)return requestIdleCallback(()=>fn(),{timeout});return setTimeout(fn,60)}
+function dispatchWorkspaceReady(stage){try{queueMicrotask(()=>window.dispatchEvent(new CustomEvent('onit:workspace-ready',{detail:{stage,version:APP_VERSION,backendVersion}})))}catch(e){setTimeout(()=>{try{window.dispatchEvent(new CustomEvent('onit:workspace-ready',{detail:{stage,version:APP_VERSION,backendVersion}}))}catch(_){ }},0)}}
 // Returning users get the last confirmed ONIT state immediately while fresh Apps Script data hydrates quietly.
 const STARTUP_CACHE_DB='onit-startup-cache-v1',STARTUP_CACHE_STORE='snapshots',STARTUP_CACHE_MAX_AGE=48*60*60*1000;
 let startupSnapshotRestored=false,startupSnapshotAt=0;
@@ -1362,11 +1393,11 @@ function openStartupCacheDb(){return new Promise((resolve,reject)=>{if(!('indexe
 async function readStartupSnapshot(){const key=startupSnapshotKey();if(!key||key===':')return null;try{const db=await openStartupCacheDb();if(!db)return null;const row=await new Promise((resolve,reject)=>{const tx=db.transaction(STARTUP_CACHE_STORE,'readonly'),req=tx.objectStore(STARTUP_CACHE_STORE).get(key);req.onsuccess=()=>resolve(req.result||null);req.onerror=()=>reject(req.error)});db.close();if(!row||!row.at||Date.now()-Number(row.at)>STARTUP_CACHE_MAX_AGE)return null;return row}catch(e){console.warn('ONIT startup cache read:',e);return null}}
 async function writeStartupSnapshot(){if(!SESSION_TOKEN||!CURRENT_USER_ID||!ORG_ID||!currentUser)return;const payload={key:startupSnapshotKey(),at:Date.now(),appVersion:APP_VERSION,backendVersion,lastStateVersion,organisationId:ORG_ID,userId:CURRENT_USER_ID,data:{organisations,users,pendingUsers,accessDirectory,securityInfo,permissions,authority,clients,allAssignments,notifications,buzzers,reports,dataExports,teamWorkload,reportSummary,homeAnalytics,currentUser,briefs}};try{const db=await openStartupCacheDb();if(!db)return;await new Promise((resolve,reject)=>{const tx=db.transaction(STARTUP_CACHE_STORE,'readwrite');tx.objectStore(STARTUP_CACHE_STORE).put(payload);tx.oncomplete=()=>resolve();tx.onerror=()=>reject(tx.error)});db.close()}catch(e){console.warn('ONIT startup cache write:',e)}}
 async function clearStartupSnapshot(){const key=startupSnapshotKey();if(!key||key===':')return;try{const db=await openStartupCacheDb();if(!db)return;await new Promise((resolve,reject)=>{const tx=db.transaction(STARTUP_CACHE_STORE,'readwrite');tx.objectStore(STARTUP_CACHE_STORE).delete(key);tx.oncomplete=()=>resolve();tx.onerror=()=>reject(tx.error)});db.close()}catch(e){}}
-function restoreStartupState(row){const d=row&&row.data;if(!d||!d.currentUser)return false;organisations=d.organisations||[];users=d.users||[];pendingUsers=d.pendingUsers||[];accessDirectory=d.accessDirectory||[];securityInfo=d.securityInfo||null;permissions=d.permissions||{};authority=d.authority||d.permissions||{};clients=d.clients||[];allAssignments=d.allAssignments||[];notifications=d.notifications||[];buzzers=d.buzzers||[];reports=d.reports||[];dataExports=d.dataExports||[];teamWorkload=d.teamWorkload||[];reportSummary=d.reportSummary||null;homeAnalytics=d.homeAnalytics||null;currentUser=d.currentUser||null;briefs=d.briefs||[];CURRENT_USER_ID=rowVal(currentUser,'User ID')||CURRENT_USER_ID;ORG_ID=rowVal(currentUser,'Organisation ID')||ORG_ID;backendVersion=row.backendVersion||backendVersion;lastStateVersion=String(row.lastStateVersion||lastStateVersion||'');lastSuccessfulSyncAt=Number(row.at||Date.now());startupSnapshotAt=lastSuccessfulSyncAt;startupSnapshotRestored=true;apiOnline=navigator.onLine!==false;try{if(window.ONITAuthority)ONITAuthority.set(authority)}catch(e){}applyPermissions();populateClients();populateAssignees();renderHome();renderNotifications();queuePendingBuzzers_();updateLastSyncLabel(true);showSyncChip('SYNCING LATEST');runWhenIdle(()=>{try{renderBriefFilters();renderBriefs();renderArchive();renderTeam();renderMore()}catch(e){}},700);return true}
+function restoreStartupState(row){const d=row&&row.data;if(!d||!d.currentUser)return false;organisations=d.organisations||[];users=d.users||[];pendingUsers=d.pendingUsers||[];accessDirectory=d.accessDirectory||[];securityInfo=d.securityInfo||null;permissions=d.permissions||{};authority=d.authority||d.permissions||{};clients=d.clients||[];allAssignments=d.allAssignments||[];notifications=d.notifications||[];buzzers=d.buzzers||[];reports=d.reports||[];dataExports=d.dataExports||[];teamWorkload=d.teamWorkload||[];reportSummary=d.reportSummary||null;homeAnalytics=d.homeAnalytics||null;currentUser=d.currentUser||null;briefs=d.briefs||[];CURRENT_USER_ID=rowVal(currentUser,'User ID')||CURRENT_USER_ID;ORG_ID=rowVal(currentUser,'Organisation ID')||ORG_ID;backendVersion=row.backendVersion||backendVersion;lastStateVersion=String(row.lastStateVersion||lastStateVersion||'');lastSuccessfulSyncAt=Number(row.at||Date.now());startupSnapshotAt=lastSuccessfulSyncAt;startupSnapshotRestored=true;apiOnline=navigator.onLine!==false;try{if(window.ONITAuthority)ONITAuthority.set(authority)}catch(e){}applyPermissions();populateClients();populateAssignees();renderHome();renderNotifications();queuePendingBuzzers_();updateLastSyncLabel(true);showSyncChip('SYNCING LATEST');runWhenIdle(()=>{try{renderBriefFilters();renderBriefs();renderArchive();renderTeam();renderMore()}catch(e){}},700);dispatchWorkspaceReady('snapshot');return true}
 function connectionNotice(message){let el=document.getElementById('connectionNotice');if(!el){el=document.createElement('div');el.id='connectionNotice';el.className='notice';el.setAttribute('role','status');const main=document.querySelector('#appShell main');if(main)main.prepend(el)}if(el){el.textContent=message||'';el.hidden=!message}}
 function syncClockText(ts=lastSuccessfulSyncAt){if(!ts)return '—';try{return new Date(ts).toLocaleTimeString('en-NG',{hour:'2-digit',minute:'2-digit',hour12:true,timeZone:'Africa/Lagos'})}catch(e){return new Date(ts).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}}
 function updateLastSyncLabel(stale=false){const el=document.getElementById('lastSyncLabel');if(!el)return;el.textContent=lastSuccessfulSyncAt?`LAST SYNCED ${syncClockText()}`:'LAST SYNCED —';el.classList.toggle('stale',!!stale)}
-function staleConnectionMessage(){return lastSuccessfulSyncAt?`Showing last synced data from ${syncClockText()}. Reconnecting…`:'ONIT could not refresh right now. Reconnecting…'}
+function staleConnectionMessage(){return startupSnapshotRestored&&lastSuccessfulSyncAt?`Showing last confirmed workspace from ${syncClockText()}. Reconnecting…`:'ONIT cannot reach its verified backend right now.'}
 function clearRefreshRetry(){if(refreshRetryTimer){clearTimeout(refreshRetryTimer);refreshRetryTimer=null}refreshRetryAttempt=0;refreshRecoveryPending=false}
 function markFullSyncSuccess(){lastSuccessfulSyncAt=Date.now();try{localStorage.setItem('onit-last-sync',String(lastSuccessfulSyncAt))}catch(e){}clearRefreshRetry();updateLastSyncLabel(false);connectionNotice('')}
 function scheduleFullRefreshRetry(){refreshRecoveryPending=true;if(refreshRetryTimer||!SESSION_TOKEN)return;const delay=Math.min(30000*Math.pow(2,Math.min(refreshRetryAttempt,2)),120000);refreshRetryAttempt++;refreshRetryTimer=setTimeout(()=>{refreshRetryTimer=null;if(!SESSION_TOKEN)return clearRefreshRetry();if(navigator.onLine===false||document.hidden){scheduleFullRefreshRetry();return}if(window.ONITSync)ONITSync.requestFullSync('network-retry');else loadFromGoogle(false,true)},delay)}
@@ -1390,18 +1421,22 @@ function apiRetryableError(err){return /timed out|failed to fetch|network|load f
 const apiGetInflight=new Map();
 async function apiGet(action='bootstrap'){
   if(!SESSION_TOKEN)throw new Error('AUTH_REQUIRED');
+  await ensureBackendResolved(false);
   const key=String(action||'bootstrap');
   if(apiGetInflight.has(key))return apiGetInflight.get(key);
   const request=(async()=>{
-    const url=API_URL+'?action='+encodeURIComponent(action)+'&token='+encodeURIComponent(SESSION_TOKEN);
-    const timeoutMs=action==='homeBootstrap'?18000:(action==='bootstrap'?45000:20000);
-    try{const r=await fetchWithTimeout(url,{cache:'no-store'},timeoutMs);if(!r.ok)throw new Error('API '+r.status);const data=await r.json();if(data.success!==true)throw new Error(data.error||'Could not load ONIT backend.');return data}
-    catch(e){if(window.AutoCare)window.AutoCare.signalApiFailure(action,e,true);throw e}
+    const doRequest=async()=>{const url=API_URL+'?action='+encodeURIComponent(action)+'&token='+encodeURIComponent(SESSION_TOKEN)+'&t='+Date.now();const timeoutMs=action==='homeBootstrap'?30000:(action==='bootstrap'?50000:22000);const r=await fetchWithTimeout(url,{cache:'no-store',redirect:'follow'},timeoutMs);if(!r.ok)throw new Error('API '+r.status);const data=await r.json();if(data.success!==true)throw new Error(data.error||'Could not load ONIT backend.');return data};
+    try{return await doRequest()}
+    catch(e){
+      if(apiRetryableError(e)){const before=API_URL;backendLastHealthAt=0;try{await ensureBackendResolved(true)}catch(_){}if(API_URL!==before)return await doRequest()}
+      if(window.AutoCare)window.AutoCare.signalApiFailure(action,e,true);throw e
+    }
   })();
   apiGetInflight.set(key,request);
   try{return await request}finally{if(apiGetInflight.get(key)===request)apiGetInflight.delete(key)}
 }
 async function apiPost(action,payload={},requiresAuth=true){
+  await ensureBackendResolved(false);
   const data={...payload};if(requiresAuth){if(!SESSION_TOKEN)throw new Error('AUTH_REQUIRED');data.sessionToken=SESSION_TOKEN}
   const safeRead=SAFE_RETRY_POST_ACTIONS.has(action),attempts=safeRead?2:1,timeoutMs=action==='createOwnerBroadcast'?60000:30000;let lastError=null;
   for(let attempt=0;attempt<attempts;attempt++){
@@ -1476,9 +1511,9 @@ function applyHomeBootstrap(data){
   organisations=data.organisations||[];users=data.users||[];pendingUsers=data.pendingUsers||[];accessDirectory=data.accessDirectory||[];securityInfo=data.security||null;permissions=data.permissions||{};authority=data.authority||data.permissions||{};if(window.ONITAuthority)ONITAuthority.set(authority);
   clients=data.clients||[];allAssignments=data.assignments||[];notifications=data.notifications||[];currentUser=data.currentUser||null;CURRENT_USER_ID=rowVal(currentUser,'User ID')||CURRENT_USER_ID;ORG_ID=rowVal(currentUser,'Organisation ID')||ORG_ID;localStorage.setItem('onit-user',CURRENT_USER_ID);localStorage.setItem('onit-org',ORG_ID);
   briefs=(data.briefs||[]).map(sheetBriefToUI);briefs.forEach(b=>{const as=allAssignments.filter(r=>sameBrief(r,b.code)&&String(rowVal(r,'Assignment Type','assignmentType')).toUpperCase()==='TO'&&String(rowVal(r,'Active','active')).toLowerCase()!=='false');if(as.length){b.assignee=as.map(r=>rowVal(r,'Full Name','fullName')||'Assigned team').join(' + ');b.assigneeUserId=rowVal(as[0],'User ID','userId');b.assigneeFullName=rowVal(as[0],'Full Name','fullName')||b.assignee}});
-  apiOnline=true;lastSuccessfulSyncAt=Date.now();try{localStorage.setItem('onit-last-sync',String(lastSuccessfulSyncAt))}catch(e){}updateLastSyncLabel(false);connectionNotice('');applyPermissions();populateClients();populateAssignees();renderHome();renderNotifications();queuePendingBuzzers_();showSyncChip('LOADING FULL WORKSPACE');return true
+  apiOnline=true;lastSuccessfulSyncAt=Date.now();try{localStorage.setItem('onit-last-sync',String(lastSuccessfulSyncAt))}catch(e){}updateLastSyncLabel(false);connectionNotice('');applyPermissions();populateClients();populateAssignees();renderHome();renderNotifications();queuePendingBuzzers_();showSyncChip('LOADING FULL WORKSPACE');dispatchWorkspaceReady('home');return true
 }
-async function loadFastHome(){if(!SESSION_TOKEN)return false;try{const data=await apiGet('homeBootstrap');return applyHomeBootstrap(data)}catch(e){console.warn('ONIT fast Home bootstrap:',e);return false}}
+let lastStartupError=null;async function loadFastHome(){if(!SESSION_TOKEN)return false;try{lastStartupError=null;const data=await apiGet('homeBootstrap');return applyHomeBootstrap(data)}catch(e){lastStartupError=e;console.warn('ONIT fast Home bootstrap:',e);return false}}
 
 async function loadFromGoogle(strict=false,silent=false){
   if(!SESSION_TOKEN)return;
@@ -1489,7 +1524,7 @@ async function loadFromGoogle(strict=false,silent=false){
   try{
     const maxAttempts=silent?1:2;for(let attempt=0;attempt<maxAttempts;attempt++){
       try{
-        const data=await apiGet('bootstrap');if(generation!==loadGeneration)return;
+        const data=await apiGet('bootstrap');if(generation!==loadGeneration)return false;
         backendVersion=data.version||'';serverOffset=data.serverTime?new Date(data.serverTime).getTime()-Date.now():0;
         if(!versionAtLeast(backendVersion,'0.15.7'))throw new Error('Backend '+backendVersion+' is older than the ONIT V0.15.7 shared-account backend required by this frontend. Deploy backend V0.15.7 first.');
         lastStateVersion=String(data.stateVersion||lastStateVersion||'');organisations=data.organisations||[];users=table(data,'USERS');pendingUsers=data.pendingUsers||[];accessDirectory=data.accessDirectory||[];securityInfo=data.security||null;permissions=data.permissions||{};authority=data.authority||data.permissions||{};if(window.ONITAuthority)ONITAuthority.set(authority);clients=table(data,'CLIENTS');allAssignments=table(data,'ASSIGNMENTS');notifications=table(data,'NOTIFICATIONS');buzzers=data.buzzers||[];reports=table(data,'REPORTS');dataExports=data.dataExports||[];teamWorkload=data.teamWorkload||[];reportSummary=data.reportSummary||null;homeAnalytics=data.homeAnalytics||null;currentUser=data.currentUser||users.find(u=>rowVal(u,'User ID','userId')===CURRENT_USER_ID)||null;
@@ -1516,14 +1551,17 @@ async function loadFromGoogle(strict=false,silent=false){
         if(!silent)uiDirtySections.clear();
         runWhenIdle(()=>writeStartupSnapshot(),1200);
         if(window.AutoCare)window.AutoCare.markHealthy();
-        return;
+        dispatchWorkspaceReady('full');
+        return true;
       }catch(e){lastError=e;if(authError(e))throw e;if(attempt<maxAttempts-1){await sleep(800*(attempt+1));continue}throw e}
     }
   }catch(e){
     console.error(e);apiOnline=false;
-    if(authError(e)){clearSession();document.getElementById('appShell').classList.add('hidden');document.getElementById('authGate').classList.remove('hidden');showAuthMode('signin');showAuthMessage('Your session expired. Please sign in again.','error');return}
+    if(authError(e)){clearSession();document.getElementById('appShell').classList.add('hidden');document.getElementById('authGate').classList.remove('hidden');showAuthMode('signin');showAuthMessage('Your session expired. Please sign in again.','error');return false}
     scheduleFullRefreshRetry();const hasUsableData=!!(currentUser&&Array.isArray(briefs)&&briefs.length>=0&&Array.isArray(users));if(!hasUsableData){apiOnline=false;connectionNotice(staleConnectionMessage());updateLastSyncLabel(true)}else{apiOnline=true;connectionNotice('');updateLastSyncLabel(false);try{window.AutoCare&&AutoCare.recordIssue&&AutoCare.recordIssue('TRANSIENT_SYNC',e,'warning')}catch(_){}}
+    if(!startupSnapshotRestored&&!currentUser)showBackendRecovery(e);
     if(strict)throw e;
+    return false;
   }finally{refreshInFlight=false;if(!silent)setBusy(false)}
 }
 function mobileNavMode(){return window.matchMedia&&window.matchMedia('(max-width:820px)').matches}
@@ -2740,7 +2778,7 @@ function refreshWhenActive(){if(document.hidden||!SESSION_TOKEN||mutationBusy)re
 window.addEventListener('focus',refreshWhenActive);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)refreshWhenActive()});
 window.addEventListener('online',()=>{connectionNotice('');setTimeout(()=>{if(SESSION_TOKEN&&!document.hidden)checkForUpdates()},1500)});
-window.addEventListener('offline',()=>{connectionNotice(lastSuccessfulSyncAt?`You are offline. Showing last synced data from ${syncClockText()}.`:'You are offline. ONIT will update when your connection returns.');updateLastSyncLabel(true)});
+window.addEventListener('offline',()=>{connectionNotice(startupSnapshotRestored&&lastSuccessfulSyncAt?`You are offline. Showing the last confirmed workspace from ${syncClockText()}.`:'You are offline. ONIT will update when your connection returns.');updateLastSyncLabel(true)});
 if('serviceWorker' in navigator && isHttpsApp() && !isStagingEnvironment()){
   // Register once. Do not force update(), skipWaiting(), controller takeover, or release polling mid-session.
   window.addEventListener('load',()=>navigator.serviceWorker.register('./service-worker.js',{updateViaCache:'none'}).catch(err=>console.warn('Service worker:',err)),{once:true});
@@ -2752,22 +2790,34 @@ refreshInstallButton();
 setInterval(()=>{if(!document.getElementById('briefs').classList.contains('hidden'))renderBriefs();if(current&&!document.getElementById('detail').classList.contains('hidden')){const t=timeInfo(current),el=document.getElementById('dtimer');el.textContent=t.text;el.className='num '+t.cls}renderApprovalClocks()},1000);
 // Lightweight fallback pulse only. Full workspace hydration is owned by ONITSync.
 setInterval(()=>{const now=Date.now(),gap=firebaseRealtimeHealthy?180000:60000;if(now-lastFallbackPulseAt>=gap){lastFallbackPulseAt=now;checkForUpdates()}},5000);
-async function boot(){if(SESSION_TOKEN){document.getElementById('authGate').classList.add('hidden');document.getElementById('appShell').classList.remove('hidden');const hydrateLater=()=>setTimeout(()=>{if(SESSION_TOKEN&&!document.hidden&&!refreshInFlight)loadFromGoogle(false,true)},2500);const cached=await readStartupSnapshot();if(cached&&restoreStartupState(cached)){hydrateLater();return}const fast=await loadFastHome();if(fast){hydrateLater();return}await loadFromGoogle(false);if(SESSION_TOKEN)return}document.getElementById('appShell').classList.add('hidden');document.getElementById('authGate').classList.remove('hidden');showAuthMode('signin')}
+async function boot(){
+  if(SESSION_TOKEN){
+    document.getElementById('authGate').classList.add('hidden');document.getElementById('appShell').classList.remove('hidden');
+    try{await ensureBackendResolved(true)}catch(e){showBackendRecovery(e);return}
+    const hydrateLater=()=>setTimeout(()=>{if(SESSION_TOKEN&&!document.hidden&&!refreshInFlight)loadFromGoogle(false,true)},3000);
+    const cached=await readStartupSnapshot();if(cached&&restoreStartupState(cached)){hydrateLater();return}
+    const fast=await loadFastHome();if(fast){hydrateLater();return}
+    const full=await loadFromGoogle(false,false);if(full||currentUser)return;
+    showBackendRecovery(lastStartupError||backendLastError||new Error('The verified backend responded, but ONIT could not load your workspace.'));
+    return
+  }
+  document.getElementById('appShell').classList.add('hidden');document.getElementById('authGate').classList.remove('hidden');showAuthMode('signin')
+}
 document.addEventListener('DOMContentLoaded',()=>boot(),{once:true});
 </script>
-<script src="./dialog-system.js?v=0.36.9.2"></script>
-<script src="./authority-engine.js?v=0.36.9.2"></script>
-<script src="./sync-engine.js?v=0.36.9.2"></script>
-<script src="./release-guard.js?v=0.36.9.2"></script>
-<script src="./command-palette.js?v=0.36.9.2"></script>
-<script src="./autocare-module.js?v=0.36.9.2"></script>
-<script src="./cases-module.js?v=0.36.9.2"></script>
-<script src="./activation-command.js?v=0.36.9.2"></script>
-<script src="./ideas-dump.js?v=0.36.9.2"></script>
-<script src="./pulse-module.js?v=0.36.9.2"></script>
-<script src="./assist-traffic-module.js?v=0.36.9.2"></script>
-<script src="./core-intelligence.js?v=0.36.9.2"></script>
-<script src="./attention-loop.js?v=0.36.9.2"></script>
+<script src="./dialog-system.js?v=0.36.9.3"></script>
+<script src="./authority-engine.js?v=0.36.9.3"></script>
+<script src="./sync-engine.js?v=0.36.9.3"></script>
+<script src="./release-guard.js?v=0.36.9.3"></script>
+<script src="./command-palette.js?v=0.36.9.3"></script>
+<script src="./autocare-module.js?v=0.36.9.3"></script>
+<script src="./cases-module.js?v=0.36.9.3"></script>
+<script src="./activation-command.js?v=0.36.9.3"></script>
+<script src="./ideas-dump.js?v=0.36.9.3"></script>
+<script src="./pulse-module.js?v=0.36.9.3"></script>
+<script src="./assist-traffic-module.js?v=0.36.9.3"></script>
+<script src="./core-intelligence.js?v=0.36.9.3"></script>
+<script src="./attention-loop.js?v=0.36.9.3"></script>
 </body>
 </html>
 

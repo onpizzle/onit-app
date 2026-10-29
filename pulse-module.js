@@ -217,9 +217,8 @@ function addMetric(){return mutate('PULSE_ADD_METRIC',{brand:text('pmBrand'),cam
 async function sendToCases(sourceType,sourceId){if(!canPromote()){showToast('Digital Pulse','You do not have permission to send Pulse evidence to Cases.');return}const caseId=(await onitPrompt('Enter the ONIT Case ID to receive this evidence:','')||'').trim();if(!caseId)return;try{await api('PULSE_SEND_TO_CASES',{sourceType,sourceId,caseId});state.candidates=null;state.lastAt=0;showToast('Digital Pulse','Evidence sent to Cases Data Vault.');await render()}catch(e){onitAlert(e.message)}}
 const originalApply=window.applyPermissions;if(typeof originalApply==='function')window.applyPermissions=function(){const r=originalApply.apply(this,arguments);setTimeout(()=>refreshCapabilities(true),0);return r};
 const originalShow=window.show;if(typeof originalShow==='function')window.show=function(id,btn){const r=originalShow.apply(this,arguments);if(id==='pulse'){restoreLastTab();loading();render()}return r};
-const originalLoad=window.loadFromGoogle;if(typeof originalLoad==='function')window.loadFromGoogle=async function(){return await originalLoad.apply(this,arguments)};
 // Editors never auto-refresh underneath active work. Leadership uses quiet polling: no spinner, no redraw unless saved Pulse data actually changed.
-setInterval(()=>{quietLeadershipSync(false)},60000);
+setInterval(()=>{if(!document.hidden)quietLeadershipSync(false)},300000);
 window.DigitalPulse={render,refresh,openTab,saveReadiness,logEngagement,addContent,updateContent,addInsight,addEscalation,resolveEscalation,addMetric,sendToCases,downloadReport,buildOnePageCase,refreshCapabilities,quietLeadershipSync};
 setTimeout(()=>{refreshCapabilities(true);syncGlobalDirty()},450);
 })();
