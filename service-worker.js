@@ -4,18 +4,19 @@ importScripts('https://www.gstatic.com/firebasejs/13.0.0/firebase-messaging-comp
 const FIREBASE_CONFIG={apiKey:'AIzaSyAmpqFDMfo6zAorD-f14hTQnSNFDFU6VHM',authDomain:'onit-backend-api.firebaseapp.com',projectId:'onit-backend-api',storageBucket:'onit-backend-api.firebasestorage.app',messagingSenderId:'1052909191157',appId:'1:1052909191157:web:392c4a50b453deb5ebeabc'};
 try{firebase.initializeApp(FIREBASE_CONFIG);firebase.messaging();}catch(e){}
 
-const UI_VERSION='0.36.8.4';
-const UI_REVISION=36814;
+const UI_VERSION='0.36.8.6';
+const UI_REVISION=36816;
 const DASHBOARD_UI_REVISION=36801;
-const CACHE='onit-v0.36.8.4-update-propagation';
+const CACHE='onit-v0.36.8.6-self-test-hotfix';
 const STATIC=['./offline.html','./manifest.webmanifest','./icons/icon-192.png','./icons/icon-512.png','./icons/apple-touch-icon.png','./assets/onit-logo-horizontal.png','./assets/onit-logo-full.png','./icons/favicon-32.png','./cases-module.css','./cases-module.js','./activation-command.css','./activation-command.js','./ideas-dump.css','./ideas-dump.js','./visual-contrast.css','./pulse-module.css','./pulse-module.js','./assist-traffic-module.css','./assist-traffic-module.js','./core-intelligence.css','./core-intelligence.js','./autocare-module.css','./autocare-module.js','./authority-engine.js','./sync-engine.js','./release-guard.js','./command-palette.css','./command-palette.js','./dialog-system.css','./dialog-system.js','./attention-loop.css','./attention-loop.js'];
 
 try{
   const messaging=firebase.messaging();
   messaging.onBackgroundMessage(payload=>{
-    const n=payload.notification||{},d=payload.data||{},title=n.title||d.title||'ONIT';
-    const isBrief=d.type==='BRIEF_ALERT';
-    const options={body:n.body||d.body||d.message||'You have a new ONIT update.',icon:'./icons/icon-192.png',badge:'./icons/favicon-32.png',tag:isBrief?'onit-new-brief-'+(d.briefCode||'new'):'onit-update',renotify:isBrief,requireInteraction:isBrief,vibrate:isBrief?[180,80,180,80,320]:undefined,data:{url:d.url||'./',type:d.type||'',briefCode:d.briefCode||''}};
+    const n=payload.notification||{},d=payload.data||{},title=n.title||d.title||(d.type==='BUZZER'?'ONIT BUZZER':'ONIT');
+    const urgent=d.type==='BUZZER'||d.type==='BRIEF_ALERT'||String(d.actionRequired||'')==='true'||['OWNER_BROADCAST','APPROVAL_REQUIRED','TEAM_LEAD_APPROVAL_REQUIRED','REVISION','HANDOVER_RECEIVED','DATA_EXPORT_APPROVAL','AUTO_ESCALATION_TRAFFIC','AUTO_ESCALATION_APPROVAL','AUTO_ESCALATION_TEAM_LEAD'].includes(String(d.notificationType||''));
+    const tag=d.notificationId?'onit-'+d.notificationId:d.buzzerId?'onit-buzzer-'+d.buzzerId:d.briefCode?'onit-'+(d.type||'update')+'-'+d.briefCode:'onit-update';
+    const options={body:n.body||d.body||d.message||'You have a new ONIT update.',icon:'./icons/icon-192.png',badge:'./icons/favicon-32.png',tag,renotify:urgent,requireInteraction:urgent,silent:false,vibrate:urgent?[180,80,180,80,320]:[120,60,120],data:{url:d.url||'./',type:d.type||'',notificationType:d.notificationType||'',notificationId:d.notificationId||'',briefCode:d.briefCode||'',buzzerId:d.buzzerId||''}};
     self.registration.showNotification(title,options);
   });
 }catch(e){}

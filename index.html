@@ -24,7 +24,7 @@
 <link rel="preconnect" href="https://script.google.com">
 <link rel="dns-prefetch" href="//www.gstatic.com">
 <link rel="dns-prefetch" href="//script.google.com">
-<link rel="stylesheet" href="./dialog-system.css?v=0.36.8.4">
+<link rel="stylesheet" href="./dialog-system.css?v=0.36.8.6">
 <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
@@ -896,10 +896,10 @@ img,video,canvas,svg{max-width:100%}
 .reviewQueueNote{font-size:11px;color:#777;margin-top:6px}
 @media(max-width:760px){.reviewPreviewModal{padding:4px!important}.reviewPreviewModal .modalBox{width:100%!important;height:calc(100dvh - 8px)!important;max-height:none!important;border-radius:12px!important}.previewAssetStage{padding:5px}.previewFooter{padding:7px}.previewNav{justify-content:flex-start;overflow-x:auto;flex-wrap:nowrap}.previewNav .mini{white-space:nowrap}}
 </style>
-<link rel="stylesheet" href="./cases-module.css?v=0.36.8.4">
-<link rel="stylesheet" href="./activation-command.css?v=0.36.8.4">
-<link rel="stylesheet" href="./ideas-dump.css?v=0.36.8.4">
-<link rel="stylesheet" href="./pulse-module.css?v=0.36.8.4">
+<link rel="stylesheet" href="./cases-module.css?v=0.36.8.6">
+<link rel="stylesheet" href="./activation-command.css?v=0.36.8.6">
+<link rel="stylesheet" href="./ideas-dump.css?v=0.36.8.6">
+<link rel="stylesheet" href="./pulse-module.css?v=0.36.8.6">
 
 <style id="onit-mobile-nav-v0212">
 .navLabelMobile{display:none!important}
@@ -1013,8 +1013,8 @@ html.onitReduceMotion *,html.onitReduceMotion *::before,html.onitReduceMotion *:
   *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
 }
 </style>
-<link rel="stylesheet" href="./assist-traffic-module.css?v=0.36.8.4">
-<link rel="stylesheet" href="./core-intelligence.css?v=0.36.8.4">
+<link rel="stylesheet" href="./assist-traffic-module.css?v=0.36.8.6">
+<link rel="stylesheet" href="./core-intelligence.css?v=0.36.8.6">
 <style id="role-consistency-v0311">
 /* ONIT v0.31.2 — role authority + Digital Pulse access hardening */
 .radarMorningGrid .morningMetric b,
@@ -1027,11 +1027,11 @@ html.onitReduceMotion *,html.onitReduceMotion *::before,html.onitReduceMotion *:
 .radarLevel{color:#f2f2ee!important}
 </style>
 
-<link rel="stylesheet" href="./autocare-module.css?v=0.36.8.4">
-<link rel="stylesheet" href="./command-palette.css?v=0.36.8.4">
+<link rel="stylesheet" href="./autocare-module.css?v=0.36.8.6">
+<link rel="stylesheet" href="./command-palette.css?v=0.36.8.6">
 
-<link rel="stylesheet" href="./visual-contrast.css?v=0.36.8.4">
-<link rel="stylesheet" href="./attention-loop.css?v=0.36.8.4">
+<link rel="stylesheet" href="./visual-contrast.css?v=0.36.8.6">
+<link rel="stylesheet" href="./attention-loop.css?v=0.36.8.6">
 </head>
 <body>
 <a class="onitSkipLink" href="#mainContent">Skip to main content</a>
@@ -1226,8 +1226,8 @@ html.onitReduceMotion *,html.onitReduceMotion *::before,html.onitReduceMotion *:
 <script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-messaging-compat.js"></script>
-<script>const APP_VERSION='0.36.8.4';
-const UI_REVISION=36814;
+<script>const APP_VERSION='0.36.8.6';
+const UI_REVISION=36816;
 const DASHBOARD_UI_REVISION=36801;
 const DASHBOARD_UI_STORAGE_KEY='onit-dashboard-ui-state-v1';
 window.ONIT_RUNTIME={version:APP_VERSION,uiRevision:UI_REVISION,dashboardUiRevision:DASHBOARD_UI_REVISION};
@@ -1245,7 +1245,8 @@ let selectedAccessEmail='',activeBackendDataset='',currentBroadcast=null;const d
 const profilePhotoCache=new Map();
 let current=null,currentUser=null,apiOnline=false,mutationBusy=false,backendVersion='',serverOffset=0,loadGeneration=0,lastListSection='home',briefFilter='ALL',refreshInFlight=false,lastStateVersion='',refreshRetryTimer=null,refreshRetryAttempt=0,refreshRecoveryPending=false,lastSuccessfulSyncAt=Number(localStorage.getItem('onit-last-sync')||0);
 const FIREBASE_CONFIG={apiKey:'AIzaSyAmpqFDMfo6zAorD-f14hTQnSNFDFU6VHM',authDomain:'onit-backend-api.firebaseapp.com',projectId:'onit-backend-api',storageBucket:'onit-backend-api.firebasestorage.app',messagingSenderId:'1052909191157',appId:'1:1052909191157:web:392c4a50b453deb5ebeabc'};
-let firebaseApp=null,firebaseDb=null,firebaseRealtimeHealthy=false,firebaseStarting=false,firebaseUnsubs=[],firebaseActivityRows=new Map(),firebaseBuzzerRows=new Map(),lastFallbackPulseAt=0,firebaseMessaging=null,pushTokenRegistered='';
+let firebaseApp=null,firebaseDb=null,firebaseRealtimeHealthy=false,firebaseStarting=false,firebaseUnsubs=[],firebaseActivityRows=new Map(),firebaseBuzzerRows=new Map(),lastFallbackPulseAt=0,firebaseMessaging=null,pushTokenRegistered='',foregroundPushBound=false,pendingPushRouteConsumed=false;
+try{if(typeof Notification!=='undefined'&&Notification.permission==='granted')pushTokenRegistered=localStorage.getItem('onit_push_token_v1')||''}catch(e){}
 let currentBuzzer=null,buzzerQueue=[];
 let audioReady=false,onitAudioContext=null,pendingBriefSoundIds=new Set(),currentDetailTab='brief';
 const uiDirtySections=new Set();
@@ -1486,7 +1487,7 @@ async function loadFromGoogle(strict=false,silent=false){
         if(!document.getElementById('memory').classList.contains('hidden')&&!preserve.has('memory'))memoryUpdateDynamic();
         if(!preserve.has('team'))renderTeam();
         if(!preserve.has('more'))renderMore();
-        renderNotifications();queuePendingBuzzers_();runWhenIdle(()=>hydrateProfilePhotos(),500);runWhenIdle(()=>showNextBroadcast(),700);runWhenIdle(()=>startFirebaseRealtime(),900);
+        renderNotifications();queuePendingBuzzers_();runWhenIdle(()=>hydrateProfilePhotos(),500);runWhenIdle(()=>showNextBroadcast(),700);runWhenIdle(()=>startFirebaseRealtime(),900);runWhenIdle(()=>applyPendingPushRoute_(),1100);
         if(!document.getElementById('data').classList.contains('hidden')&&!preserve.has('data'))renderDataPage();
         if(current){current=briefs.find(b=>b.code===current.code)||null;if(current){if(!preserve.has('detail'))renderDetail()}else show('home')}
         if(!silent)uiDirtySections.clear();
@@ -2211,19 +2212,38 @@ async function respondToBuzzer(response,detail=''){
   if(!currentBuzzer)return;const id=currentBuzzer.buzzerId||rowVal(currentBuzzer,'Buzzer ID');if(!id)return;
   try{const res=await apiPost('respondBuzzer',{buzzerId:id,response,detail});document.getElementById('buzzerReceiveModal').classList.add('hidden');buzzers=buzzers.filter(b=>String(b.buzzerId||rowVal(b,'Buzzer ID'))!==String(id));firebaseBuzzerRows.delete(String(id));currentBuzzer=null;showToast('Progress sent',detail?`${response} — ${detail}`:response);setTimeout(showNextBuzzer,180)}catch(e){onitAlert('Could not send your Buzzer response. '+e.message)}
 }
+function pushPayloadUrgent_(d){const t=String(d&&d.type||''),nt=String(d&&d.notificationType||'');return t==='BUZZER'||t==='BRIEF_ALERT'||String(d&&d.actionRequired||'')==='true'||['OWNER_BROADCAST','APPROVAL_REQUIRED','TEAM_LEAD_APPROVAL_REQUIRED','REVISION','HANDOVER_RECEIVED','DATA_EXPORT_APPROVAL','AUTO_ESCALATION_TRAFFIC','AUTO_ESCALATION_APPROVAL','AUTO_ESCALATION_TEAM_LEAD'].includes(nt)}
+function foregroundPushOptions_(d){const urgent=pushPayloadUrgent_(d),tag=d.notificationId?`onit-${d.notificationId}`:d.buzzerId?`onit-buzzer-${d.buzzerId}`:d.briefCode?`onit-${d.type||'update'}-${d.briefCode}`:'onit-update';return{body:d.body||d.message||'You have a new ONIT update.',icon:'./icons/icon-192.png',badge:'./icons/favicon-32.png',tag,renotify:urgent,requireInteraction:urgent,silent:false,vibrate:urgent?[180,80,180,80,320]:[120,60,120],data:{url:d.url||'./',type:d.type||'',notificationType:d.notificationType||'',notificationId:d.notificationId||'',briefCode:d.briefCode||'',buzzerId:d.buzzerId||''}}}
+function bindForegroundPush_(){
+  if(foregroundPushBound||!firebaseMessaging||typeof firebaseMessaging.onMessage!=='function')return;foregroundPushBound=true;
+  firebaseMessaging.onMessage(payload=>{try{const d=payload.data||{},title=d.title||(d.type==='BUZZER'?'ONIT BUZZER':'ONIT');if(d.notificationId){announcedNotifications.add(d.notificationId);try{localStorage.setItem(announcedKey(CURRENT_USER_ID),JSON.stringify([...announcedNotifications]))}catch(e){}}if(d.type==='BUZZER')playBuzzerSound();else if(d.type==='BRIEF_ALERT')playBriefAlertSound();else playNotificationSound();navigator.serviceWorker.ready.then(reg=>reg.showNotification(title,foregroundPushOptions_(d))).catch(()=>{});}catch(e){console.warn('ONIT foreground push:',e)}});
+}
+function clearPushRouteParams_(){try{const u=new URL(location.href);['notification','brief','type','buzzer'].forEach(k=>u.searchParams.delete(k));history.replaceState({},'',u.pathname+(u.searchParams.toString()?'?'+u.searchParams.toString():'')+u.hash)}catch(e){}}
+function applyPendingPushRoute_(){
+  if(pendingPushRouteConsumed||!SESSION_TOKEN||!currentUser)return false;let p;try{p=new URLSearchParams(location.search)}catch(e){return false}const notificationId=p.get('notification')||'',briefCode=p.get('brief')||'',buzzerId=p.get('buzzer')||'';if(!notificationId&&!briefCode&&!buzzerId)return false;
+  pendingPushRouteConsumed=true;clearPushRouteParams_();
+  if(notificationId){const n=notifications.find(x=>String(rowVal(x,'Notification ID'))===String(notificationId));if(n){openNotificationTarget(notificationId);return true}}
+  if(briefCode){const b=briefs.find(x=>String(x.code)===String(briefCode));if(b){detail(briefCode);return true}show('memory');memorySetExample(briefCode);return true}
+  if(buzzerId){const b=buzzers.find(x=>String(x.buzzerId||rowVal(x,'Buzzer ID'))===String(buzzerId));if(b){currentBuzzer=null;buzzerQueue=[b,...buzzerQueue.filter(x=>String(x.buzzerId||rowVal(x,'Buzzer ID'))!==String(buzzerId))];showNextBuzzer();return true}}
+  show('home');return true;
+}
+async function testOutsidePush(){
+  if(pushNotificationStatus_()!=='ON')return onitAlert('Enable outside-ONIT alerts on this device first.');
+  try{const res=await apiPost('testPushNotification',{}),d=res.data||res;if(Number(d.sent||0)>0)showToast('Push test sent','A system ONIT notification has been sent to your registered device(s).');else onitAlert('No push was delivered. '+(d.error||'This device may need to register again.'))}catch(e){onitAlert('Could not send the push test. '+e.message)}
+}
 async function enablePushNotifications(){
   if(!('Notification'in window)||!('serviceWorker'in navigator))return onitAlert('Outside-ONIT alerts are not supported in this browser.');
   if(typeof firebase==='undefined'||!firebase.messaging)return onitAlert('Firebase Messaging is not available yet.');
   try{
     const permission=await Notification.requestPermission();if(permission!=='granted')return onitAlert('Notifications were not enabled. You can change this later in your browser settings.');
     const configRes=await apiPost('getPushConfig',{}),cfg=configRes.data||configRes;if(!cfg.enabled||!cfg.vapidKey)return onitAlert('Web Push is not fully configured yet. The System Owner needs to add the Firebase Web Push public key to ONIT.');
-    if(!firebase.apps.length)firebaseApp=firebase.initializeApp(FIREBASE_CONFIG);else firebaseApp=firebase.app();firebaseMessaging=firebase.messaging();
+    if(!firebase.apps.length)firebaseApp=firebase.initializeApp(FIREBASE_CONFIG);else firebaseApp=firebase.app();firebaseMessaging=firebase.messaging();bindForegroundPush_();
     const reg=await navigator.serviceWorker.ready,token=await firebaseMessaging.getToken({vapidKey:cfg.vapidKey,serviceWorkerRegistration:reg});if(!token)throw new Error('No push token was returned.');
-    const uid=firebase.auth().currentUser?.uid||'';await apiPost('registerPushToken',{fcmToken:token,firebaseUid:uid,deviceLabel:navigator.userAgent});pushTokenRegistered=token;showToast('Outside-ONIT alerts enabled','Buzzer notifications can now reach this device while ONIT is in the background.');renderMore();
+    const uid=firebase.auth().currentUser?.uid||'';await apiPost('registerPushToken',{fcmToken:token,firebaseUid:uid,deviceLabel:navigator.userAgent});pushTokenRegistered=token;try{localStorage.setItem('onit_push_token_v1',token)}catch(e){}showToast('Outside-ONIT alerts enabled','Action alerts can now reach this device as system notifications when ONIT is closed or in the background.');renderMore();
   }catch(e){console.error(e);onitAlert('Could not enable outside-ONIT alerts. '+e.message)}
 }
 function pushNotificationStatus_(){if(typeof Notification==='undefined')return'UNSUPPORTED';if(Notification.permission==='granted'&&pushTokenRegistered)return'ON';if(Notification.permission==='denied')return'BLOCKED';return'OFF'}
-async function ensurePushRegistrationQuietly(){if(typeof Notification==='undefined'||Notification.permission!=='granted'||!SESSION_TOKEN||typeof firebase==='undefined'||!firebase.messaging)return;try{const configRes=await apiPost('getPushConfig',{}),cfg=configRes.data||configRes;if(!cfg.enabled||!cfg.vapidKey)return;if(!firebase.apps.length)firebaseApp=firebase.initializeApp(FIREBASE_CONFIG);firebaseMessaging=firebase.messaging();const reg=await navigator.serviceWorker.ready,token=await firebaseMessaging.getToken({vapidKey:cfg.vapidKey,serviceWorkerRegistration:reg});if(token&&token!==pushTokenRegistered){const uid=firebase.auth().currentUser?.uid||'';await apiPost('registerPushToken',{fcmToken:token,firebaseUid:uid,deviceLabel:navigator.userAgent});pushTokenRegistered=token;}}catch(e){console.warn('ONIT push registration:',e)}}
+async function ensurePushRegistrationQuietly(){if(typeof Notification==='undefined'||Notification.permission!=='granted'||!SESSION_TOKEN||typeof firebase==='undefined'||!firebase.messaging)return;try{const configRes=await apiPost('getPushConfig',{}),cfg=configRes.data||configRes;if(!cfg.enabled||!cfg.vapidKey)return;if(!firebase.apps.length)firebaseApp=firebase.initializeApp(FIREBASE_CONFIG);firebaseMessaging=firebase.messaging();bindForegroundPush_();const reg=await navigator.serviceWorker.ready,token=await firebaseMessaging.getToken({vapidKey:cfg.vapidKey,serviceWorkerRegistration:reg});if(token&&token!==pushTokenRegistered){const uid=firebase.auth().currentUser?.uid||'';await apiPost('registerPushToken',{fcmToken:token,firebaseUid:uid,deviceLabel:navigator.userAgent});pushTokenRegistered=token;try{localStorage.setItem('onit_push_token_v1',token)}catch(e){}if(!document.getElementById('more')?.classList.contains('hidden'))renderMore();}}catch(e){console.warn('ONIT push registration:',e)}}
 function notificationRouteTarget_(n){const code=String(rowVal(n,'Brief Code')||''),type=String(rowVal(n,'Type')||'').toUpperCase();if(code){const b=briefs.find(x=>String(x.code)===code);if(b)return()=>detail(code);return()=>{show('memory');memorySetExample(code);showToast('Brief not in live workspace',`${code} is not loaded in the current workspace. Memory has been searched for it.`)}}if(/DATA_EXPORT|BACKEND_DATA/.test(type))return()=>show('data');if(/PULSE|DIGITAL/.test(type))return()=>show('pulse');if(/CASE/.test(type))return()=>show('cases');if(/ACTIVATION/.test(type))return()=>show('activation');if(/IDEA|SIGNAL|PROACTIVE/.test(type))return()=>show('ideas');if(type==='OWNER_BROADCAST')return()=>onitAlert(`${rowVal(n,'Title')||'Announcement'}\n\n${rowVal(n,'Message')||''}`);return()=>showToast(rowVal(n,'Title')||'ONIT update',rowVal(n,'Message')||'')}
 async function openNotificationTarget(id){const n=notifications.find(x=>String(rowVal(x,'Notification ID'))===String(id));if(!n)return;const nid=rowVal(n,'Notification ID');document.getElementById('notifPanel')?.classList.add('hidden');if(!truthy(rowVal(n,'Read'))){n['Read']=true;n['Read At']=new Date().toISOString();renderNotifications();if(nid)apiPost('markNotificationsRead',{notificationIds:[nid]}).catch(e=>console.warn('Notification read receipt:',e))}const go=notificationRouteTarget_(n);setTimeout(()=>{try{go()}catch(e){console.warn('Notification route:',e);show('home')}},0)}
 window.openNotificationTarget=openNotificationTarget;
@@ -2457,7 +2477,7 @@ async function approveDataExportRequest(id){if(!await onitConfirm('Approve this 
 async function downloadDataExport(id){
   try{setBusy(true);const res=await apiPost('getDataExportPdf',{exportId:decodeURIComponent(id)}),d=res.data||res;if(!d.base64)throw new Error('No PDF was returned.');const url=URL.createObjectURL(base64ToBlob(d.base64,d.mimeType||'application/pdf')),a=document.createElement('a');a.href=url;a.download=d.fileName||'ONIT-data-export.pdf';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),5000)}catch(e){onitAlert('Could not download PDF. '+e.message)}finally{setBusy(false)}
 }
-function renderMore(){if(!currentUser)return;const names=backendAccess();let html=`<div class='moregrid'><div class='morecard'><h3>MY PROFILE</h3><div class='profileRow'><div class='avatar large' data-avatar-user='${escapeHTML(CURRENT_USER_ID)}'>${escapeHTML(initials(currentUserName()))}</div><div><b>${escapeHTML(currentUserName())}${isOwner()?` <span class='ownerBadge'>SYSTEM OWNER</span>`:''}</b><div class='bigTiny'>${escapeHTML(positionOf(currentUser)||'Position not set')}<br>${escapeHTML(departmentOf(currentUser)||'Department not set')}<br>${escapeHTML(rowVal(currentUser,'Email')||'Email not added yet')}</div></div></div><div class='field'><label>PROFILE PICTURE</label><input type='file' accept='image/jpeg,image/png,image/webp' onchange='uploadProfilePhoto(this)'><div class='tiny'>JPG, PNG or WebP • ONIT optimises the image automatically</div></div><button class='secondary linkbtn' onclick='handleSignOut()'>SIGN OUT</button></div><div class='morecard'><h3>NOTIFICATIONS</h3><div class='switchrow'><div><b>Notification sound</b><div class='bigTiny'>A distinct, louder ONIT brief alert plays whenever a new brief lands. Other alerts use the standard chime. Sound is ON by default unless you switch it off.</div></div><input type='checkbox' ${notificationSoundEnabled()?'checked':''} onchange='toggleSoundPreference(this)'></div><div class='actions'><button class='secondary linkbtn' onclick='testNotificationSound()'>TEST SOUND</button><button class='secondary linkbtn' onclick='enablePushNotifications()'>ENABLE OUTSIDE-ONIT ALERTS</button></div><div class='pushStatus ${audioReady?'on':'off'}'>Brief sound: ${audioReady?'ARMED':'WAITING FOR FIRST TAP'}</div><div class='pushStatus ${pushNotificationStatus_()==='ON'?'on':'off'}'>Outside-ONIT alerts: ${pushNotificationStatus_()}</div><div class='bigTiny' style='margin-top:6px'>Desktop/Android web push works after permission is granted. On iPhone/iPad, install ONIT to the Home Screen first.</div></div><div class='morecard onitA11yCard'><h3>ACCESSIBILITY</h3><div class='switchrow'><div><b>Reduce motion</b><div class='bigTiny'>Minimises interface transitions and animated feedback. ONIT also respects your device Reduce Motion setting.</div></div><input type='checkbox' aria-label='Reduce motion' ${onitReducedMotionEnabled()?'checked':''} onchange='toggleOnitReducedMotion(this)'></div><div class='onitA11yStatus'>Keyboard focus, larger mobile tap targets and screen-reader status updates are always on.</div></div><div class='morecard'><h3>ORGANISATION</h3><b>${escapeHTML(rowVal(organisations[0],'Organisation Name')||'Organisation')}</b><div class='bigTiny'>Creative • Account Management • Strategy • Digital • Activation • HR • Accounts</div></div><div class='morecard'><h3>ACCESS</h3><div class='bigTiny'>Create briefs: <b>${canCreateBrief()?'YES':'NO'}</b><br>Review work: <b>${canReview()?'YES':'NO'}</b><br>Final approval: <b>${canApprove()?'YES':'NO'}</b><br>Backend datasets: <b>${isOwner()?'ALL':names.length}</b></div></div>`;
+function renderMore(){if(!currentUser)return;const names=backendAccess();let html=`<div class='moregrid'><div class='morecard'><h3>MY PROFILE</h3><div class='profileRow'><div class='avatar large' data-avatar-user='${escapeHTML(CURRENT_USER_ID)}'>${escapeHTML(initials(currentUserName()))}</div><div><b>${escapeHTML(currentUserName())}${isOwner()?` <span class='ownerBadge'>SYSTEM OWNER</span>`:''}</b><div class='bigTiny'>${escapeHTML(positionOf(currentUser)||'Position not set')}<br>${escapeHTML(departmentOf(currentUser)||'Department not set')}<br>${escapeHTML(rowVal(currentUser,'Email')||'Email not added yet')}</div></div></div><div class='field'><label>PROFILE PICTURE</label><input type='file' accept='image/jpeg,image/png,image/webp' onchange='uploadProfilePhoto(this)'><div class='tiny'>JPG, PNG or WebP • ONIT optimises the image automatically</div></div><button class='secondary linkbtn' onclick='handleSignOut()'>SIGN OUT</button></div><div class='morecard'><h3>NOTIFICATIONS</h3><div class='switchrow'><div><b>Notification sound</b><div class='bigTiny'>A distinct, louder ONIT brief alert plays whenever a new brief lands. Other alerts use the standard chime. Sound is ON by default unless you switch it off.</div></div><input type='checkbox' ${notificationSoundEnabled()?'checked':''} onchange='toggleSoundPreference(this)'></div><div class='actions'><button class='secondary linkbtn' onclick='testNotificationSound()'>TEST IN-APP SOUND</button><button class='secondary linkbtn' onclick='enablePushNotifications()'>ENABLE OUTSIDE-ONIT ALERTS</button><button class='secondary linkbtn' onclick='testOutsidePush()' ${pushNotificationStatus_()==='ON'?'':'disabled'}>TEST SYSTEM ALERT</button></div><div class='pushStatus ${audioReady?'on':'off'}'>In-app brief sound: ${audioReady?'ARMED':'WAITING FOR FIRST TAP'}</div><div class='pushStatus ${pushNotificationStatus_()==='ON'?'on':'off'}'>Closed/background alerts: ${pushNotificationStatus_()}</div><div class='bigTiny' style='margin-top:6px'>Each device must enable alerts once. When ONIT is closed, the operating system controls the notification sound/volume. On iPhone/iPad, install ONIT to the Home Screen before enabling alerts.</div></div><div class='morecard onitA11yCard'><h3>ACCESSIBILITY</h3><div class='switchrow'><div><b>Reduce motion</b><div class='bigTiny'>Minimises interface transitions and animated feedback. ONIT also respects your device Reduce Motion setting.</div></div><input type='checkbox' aria-label='Reduce motion' ${onitReducedMotionEnabled()?'checked':''} onchange='toggleOnitReducedMotion(this)'></div><div class='onitA11yStatus'>Keyboard focus, larger mobile tap targets and screen-reader status updates are always on.</div></div><div class='morecard'><h3>ORGANISATION</h3><b>${escapeHTML(rowVal(organisations[0],'Organisation Name')||'Organisation')}</b><div class='bigTiny'>Creative • Account Management • Strategy • Digital • Activation • HR • Accounts</div></div><div class='morecard'><h3>ACCESS</h3><div class='bigTiny'>Create briefs: <b>${canCreateBrief()?'YES':'NO'}</b><br>Review work: <b>${canReview()?'YES':'NO'}</b><br>Final approval: <b>${canApprove()?'YES':'NO'}</b><br>Backend datasets: <b>${isOwner()?'ALL':names.length}</b></div></div>`;
   if(isOwner()&&securityInfo){html+=`<div class='morecard' style='grid-column:1/-1'><h3>ORGANISATION SECURITY <span class='ownerBadge'>OWNER ONLY</span></h3><div class='bigTiny'>Share the Join Code only with authorised staff. Backend data is never granted automatically by this code.</div><div class='securityCode'>${escapeHTML(securityInfo.inviteCode||'—')}</div><div class='actions'><button class='secondary' onclick='regenerateJoinCode()'>REGENERATE JOIN CODE</button><button class='secondary' onclick='toggleSignupAccess()'>${securityInfo.signupsEnabled?'DISABLE':'ENABLE'} SIGNUPS</button></div></div>`}
   if(isOwner()){html+=ownerBroadcastMarkup()}
   if(isOwner()){
@@ -2795,19 +2815,19 @@ setInterval(()=>{const now=Date.now(),gap=firebaseRealtimeHealthy?60000:15000;if
 async function boot(){if(SESSION_TOKEN){document.getElementById('authGate').classList.add('hidden');document.getElementById('appShell').classList.remove('hidden');await loadFromGoogle(false);if(SESSION_TOKEN)return}document.getElementById('appShell').classList.add('hidden');document.getElementById('authGate').classList.remove('hidden');showAuthMode('signin')}
 document.addEventListener('DOMContentLoaded',()=>boot(),{once:true});
 </script>
-<script src="./dialog-system.js?v=0.36.8.4"></script>
-<script src="./authority-engine.js?v=0.36.8.4"></script>
-<script src="./sync-engine.js?v=0.36.8.4"></script>
-<script src="./release-guard.js?v=0.36.8.4"></script>
-<script src="./command-palette.js?v=0.36.8.4"></script>
-<script src="./autocare-module.js?v=0.36.8.4"></script>
-<script src="./cases-module.js?v=0.36.8.4"></script>
-<script src="./activation-command.js?v=0.36.8.4"></script>
-<script src="./ideas-dump.js?v=0.36.8.4"></script>
-<script src="./pulse-module.js?v=0.36.8.4"></script>
-<script src="./assist-traffic-module.js?v=0.36.8.4"></script>
-<script src="./core-intelligence.js?v=0.36.8.4"></script>
-<script src="./attention-loop.js?v=0.36.8.4"></script>
+<script src="./dialog-system.js?v=0.36.8.6"></script>
+<script src="./authority-engine.js?v=0.36.8.6"></script>
+<script src="./sync-engine.js?v=0.36.8.6"></script>
+<script src="./release-guard.js?v=0.36.8.6"></script>
+<script src="./command-palette.js?v=0.36.8.6"></script>
+<script src="./autocare-module.js?v=0.36.8.6"></script>
+<script src="./cases-module.js?v=0.36.8.6"></script>
+<script src="./activation-command.js?v=0.36.8.6"></script>
+<script src="./ideas-dump.js?v=0.36.8.6"></script>
+<script src="./pulse-module.js?v=0.36.8.6"></script>
+<script src="./assist-traffic-module.js?v=0.36.8.6"></script>
+<script src="./core-intelligence.js?v=0.36.8.6"></script>
+<script src="./attention-loop.js?v=0.36.8.6"></script>
 </body>
 </html>
 
