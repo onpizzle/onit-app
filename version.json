@@ -1,7 +1,7 @@
 {
-  "version": "0.36.9.3",
-  "build": "0.36.9.3",
-  "uiRevision": 36930,
+  "version": "0.36.9.4",
+  "build": "0.36.9.4",
+  "uiRevision": 36940,
   "dashboardUiRevision": 36801,
   "mandatoryUiSync": false,
   "universalDashboardUi": true,
@@ -12,8 +12,8 @@
   "dialogSystemVersion": "1.0.0",
   "workflowControlVersion": "1.0.0",
   "activationCommandVersion": "0.1.0",
-  "label": "backend verification + startup loader isolation",
-  "releasedAt": "2026-10-29T08:30:00+01:00",
+  "label": "handover + multi-recipient workflow",
+  "releasedAt": "2026-10-29T10:00:00+01:00",
   "ideasDumpVersion": "0.1.1",
   "visualContrastVersion": "1.0.3",
   "attentionLoopVersion": "0.1.2",
@@ -24,5 +24,5 @@
   "saveStateReliabilityVersion": "1.0.2",
   "coreIntelligenceVersion": "0.31.3",
   "updatePropagationVersion": "3.0.0",
-  "closedAppPushVersion": "1.0.3"
+  "closedAppPushVersion": "1.0.4"
 }
