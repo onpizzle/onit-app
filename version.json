@@ -1,7 +1,7 @@
 {
-  "version": "0.36.9.4",
-  "build": "0.36.9.4",
-  "uiRevision": 36940,
+  "version": "0.36.9.5",
+  "build": "0.36.9.5",
+  "uiRevision": 36950,
   "dashboardUiRevision": 36801,
   "mandatoryUiSync": false,
   "universalDashboardUi": true,

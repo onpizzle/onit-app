@@ -24,7 +24,7 @@
 <link rel="preconnect" href="https://script.google.com">
 <link rel="dns-prefetch" href="//www.gstatic.com">
 <link rel="dns-prefetch" href="//script.google.com">
-<link rel="stylesheet" href="./dialog-system.css?v=0.36.9.4">
+<link rel="stylesheet" href="./dialog-system.css?v=0.36.9.5">
 <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
@@ -896,10 +896,10 @@ img,video,canvas,svg{max-width:100%}
 .reviewQueueNote{font-size:11px;color:#777;margin-top:6px}
 @media(max-width:760px){.reviewPreviewModal{padding:4px!important}.reviewPreviewModal .modalBox{width:100%!important;height:calc(100dvh - 8px)!important;max-height:none!important;border-radius:12px!important}.previewAssetStage{padding:5px}.previewFooter{padding:7px}.previewNav{justify-content:flex-start;overflow-x:auto;flex-wrap:nowrap}.previewNav .mini{white-space:nowrap}}
 </style>
-<link rel="stylesheet" href="./cases-module.css?v=0.36.9.4">
-<link rel="stylesheet" href="./activation-command.css?v=0.36.9.4">
-<link rel="stylesheet" href="./ideas-dump.css?v=0.36.9.4">
-<link rel="stylesheet" href="./pulse-module.css?v=0.36.9.4">
+<link rel="stylesheet" href="./cases-module.css?v=0.36.9.5">
+<link rel="stylesheet" href="./activation-command.css?v=0.36.9.5">
+<link rel="stylesheet" href="./ideas-dump.css?v=0.36.9.5">
+<link rel="stylesheet" href="./pulse-module.css?v=0.36.9.5">
 
 <style id="onit-mobile-nav-v0212">
 .navLabelMobile{display:none!important}
@@ -1013,8 +1013,8 @@ html.onitReduceMotion *,html.onitReduceMotion *::before,html.onitReduceMotion *:
   *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
 }
 </style>
-<link rel="stylesheet" href="./assist-traffic-module.css?v=0.36.9.4">
-<link rel="stylesheet" href="./core-intelligence.css?v=0.36.9.4">
+<link rel="stylesheet" href="./assist-traffic-module.css?v=0.36.9.5">
+<link rel="stylesheet" href="./core-intelligence.css?v=0.36.9.5">
 <style id="role-consistency-v0311">
 /* ONIT v0.31.2 — role authority + Digital Pulse access hardening */
 .radarMorningGrid .morningMetric b,
@@ -1027,11 +1027,11 @@ html.onitReduceMotion *,html.onitReduceMotion *::before,html.onitReduceMotion *:
 .radarLevel{color:#f2f2ee!important}
 </style>
 
-<link rel="stylesheet" href="./autocare-module.css?v=0.36.9.4">
-<link rel="stylesheet" href="./command-palette.css?v=0.36.9.4">
+<link rel="stylesheet" href="./autocare-module.css?v=0.36.9.5">
+<link rel="stylesheet" href="./command-palette.css?v=0.36.9.5">
 
-<link rel="stylesheet" href="./visual-contrast.css?v=0.36.9.4">
-<link rel="stylesheet" href="./attention-loop.css?v=0.36.9.4">
+<link rel="stylesheet" href="./visual-contrast.css?v=0.36.9.5">
+<link rel="stylesheet" href="./attention-loop.css?v=0.36.9.5">
 </head>
 <body>
 <a class="onitSkipLink" href="#mainContent">Skip to main content</a>
@@ -1226,8 +1226,8 @@ html.onitReduceMotion *,html.onitReduceMotion *::before,html.onitReduceMotion *:
 <script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-messaging-compat.js"></script>
-<script>const APP_VERSION='0.36.9.4';
-const UI_REVISION=36940;
+<script>const APP_VERSION='0.36.9.5';
+const UI_REVISION=36950;
 const DASHBOARD_UI_REVISION=36801;
 const DASHBOARD_UI_STORAGE_KEY='onit-dashboard-ui-state-v1';
 window.ONIT_RUNTIME={version:APP_VERSION,uiRevision:UI_REVISION,dashboardUiRevision:DASHBOARD_UI_REVISION};
@@ -2174,6 +2174,8 @@ async function confirmHandover(button){
   finally{button.disabled=false;button.textContent=old}
 }
 
+async function runAction(button,action,payload,ok){if(!current||mutationBusy)return false;if(!apiOnline){onitAlert('Refresh ONIT before making changes.');return false}if(!versionAtLeast(backendVersion,'0.14.0')){onitAlert('Deploy ONIT Backend V0.14.0 before using this frontend.');return false}const snapshot=current,old=button?.textContent;mutationBusy=true;setBusy(true);if(button){button.disabled=true;button.textContent='WORKING…'}let saved=false,busyReleased=false;try{await apiPost(action,{briefCode:snapshot.code,organisationId:ORG_ID,userId:CURRENT_USER_ID,userName:currentUserName(),...payload});saved=true;if(button){button.textContent='SAVED ✓';button.classList.add('onitSaved');setTimeout(()=>button.classList.remove('onitSaved'),520)}if(ok)showToast('ONIT',ok);showSyncChip('UPDATING');setBusy(false);busyReleased=true;await loadFromGoogle(true,true);return true}catch(e){console.error(e);onitAlert(saved?'Saved, but the refreshed data could not be confirmed. Refresh before trying again.':'ONIT could not complete this action. '+e.message);return false}finally{mutationBusy=false;if(!busyReleased)setBusy(false);if(button){button.disabled=false;button.textContent=old}}}
+async function acknowledgeTask(button){if(!current)return;const ok=await runAction(button,'acknowledgeTask',{},'Task receipt confirmed. The sender has been notified.');if(ok)renderDetail()}
 async function startWork(button){if(!current)return;const mine=currentUserAssignment(current.code,'TO');if(!mine)return onitAlert('Only a person assigned TO this brief can start the work.');if(!taskAcknowledged(current.code))return onitAlert('Acknowledge receipt of the task before starting work.');await runAction(button,'startWork',{},'Work started. Account Management and management visibility have been updated.')}
 async function pauseBrief(button){const mine=!!currentUserAssignment(current.code,'TO');if(!mine)return onitAlert('Only the person assigned TO this brief can pause or resume their work.');if(current.status==='Closed')return;const action=current.paused?'resumeBrief':'pauseBrief';await runAction(button,action,{},current.paused?'Work resumed. The deadline and timeline have been adjusted.':'Work paused. Account Management and senior management have been notified.')}
 async function changeDeadline(button){if(!canCreateBrief()||current.createdByUserId!==CURRENT_USER_ID)return onitAlert('Only the person who sent this brief can change its deadline.');const v=await onitPrompt('New deadline in Nigeria time: YYYY-MM-DD HH:MM',lagosInput(current.deadline).replace('T',' '));if(!v)return;let d;try{d=parseLagos(v.trim())}catch(e){return onitAlert(e.message)}const reason=await onitPrompt('Reason for deadline change:');if(!reason?.trim())return onitAlert('A reason is required.');await runAction(button,'changeDeadline',{newDeadline:d.toISOString(),reason:reason.trim()},'Deadline updated, logged and communicated.')}
@@ -2847,19 +2849,19 @@ async function boot(){
 }
 document.addEventListener('DOMContentLoaded',()=>boot(),{once:true});
 </script>
-<script src="./dialog-system.js?v=0.36.9.4"></script>
-<script src="./authority-engine.js?v=0.36.9.4"></script>
-<script src="./sync-engine.js?v=0.36.9.4"></script>
-<script src="./release-guard.js?v=0.36.9.4"></script>
-<script src="./command-palette.js?v=0.36.9.4"></script>
-<script src="./autocare-module.js?v=0.36.9.4"></script>
-<script src="./cases-module.js?v=0.36.9.4"></script>
-<script src="./activation-command.js?v=0.36.9.4"></script>
-<script src="./ideas-dump.js?v=0.36.9.4"></script>
-<script src="./pulse-module.js?v=0.36.9.4"></script>
-<script src="./assist-traffic-module.js?v=0.36.9.4"></script>
-<script src="./core-intelligence.js?v=0.36.9.4"></script>
-<script src="./attention-loop.js?v=0.36.9.4"></script>
+<script src="./dialog-system.js?v=0.36.9.5"></script>
+<script src="./authority-engine.js?v=0.36.9.5"></script>
+<script src="./sync-engine.js?v=0.36.9.5"></script>
+<script src="./release-guard.js?v=0.36.9.5"></script>
+<script src="./command-palette.js?v=0.36.9.5"></script>
+<script src="./autocare-module.js?v=0.36.9.5"></script>
+<script src="./cases-module.js?v=0.36.9.5"></script>
+<script src="./activation-command.js?v=0.36.9.5"></script>
+<script src="./ideas-dump.js?v=0.36.9.5"></script>
+<script src="./pulse-module.js?v=0.36.9.5"></script>
+<script src="./assist-traffic-module.js?v=0.36.9.5"></script>
+<script src="./core-intelligence.js?v=0.36.9.5"></script>
+<script src="./attention-loop.js?v=0.36.9.5"></script>
 </body>
 </html>
 

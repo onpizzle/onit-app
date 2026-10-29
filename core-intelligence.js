@@ -26,7 +26,6 @@ function mutationLike(action){const a=String(action||'');return !READ_ONLY_ACTIO
 const baseApiPost=typeof apiPost==='function'?apiPost:null;
 if(baseApiPost){apiPost=async function(action,payload={},requiresAuth=true){if(mutationLike(action))setSaveState('saving');try{const r=await baseApiPost(action,payload,requiresAuth);const scope=actionScope[action];if(scope)clearDraftScope(scope);if(mutationLike(action))setSaveState('saved');return r}catch(e){if(mutationLike(action))setSaveState(navigator.onLine===false?'offline':'error');throw e}}}
 document.addEventListener('input',e=>saveFieldDraft(e.target),true);document.addEventListener('change',e=>saveFieldDraft(e.target),true);
-document.addEventListener('click',e=>{const b=e.target.closest?.('button');if(!b)return;const t=(b.textContent||'').trim().toUpperCase();if(/^(SAVE|CREATE|SEND|SUBMIT|RELEASE|APPROVE|COMPLETE|UPDATE)/.test(t)&&!b.disabled)setSaveState('saving')},true);
 window.addEventListener('online',()=>{if(saveState==='offline')setSaveState('unsaved','BACK ONLINE • REVIEW & SAVE')});window.addEventListener('offline',()=>setSaveState('offline'));
 window.addEventListener('beforeunload',e=>{if(window.uiDirtySections?.size){e.preventDefault();e.returnValue=''}});
 const draftObserver=new MutationObserver(ms=>ms.forEach(m=>m.addedNodes.forEach(n=>{if(n.nodeType===1){if(n.matches?.('input,textarea,select'))restoreFieldDraft(n);restoreDrafts(n)}})));draftObserver.observe(document.documentElement,{subtree:true,childList:true});
