@@ -1,9 +1,9 @@
-# ONIT v0.36.8.6 — Closed-App Push Self-Test Hotfix
+# ONIT v0.36.8.7 — Closed-App Push Self-Test Hotfix
 
 Frontend only. Backend remains ONIT v0.31.11.
 
 1. Upload/replace these frontend files in GitHub `main`.
-2. Commit: `ONIT v0.36.8.6 — push self-test hotfix`.
+2. Commit: `ONIT v0.36.8.7 — push self-test hotfix`.
 3. Let Render deploy.
 4. Open ONIT Settings.
 5. Enable Outside-ONIT Alerts if required.
