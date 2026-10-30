@@ -1,8 +1,8 @@
 {
-  "version": "0.37.3",
-  "build": "0.37.3",
-  "uiRevision": 37300,
-  "dashboardUiRevision": 37301,
+  "version": "0.37.4",
+  "build": "0.37.4",
+  "uiRevision": 37400,
+  "dashboardUiRevision": 37401,
   "mandatoryUiSync": false,
   "universalDashboardUi": true,
   "authorityEngineVersion": "1.0.0",
@@ -12,8 +12,8 @@
   "dialogSystemVersion": "1.0.0",
   "workflowControlVersion": "1.0.0",
   "activationCommandVersion": "0.2.0",
-  "label": "ONIT Rewards V1 \u2014 personalised encouragements, 40/160 coins and monthly rewards",
-  "releasedAt": "2026-10-30T11:45:00+01:00",
+  "label": "ONIT Workstation Tabs + Rewards V1",
+  "releasedAt": "2026-10-30T13:45:00+01:00",
   "ideasDumpVersion": "0.2.0",
   "visualContrastVersion": "1.0.3",
   "attentionLoopVersion": "0.1.2",
@@ -27,5 +27,6 @@
   "closedAppPushVersion": "1.0.4",
   "securityPreviewVersion": "1.0.0",
   "rewardsVersion": "1.0.0",
-  "securityClickjackingVersion": "1.0.0"
+  "securityClickjackingVersion": "1.0.0",
+  "notes": "System Owner Workstation Tab Control + Rewards V1 + security hardening"
 }
