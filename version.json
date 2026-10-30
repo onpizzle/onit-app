@@ -1,8 +1,8 @@
 {
-  "version": "0.37.1",
-  "build": "0.37.1",
-  "uiRevision": 37100,
-  "dashboardUiRevision": 37101,
+  "version": "0.37.2",
+  "build": "0.37.2",
+  "uiRevision": 37200,
+  "dashboardUiRevision": 37201,
   "mandatoryUiSync": false,
   "universalDashboardUi": true,
   "authorityEngineVersion": "1.0.0",
@@ -12,8 +12,8 @@
   "dialogSystemVersion": "1.0.0",
   "workflowControlVersion": "1.0.0",
   "activationCommandVersion": "0.2.0",
-  "label": "Cloudflare Pages production migration",
-  "releasedAt": "2026-10-29T18:30:00+01:00",
+  "label": "Security Fix 01 \u2014 safe non-executable file previews",
+  "releasedAt": "2026-10-30T09:20:00+01:00",
   "ideasDumpVersion": "0.2.0",
   "visualContrastVersion": "1.0.3",
   "attentionLoopVersion": "0.1.2",
@@ -24,5 +24,6 @@
   "saveStateReliabilityVersion": "1.0.2",
   "coreIntelligenceVersion": "0.31.3",
   "updatePropagationVersion": "3.0.0",
-  "closedAppPushVersion": "1.0.4"
+  "closedAppPushVersion": "1.0.4",
+  "securityPreviewVersion": "1.0.0"
 }

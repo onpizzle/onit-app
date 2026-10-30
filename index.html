@@ -24,7 +24,7 @@
 <link rel="preconnect" href="https://script.google.com">
 <link rel="dns-prefetch" href="//www.gstatic.com">
 <link rel="dns-prefetch" href="//script.google.com">
-<link rel="stylesheet" href="./dialog-system.css?v=0.37.1">
+<link rel="stylesheet" href="./dialog-system.css?v=0.37.2">
 <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
@@ -901,10 +901,10 @@ img,video,canvas,svg{max-width:100%}
 .reviewQueueNote{font-size:11px;color:#777;margin-top:6px}
 @media(max-width:760px){.reviewPreviewModal{padding:4px!important}.reviewPreviewModal .modalBox{width:100%!important;height:calc(100dvh - 8px)!important;max-height:none!important;border-radius:12px!important}.previewAssetStage{padding:5px}.previewFooter{padding:7px}.previewNav{justify-content:flex-start;overflow-x:auto;flex-wrap:nowrap}.previewNav .mini{white-space:nowrap}}
 </style>
-<link rel="stylesheet" href="./cases-module.css?v=0.37.1">
-<link rel="stylesheet" href="./activation-command.css?v=0.37.1">
-<link rel="stylesheet" href="./ideas-dump.css?v=0.37.1">
-<link rel="stylesheet" href="./pulse-module.css?v=0.37.1">
+<link rel="stylesheet" href="./cases-module.css?v=0.37.2">
+<link rel="stylesheet" href="./activation-command.css?v=0.37.2">
+<link rel="stylesheet" href="./ideas-dump.css?v=0.37.2">
+<link rel="stylesheet" href="./pulse-module.css?v=0.37.2">
 
 <style id="onit-mobile-nav-v0212">
 .navLabelMobile{display:none!important}
@@ -1018,8 +1018,8 @@ html.onitReduceMotion *,html.onitReduceMotion *::before,html.onitReduceMotion *:
   *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
 }
 </style>
-<link rel="stylesheet" href="./assist-traffic-module.css?v=0.37.1">
-<link rel="stylesheet" href="./core-intelligence.css?v=0.37.1">
+<link rel="stylesheet" href="./assist-traffic-module.css?v=0.37.2">
+<link rel="stylesheet" href="./core-intelligence.css?v=0.37.2">
 <style id="role-consistency-v0311">
 /* ONIT v0.31.2 — role authority + Digital Pulse access hardening */
 .radarMorningGrid .morningMetric b,
@@ -1032,11 +1032,11 @@ html.onitReduceMotion *,html.onitReduceMotion *::before,html.onitReduceMotion *:
 .radarLevel{color:#f2f2ee!important}
 </style>
 
-<link rel="stylesheet" href="./autocare-module.css?v=0.37.1">
-<link rel="stylesheet" href="./command-palette.css?v=0.37.1">
+<link rel="stylesheet" href="./autocare-module.css?v=0.37.2">
+<link rel="stylesheet" href="./command-palette.css?v=0.37.2">
 
-<link rel="stylesheet" href="./visual-contrast.css?v=0.37.1">
-<link rel="stylesheet" href="./attention-loop.css?v=0.37.1">
+<link rel="stylesheet" href="./visual-contrast.css?v=0.37.2">
+<link rel="stylesheet" href="./attention-loop.css?v=0.37.2">
 </head>
 <body>
 <a class="onitSkipLink" href="#mainContent">Skip to main content</a>
@@ -1231,9 +1231,9 @@ html.onitReduceMotion *,html.onitReduceMotion *::before,html.onitReduceMotion *:
 <script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-messaging-compat.js"></script>
-<script>const APP_VERSION='0.37.1';
-const UI_REVISION=37100;
-const DASHBOARD_UI_REVISION=37101;
+<script>const APP_VERSION='0.37.2';
+const UI_REVISION=37200;
+const DASHBOARD_UI_REVISION=37201;
 const DASHBOARD_UI_STORAGE_KEY='onit-dashboard-ui-state-v1';
 window.ONIT_RUNTIME={version:APP_VERSION,uiRevision:UI_REVISION,dashboardUiRevision:DASHBOARD_UI_REVISION};
 const BACKEND_DATASETS=['USERS','CLIENTS','BRIEFS','ASSIGNMENTS','ITERATIONS','ACTIVITY_LOG','NOTIFICATIONS','REPORTS'];
@@ -2258,7 +2258,11 @@ let currentPreviewIterationId='';
 let currentPreviewFileIndex=0;
 let currentPreviewFiles=[];
 function clearPreviewObjectUrl(){if(currentPreviewObjectUrl){try{URL.revokeObjectURL(currentPreviewObjectUrl)}catch(e){}currentPreviewObjectUrl=''}}
-function previewBrowserSafe_(mime){const m=String(mime||'').toLowerCase();return m.startsWith('image/')||m.startsWith('video/')||m.startsWith('audio/')||m==='application/pdf'||m.startsWith('text/')||['application/json','application/xml','application/javascript','application/x-javascript'].includes(m)}
+function previewBrowserSafe_(mime){
+  const m=String(mime||'').toLowerCase().split(';')[0].trim();
+  const safeRasterImages=new Set(['image/jpeg','image/png','image/gif','image/webp','image/avif','image/bmp','image/x-icon']);
+  return safeRasterImages.has(m)||m.startsWith('video/')||m.startsWith('audio/')||m==='application/pdf';
+}
 function previewActionsMarkup(canDownload,allowBrowser=true){return `<div class="actions"><button class="secondary ${allowBrowser?'':'hidden'}" onclick="openCurrentPreviewInBrowser()">OPEN IN BROWSER</button>${canDownload?'<button class="secondary" onclick="downloadCurrentPreviewOriginal()">DOWNLOAD ORIGINAL</button>':''}</div>`}
 function openCurrentPreviewInBrowser(){if(!currentPreviewObjectUrl)return onitAlert('This format cannot safely be opened outside ONIT before approval.');window.open(currentPreviewObjectUrl,'_blank','noopener')}
 function downloadCurrentPreviewOriginal(){if(typeof currentPreviewDownloadCallback==='function')currentPreviewDownloadCallback()}
@@ -2273,7 +2277,9 @@ function renderPreview(d,name,canDownload){
   clearPreviewObjectUrl();
   let asset='',allowBrowser=true;
   if(d.previewMode==='text'){
-    const blob=new Blob([d.text||''],{type:mime||'text/plain'});currentPreviewObjectUrl=URL.createObjectURL(blob);asset=`<div class='previewMessage' style='text-align:left;width:100%'><b>${escapeHTML(name)}</b><div class='tiny'>READ-ONLY TEXT PREVIEW • ${escapeHTML(original)}</div><pre style='white-space:pre-wrap;word-break:break-word;max-height:100%;overflow:auto;background:#fff;border:1px solid #ddd;border-radius:10px;padding:14px'>${escapeHTML(d.text||'')}</pre></div>`;
+    allowBrowser=false;
+    const securityNote=d.activeContentBlocked?`<div class='notice' style='margin:10px 0 0'><b>SECURITY PREVIEW</b><br>ONIT converted this active file to plain text. HTML, SVG, XML and script content cannot execute from the review screen.</div>`:'';
+    asset=`<div class='previewMessage' style='text-align:left;width:100%'><b>${escapeHTML(name)}</b><div class='tiny'>READ-ONLY TEXT PREVIEW • ${escapeHTML(original)}</div>${securityNote}<pre style='white-space:pre-wrap;word-break:break-word;max-height:100%;overflow:auto;background:#fff;border:1px solid #ddd;border-radius:10px;padding:14px'>${escapeHTML(d.text||'')}</pre></div>`;
   }else{
     if(!d.base64)throw new Error('No preview data returned.');
     const blob=base64ToBlob(d.base64,mime);currentPreviewObjectUrl=URL.createObjectURL(blob);
@@ -2896,19 +2902,19 @@ async function boot(){
 }
 document.addEventListener('DOMContentLoaded',()=>boot(),{once:true});
 </script>
-<script src="./dialog-system.js?v=0.37.1"></script>
-<script src="./authority-engine.js?v=0.37.1"></script>
-<script src="./sync-engine.js?v=0.37.1"></script>
-<script src="./release-guard.js?v=0.37.1"></script>
-<script src="./command-palette.js?v=0.37.1"></script>
-<script src="./autocare-module.js?v=0.37.1"></script>
-<script src="./cases-module.js?v=0.37.1"></script>
-<script src="./activation-command.js?v=0.37.1"></script>
-<script src="./ideas-dump.js?v=0.37.1"></script>
-<script src="./pulse-module.js?v=0.37.1"></script>
-<script src="./assist-traffic-module.js?v=0.37.1"></script>
-<script src="./core-intelligence.js?v=0.37.1"></script>
-<script src="./attention-loop.js?v=0.37.1"></script>
+<script src="./dialog-system.js?v=0.37.2"></script>
+<script src="./authority-engine.js?v=0.37.2"></script>
+<script src="./sync-engine.js?v=0.37.2"></script>
+<script src="./release-guard.js?v=0.37.2"></script>
+<script src="./command-palette.js?v=0.37.2"></script>
+<script src="./autocare-module.js?v=0.37.2"></script>
+<script src="./cases-module.js?v=0.37.2"></script>
+<script src="./activation-command.js?v=0.37.2"></script>
+<script src="./ideas-dump.js?v=0.37.2"></script>
+<script src="./pulse-module.js?v=0.37.2"></script>
+<script src="./assist-traffic-module.js?v=0.37.2"></script>
+<script src="./core-intelligence.js?v=0.37.2"></script>
+<script src="./attention-loop.js?v=0.37.2"></script>
 </body>
 </html>
 
