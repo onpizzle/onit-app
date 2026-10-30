@@ -24,7 +24,7 @@
 <link rel="preconnect" href="https://script.google.com">
 <link rel="dns-prefetch" href="//www.gstatic.com">
 <link rel="dns-prefetch" href="//script.google.com">
-<link rel="stylesheet" href="./dialog-system.css?v=0.37.5">
+<link rel="stylesheet" href="./dialog-system.css?v=0.37.6">
 <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
@@ -912,10 +912,10 @@ img,video,canvas,svg{max-width:100%}
 .reviewQueueNote{font-size:11px;color:#777;margin-top:6px}
 @media(max-width:760px){.reviewPreviewModal{padding:4px!important}.reviewPreviewModal .modalBox{width:100%!important;height:calc(100dvh - 8px)!important;max-height:none!important;border-radius:12px!important}.previewAssetStage{padding:5px}.previewFooter{padding:7px}.previewNav{justify-content:flex-start;overflow-x:auto;flex-wrap:nowrap}.previewNav .mini{white-space:nowrap}}
 </style>
-<link rel="stylesheet" href="./cases-module.css?v=0.37.5">
-<link rel="stylesheet" href="./activation-command.css?v=0.37.5">
-<link rel="stylesheet" href="./ideas-dump.css?v=0.37.5">
-<link rel="stylesheet" href="./pulse-module.css?v=0.37.5">
+<link rel="stylesheet" href="./cases-module.css?v=0.37.6">
+<link rel="stylesheet" href="./activation-command.css?v=0.37.6">
+<link rel="stylesheet" href="./ideas-dump.css?v=0.37.6">
+<link rel="stylesheet" href="./pulse-module.css?v=0.37.6">
 
 <style id="onit-mobile-nav-v0212">
 .navLabelMobile{display:none!important}
@@ -1029,8 +1029,8 @@ html.onitReduceMotion *,html.onitReduceMotion *::before,html.onitReduceMotion *:
   *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
 }
 </style>
-<link rel="stylesheet" href="./assist-traffic-module.css?v=0.37.5">
-<link rel="stylesheet" href="./core-intelligence.css?v=0.37.5">
+<link rel="stylesheet" href="./assist-traffic-module.css?v=0.37.6">
+<link rel="stylesheet" href="./core-intelligence.css?v=0.37.6">
 <style id="role-consistency-v0311">
 /* ONIT v0.31.2 — role authority + Digital Pulse access hardening */
 .radarMorningGrid .morningMetric b,
@@ -1043,12 +1043,12 @@ html.onitReduceMotion *,html.onitReduceMotion *::before,html.onitReduceMotion *:
 .radarLevel{color:#f2f2ee!important}
 </style>
 
-<link rel="stylesheet" href="./autocare-module.css?v=0.37.5">
-<link rel="stylesheet" href="./command-palette.css?v=0.37.5">
+<link rel="stylesheet" href="./autocare-module.css?v=0.37.6">
+<link rel="stylesheet" href="./command-palette.css?v=0.37.6">
 
-<link rel="stylesheet" href="./visual-contrast.css?v=0.37.5">
-<link rel="stylesheet" href="./attention-loop.css?v=0.37.5">
-<link rel="stylesheet" href="./rewards-module.css?v=0.37.5">
+<link rel="stylesheet" href="./visual-contrast.css?v=0.37.6">
+<link rel="stylesheet" href="./attention-loop.css?v=0.37.6">
+<link rel="stylesheet" href="./rewards-module.css?v=0.37.6">
 </head>
 <body>
 <a class="onitSkipLink" href="#mainContent">Skip to main content</a>
@@ -1246,7 +1246,7 @@ html.onitReduceMotion *,html.onitReduceMotion *::before,html.onitReduceMotion *:
 <script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-messaging-compat.js"></script>
-<script>const APP_VERSION='0.37.5';
+<script>const APP_VERSION='0.37.6';
 const UI_REVISION=37500;
 const DASHBOARD_UI_REVISION=37501;
 const DASHBOARD_UI_STORAGE_KEY='onit-dashboard-ui-state-v1';
@@ -2596,7 +2596,7 @@ async function toggleSoundPreference(box){const desired=!!box.checked;try{await 
 
 function renderDataPage(){const datasets=backendAccess(),admin=document.getElementById('dataAdmin'),toolbar=document.getElementById('dataToolbar'),viewer=document.getElementById('dataViewer');admin.innerHTML=isOwner()?ownerAccessAdminMarkup():'';toolbar.innerHTML=datasets.map(n=>`<button class='${activeBackendDataset===n?'active':''}' onclick="loadBackendDataset('${n}')">${escapeHTML(n.replaceAll('_',' '))}</button>`).join('');hydrateProfilePhotos();if(!datasets.length){viewer.innerHTML=`<div class='empty'>No backend data access has been granted to this account.</div>`;return}if(activeBackendDataset&&!datasets.includes(activeBackendDataset))activeBackendDataset='';if(!activeBackendDataset)viewer.innerHTML=`<div class='empty'>Choose a data area above. Access is read-only. CD, DCD and MD can download directly; other staff need one approval from any one of them.</div>`}
 function ownerAccessAdminMarkup(){return `<div class='morecard' style='margin-bottom:14px'><h3>DATA ACCESS CONTROL <span class='ownerBadge'>OWNER ONLY</span></h3><div class='bigTiny'>Search by first name, surname, initials or email, then manage backend data and workstation tabs. Typing one letter immediately loads matching names.</div><div class='searchbar'><input id='accessEmail' type='search' placeholder='Search staff name, initials or email' value='${escapeHTML(selectedAccessEmail)}' autocomplete='off' oninput='renderAccessStaffMatches(this.value)' onkeydown="if(event.key==='Enter'){event.preventDefault();loadAccessTarget()}"><button class='secondary' onclick='loadAccessTarget()'>LOAD STAFF</button></div><div id='accessSearchResults' class='staffSearchResults'></div><div id='accessTargetPanel'>${selectedAccessEmail?renderAccessTargetMarkup(selectedAccessEmail):`<div class='empty'>No staff member selected.</div>`}</div></div><div class='morecard' style='margin-bottom:14px'><h3>TEAM LEAD CONTROL <span class='ownerBadge'>OWNER ONLY</span></h3><div class='bigTiny'>Team Lead status is operational only. It does not appear as a title on the member’s profile. A Team Lead reviews work from their own department before CD/DCD final approval.</div><input class='staffFinderInput' type='search' placeholder='Search team lead candidates by name or initials' oninput="filterStaffOptionList('teamLeadAdminList',this.value)"><div id='teamLeadAdminList' class='teamLeadAdmin'>${teamLeadAdminMarkup()}</div></div>`}
-function renderAccessTargetMarkup(ref){const u=accessDirectory.find(x=>String(rowVal(x,'Email')).toLowerCase()===String(ref).toLowerCase()||String(rowVal(x,'User ID')).toLowerCase()===String(ref).toLowerCase());if(!u)return `<div class='empty'>No ONIT member found for that search.</div>`;const uid=rowVal(u,'User ID'),person=`<div class='profileRow'><div class='avatar' data-avatar-user='${escapeHTML(uid)}'>${escapeHTML(initials(rowVal(u,'Full Name')))}</div><div><b>${escapeHTML(rowVal(u,'Full Name'))}</b><div class='bigTiny'>${escapeHTML(rowVal(u,'Email'))} • ${escapeHTML(departmentOf(u))} • ${escapeHTML(positionOf(u))} • ${escapeHTML(rowVal(u,'Status'))}</div></div></div>`;if(permissionProfile(u)==='ORG_OWNER')return `<div class='accessTarget'>${person}<div class='bigTiny'>System Owner always has full backend access.</div></div>`;const current=String(rowVal(u,'Backend Data Access')||'').toUpperCase().split(',').map(x=>x.trim()).filter(Boolean),tabOverrides=workstationTabOverrides(u);return `<div class='accessTarget'>${person}<div class='accessGrid'>${BACKEND_DATASETS.map(n=>`<label class='accessCheck'><input type='checkbox' data-backend-access='${n}' ${current.includes(n)?'checked':''}> ${escapeHTML(n.replaceAll('_',' '))}</label>`).join('')}</div><div class='actions'><button class='new' onclick='saveBackendAccess()'>SAVE DATA ACCESS</button><button class='secondary' onclick='clearBackendAccessChecks()'>CLEAR ALL</button></div><div style='height:1px;background:#eee;margin:18px 0'></div><h3>WORKSTATION TABS <span class='ownerBadge'>OWNER ONLY</span></h3><div class='bigTiny'>Existing staff keep their normal workstation by default. Choose HIDE to remove a tab for this person, SHOW to explicitly restore it, or DEFAULT to follow ONIT's normal role/module rules. Home and Settings always remain available. Showing Data, Cases or Activation does not bypass their separate backend permission.</div><div class='accessGrid' style='margin-top:12px'>${WORKSTATION_TAB_DEFS.map(([key,label])=>`<label class='accessCheck' style='display:flex;justify-content:space-between;align-items:center;gap:8px'><span>${escapeHTML(label)}</span><select data-workstation-tab='${key}' style='max-width:120px;padding:7px;border:1px solid #ddd;border-radius:8px'><option value='' ${tabOverrides[key]===undefined?'selected':''}>DEFAULT</option><option value='show' ${tabOverrides[key]===true?'selected':''}>SHOW</option><option value='hide' ${tabOverrides[key]===false?'selected':''}>HIDE</option></select></label>`).join('')}</div><div class='actions'><button class='new' onclick='saveWorkstationTabs()'>SAVE WORKSTATION TABS</button><button class='secondary' onclick='resetWorkstationTabs()'>RESET TO DEFAULT</button></div></div>`}
+function renderAccessTargetMarkup(ref){const u=accessDirectory.find(x=>String(rowVal(x,'Email')).toLowerCase()===String(ref).toLowerCase()||String(rowVal(x,'User ID')).toLowerCase()===String(ref).toLowerCase());if(!u)return `<div class='empty'>No ONIT member found for that search.</div>`;const uid=rowVal(u,'User ID'),person=`<div class='profileRow'><div class='avatar' data-avatar-user='${escapeHTML(uid)}'>${escapeHTML(initials(rowVal(u,'Full Name')))}</div><div><b>${escapeHTML(rowVal(u,'Full Name'))}</b><div class='bigTiny'>${escapeHTML(rowVal(u,'Email'))} • ${escapeHTML(departmentOf(u))} • ${escapeHTML(positionOf(u))} • ${escapeHTML(rowVal(u,'Status'))}</div></div></div>`;if(permissionProfile(u)==='ORG_OWNER')return `<div class='accessTarget'>${person}<div class='bigTiny'>System Owner always has full backend access.</div></div>`;const current=String(rowVal(u,'Backend Data Access')||'').toUpperCase().split(',').map(x=>x.trim()).filter(Boolean),tabOverrides=workstationTabOverrides(u);return `<div class='accessTarget'>${person}<div class='accessGrid'>${BACKEND_DATASETS.map(n=>`<label class='accessCheck'><input type='checkbox' data-backend-access='${n}' ${current.includes(n)?'checked':''}> ${escapeHTML(n.replaceAll('_',' '))}</label>`).join('')}</div><div class='actions'><button class='new' onclick='saveBackendAccess()'>SAVE DATA ACCESS</button><button class='secondary' onclick='clearBackendAccessChecks()'>CLEAR ALL</button></div><div style='height:1px;background:#eee;margin:18px 0'></div><h3>WORKSTATION TABS <span class='ownerBadge'>OWNER ONLY</span></h3><div class='bigTiny'><b>Nothing changes until you save.</b> Checked means the tab remains available to this staff member; uncheck a tab to quietly remove it. Re-checking restores/adds it. Existing staff are not changed by this update. Home and Settings always remain available. Data, Cases and Activation still require their separate security permission.</div><div class='accessGrid' style='margin-top:12px'>${WORKSTATION_TAB_DEFS.map(([key,label])=>`<label class='accessCheck'><input type='checkbox' data-workstation-tab='${key}' ${tabOverrides[key]===false?'':'checked'}> ${escapeHTML(label)}</label>`).join('')}</div><div class='actions'><button class='new' onclick='saveWorkstationTabs()'>SAVE WORKSTATION</button><button class='secondary' onclick='restoreWorkstationDefaults()'>RESTORE ONIT DEFAULTS</button></div></div>`}
 function teamLeadAdminMarkup(){const rows=(accessDirectory||[]).filter(u=>String(rowVal(u,'Status')).toLowerCase()==='active'&&permissionProfile(u)!=='ORG_OWNER').sort((a,b)=>String(rowVal(a,'Department')).localeCompare(String(rowVal(b,'Department')))||String(rowVal(a,'Full Name')).localeCompare(String(rowVal(b,'Full Name'))));if(!rows.length)return `<div class='empty'>No active staff accounts yet.</div>`;return rows.map(u=>{const rawId=rowVal(u,'User ID'),id=encodeURIComponent(rawId),on=truthy(rowVal(u,'Team Lead'));return `<div class='accessTarget' data-staff-option data-staff-user-id='${escapeHTML(rawId)}' data-staff-search='${staffSearchData(u)}' style='display:flex;justify-content:space-between;align-items:center;gap:12px'><div><b>${escapeHTML(rowVal(u,'Full Name'))}</b><div class='bigTiny'>${escapeHTML(rowVal(u,'Department')||'—')} • ${escapeHTML(rowVal(u,'Position')||'—')}${rowVal(u,'Email')?' • '+escapeHTML(rowVal(u,'Email')):''}</div></div><button class='secondary' onclick="toggleTeamLead('${id}',${on?'false':'true'})">${on?'REMOVE TEAM LEAD':'MAKE TEAM LEAD'}</button></div>`}).join('')}
 async function toggleTeamLead(encodedId,enabled){if(!isOwner())return onitAlert('Only the System Owner can assign Team Leads.');const id=decodeURIComponent(encodedId);try{setBusy(true);await apiPost('setTeamLead',{targetUserId:id,enabled:!!enabled});await loadFromGoogle(true);renderDataPage();showToast('Team Lead updated',enabled?'The member is now part of the first approval stage.':'Team Lead responsibility removed.')}catch(e){onitAlert('Could not update Team Lead. '+e.message)}finally{setBusy(false)}}
 function renderAccessStaffMatches(query){const host=document.getElementById('accessSearchResults');if(!host)return;const q=String(query||'').trim();if(!q){host.innerHTML='';return}const matches=rankedStaffMatches(accessDirectory,q,10);host.innerHTML=matches.length?matches.map(u=>`<button type='button' class='staffSearchResult' onclick="selectAccessStaff('${encodeURIComponent(rowVal(u,'User ID'))}')"><span class='avatar'>${escapeHTML(initials(rowVal(u,'Full Name')))}</span><span><b>${escapeHTML(rowVal(u,'Full Name'))}</b><small>${escapeHTML(positionOf(u)||departmentOf(u)||'Staff')}${rowVal(u,'Email')?' • '+escapeHTML(rowVal(u,'Email')):''}</small></span></button>`).join(''):`<div class='staffSearchHint'>No staff match “${escapeHTML(q)}”.</div>`}
@@ -2604,8 +2604,8 @@ function selectAccessStaff(encodedId){const id=decodeURIComponent(encodedId||'')
 function loadAccessTarget(){const raw=(document.getElementById('accessEmail')?.value||'').trim(),exact=(accessDirectory||[]).find(u=>String(rowVal(u,'Email')).toLowerCase()===raw.toLowerCase()||String(rowVal(u,'Full Name')).toLowerCase()===raw.toLowerCase());if(exact)return selectAccessStaff(encodeURIComponent(rowVal(exact,'User ID')));const matches=rankedStaffMatches(accessDirectory,raw,10);if(matches.length===1)return selectAccessStaff(encodeURIComponent(rowVal(matches[0],'User ID')));renderAccessStaffMatches(raw);const panel=document.getElementById('accessTargetPanel');if(panel)panel.innerHTML=matches.length?`<div class='empty'>Choose the correct staff member from the matching names above.</div>`:`<div class='empty'>No ONIT staff member matches that name, initials or email.</div>`}
 function clearBackendAccessChecks(){document.querySelectorAll('[data-backend-access]').forEach(x=>x.checked=false)}
 async function saveBackendAccess(){if(!isOwner())return onitAlert('Only the System Owner can change backend data access.');const target=accessDirectory.find(x=>String(rowVal(x,'Email')).toLowerCase()===selectedAccessEmail||String(rowVal(x,'User ID')).toLowerCase()===String(selectedAccessEmail).toLowerCase());if(!target)return onitAlert('Load a valid staff member first.');if(!rowVal(target,'Email'))return onitAlert('Add a work email to this staff account before granting backend data access.');const datasets=[...document.querySelectorAll('[data-backend-access]:checked')].map(x=>x.dataset.backendAccess);try{setBusy(true);await apiPost('setBackendDataAccess',{targetEmail:selectedAccessEmail,datasets});clearUiDirty('data');await loadFromGoogle(true);selectedAccessEmail=rowVal(target,'Email')?String(rowVal(target,'Email')).toLowerCase():String(rowVal(target,'User ID'));renderDataPage();showToast('Data access updated',`${rowVal(target,'Full Name')} can view ${datasets.length?datasets.join(', '):'no backend datasets'}.`)}catch(e){onitAlert('Could not update data access. '+e.message)}finally{setBusy(false)}}
-async function saveWorkstationTabs(){if(!isOwner())return onitAlert('Only the System Owner can change Workstation Tabs.');const target=accessDirectory.find(x=>String(rowVal(x,'Email')).toLowerCase()===selectedAccessEmail||String(rowVal(x,'User ID')).toLowerCase()===String(selectedAccessEmail).toLowerCase());if(!target)return onitAlert('Load a valid staff member first.');const overrides={};document.querySelectorAll('[data-workstation-tab]').forEach(el=>{if(el.value==='show')overrides[el.dataset.workstationTab]=true;else if(el.value==='hide')overrides[el.dataset.workstationTab]=false});try{setBusy(true);await apiPost('setWorkstationTabs',{targetUserId:rowVal(target,'User ID'),overrides});await loadFromGoogle(true);selectedAccessEmail=rowVal(target,'Email')?String(rowVal(target,'Email')).toLowerCase():String(rowVal(target,'User ID'));renderDataPage();showToast('Workstation updated',`${rowVal(target,'Full Name')}'s tab access has been saved.`)}catch(e){onitAlert('Could not update workstation tabs. '+e.message)}finally{setBusy(false)}}
-function resetWorkstationTabs(){document.querySelectorAll('[data-workstation-tab]').forEach(el=>el.value='');showToast('Workstation tabs','All tab controls are set back to DEFAULT. Click SAVE WORKSTATION TABS to apply.')}
+async function saveWorkstationTabs(){if(!isOwner())return onitAlert('Only the System Owner can change Workstation Tabs.');const target=accessDirectory.find(x=>String(rowVal(x,'Email')).toLowerCase()===selectedAccessEmail||String(rowVal(x,'User ID')).toLowerCase()===String(selectedAccessEmail).toLowerCase());if(!target)return onitAlert('Load a valid staff member first.');const overrides={};document.querySelectorAll('[data-workstation-tab]').forEach(el=>{overrides[el.dataset.workstationTab]=!!el.checked});try{setBusy(true);await apiPost('setWorkstationTabs',{targetUserId:rowVal(target,'User ID'),overrides});await loadFromGoogle(true);selectedAccessEmail=rowVal(target,'Email')?String(rowVal(target,'Email')).toLowerCase():String(rowVal(target,'User ID'));renderDataPage();showToast('Workstation updated',`${rowVal(target,'Full Name')}'s workstation tabs are now updated.`)}catch(e){onitAlert('Could not update workstation tabs. '+e.message)}finally{setBusy(false)}}
+async function restoreWorkstationDefaults(){if(!isOwner())return onitAlert('Only the System Owner can change Workstation Tabs.');const target=accessDirectory.find(x=>String(rowVal(x,'Email')).toLowerCase()===selectedAccessEmail||String(rowVal(x,'User ID')).toLowerCase()===String(selectedAccessEmail).toLowerCase());if(!target)return onitAlert('Load a valid staff member first.');try{setBusy(true);await apiPost('setWorkstationTabs',{targetUserId:rowVal(target,'User ID'),overrides:{}});await loadFromGoogle(true);selectedAccessEmail=rowVal(target,'Email')?String(rowVal(target,'Email')).toLowerCase():String(rowVal(target,'User ID'));renderDataPage();showToast('ONIT defaults restored',`${rowVal(target,'Full Name')}'s workstation is following the normal ONIT defaults again.`)}catch(e){onitAlert('Could not restore workstation defaults. '+e.message)}finally{setBusy(false)}}
 async function loadBackendDataset(name){if(!backendAccess().includes(name))return onitAlert('You do not have access to '+name+'.');activeBackendDataset=name;renderDataPage();const viewer=document.getElementById('dataViewer');viewer.innerHTML=`<div class='loadingState'>Loading ${escapeHTML(name)}…</div>`;try{const res=await apiPost('getBackendDataset',{dataset:name}),d=res.data||res,cols=d.columns||[],rows=d.rows||[];const shown=rows.slice(0,250),management=!!exportApprovalRole(),buttonLabel=management?'DOWNLOAD BRANDED PDF':'REQUEST PDF DOWNLOAD',policy=management?'As CD, DCD or MD, you may download datasets already granted to your account without a separate approval.':'PDF downloads are branded by ONIT. One approval from any CD, DCD or MD releases the PDF.';viewer.innerHTML=`<div class='hello dataViewerHead' style='align-items:center'><div class='bigTiny'><b>${escapeHTML(name.replaceAll('_',' '))}</b> • ${rows.length} row(s) • Read only${rows.length>250?' • Showing first 250 rows':''}</div><button class='secondary' onclick="requestPdfExport('${name}')">${buttonLabel}</button></div><div class='dataSensitive'>${escapeHTML(policy)}</div><div class='dataTableWrap'><table class='dataTable'><thead><tr>${cols.map(c=>`<th>${escapeHTML(c)}</th>`).join('')}</tr></thead><tbody>${shown.map(r=>`<tr>${cols.map(c=>`<td title='${escapeHTML(rowVal(r,c))}'>${escapeHTML(rowVal(r,c))}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;renderDataPageToolbarOnly()}catch(e){viewer.innerHTML=`<div class='empty dangerText'>Could not load ${escapeHTML(name)}: ${escapeHTML(e.message)}</div>`}}
 function renderDataPageToolbarOnly(){const toolbar=document.getElementById('dataToolbar'),datasets=backendAccess();toolbar.innerHTML=datasets.map(n=>`<button class='${activeBackendDataset===n?'active':''}' onclick="loadBackendDataset('${n}')">${escapeHTML(n.replaceAll('_',' '))}</button>`).join('')}
 
@@ -2947,20 +2947,20 @@ async function boot(){
 }
 document.addEventListener('DOMContentLoaded',()=>boot(),{once:true});
 </script>
-<script src="./dialog-system.js?v=0.37.5"></script>
-<script src="./authority-engine.js?v=0.37.5"></script>
-<script src="./sync-engine.js?v=0.37.5"></script>
-<script src="./release-guard.js?v=0.37.5"></script>
-<script src="./command-palette.js?v=0.37.5"></script>
-<script src="./autocare-module.js?v=0.37.5"></script>
-<script src="./cases-module.js?v=0.37.5"></script>
-<script src="./activation-command.js?v=0.37.5"></script>
-<script src="./ideas-dump.js?v=0.37.5"></script>
-<script src="./pulse-module.js?v=0.37.5"></script>
-<script src="./assist-traffic-module.js?v=0.37.5"></script>
-<script src="./core-intelligence.js?v=0.37.5"></script>
-<script src="./rewards-module.js?v=0.37.5"></script>
-<script src="./attention-loop.js?v=0.37.5"></script>
+<script src="./dialog-system.js?v=0.37.6"></script>
+<script src="./authority-engine.js?v=0.37.6"></script>
+<script src="./sync-engine.js?v=0.37.6"></script>
+<script src="./release-guard.js?v=0.37.6"></script>
+<script src="./command-palette.js?v=0.37.6"></script>
+<script src="./autocare-module.js?v=0.37.6"></script>
+<script src="./cases-module.js?v=0.37.6"></script>
+<script src="./activation-command.js?v=0.37.6"></script>
+<script src="./ideas-dump.js?v=0.37.6"></script>
+<script src="./pulse-module.js?v=0.37.6"></script>
+<script src="./assist-traffic-module.js?v=0.37.6"></script>
+<script src="./core-intelligence.js?v=0.37.6"></script>
+<script src="./rewards-module.js?v=0.37.6"></script>
+<script src="./attention-loop.js?v=0.37.6"></script>
 </body>
 </html>
 
