@@ -23,10 +23,10 @@ const FIREBASE_CONFIG={apiKey:'AIzaSyAmpqFDMfo6zAorD-f14hTQnSNFDFU6VHM',authDoma
 let messaging=null;
 try{firebase.initializeApp(FIREBASE_CONFIG);messaging=firebase.messaging();}catch(e){}
 
-const UI_VERSION='0.38.0';
-const UI_REVISION=38000;
-const DASHBOARD_UI_REVISION=38001;
-const CACHE='onit-v0.38.0-universal-workstations';
+const UI_VERSION='0.38.1';
+const UI_REVISION=38100;
+const DASHBOARD_UI_REVISION=38101;
+const CACHE='onit-v0.38.1-safe-update-manager';
 const STATIC=['./offline.html','./manifest.webmanifest','./icons/icon-192.png','./icons/icon-512.png','./icons/apple-touch-icon.png','./assets/onit-logo-horizontal.png','./assets/onit-logo-full.png','./icons/favicon-32.png','./cases-module.css','./cases-module.js','./activation-command.css','./activation-command.js','./ideas-dump.css','./ideas-dump.js','./visual-contrast.css','./pulse-module.css','./pulse-module.js','./assist-traffic-module.css','./assist-traffic-module.js','./core-intelligence.css','./core-intelligence.js','./autocare-module.css','./autocare-module.js','./authority-engine.js','./sync-engine.js','./release-guard.js','./command-palette.css','./command-palette.js','./dialog-system.css','./dialog-system.js','./attention-loop.css','./attention-loop.js','./rewards-module.css','./rewards-module.js','./ui-system.css','./ui-system.js'];
 
 // Notification+data messages are displayed automatically by FCM in the background.
@@ -48,8 +48,8 @@ async function cacheFreshStatic(){
   }
 }
 self.addEventListener('install',event=>{event.waitUntil(cacheFreshStatic())});
-self.addEventListener('activate',event=>{event.waitUntil((async()=>{const keys=await caches.keys();await Promise.all(keys.filter(k=>k.startsWith('onit-')&&k!==CACHE).map(k=>caches.delete(k)));try{if(self.registration.navigationPreload)await self.registration.navigationPreload.disable()}catch(e){}})())});
-self.addEventListener('message',event=>{const d=event.data||{};if(d.type==='AUTOCARE_REFRESH_STATIC')event.waitUntil(cacheFreshStatic())});
+self.addEventListener('activate',event=>{event.waitUntil((async()=>{const keys=await caches.keys();await Promise.all(keys.filter(k=>k.startsWith('onit-')&&k!==CACHE).map(k=>caches.delete(k)));try{if(self.registration.navigationPreload)await self.registration.navigationPreload.disable()}catch(e){}try{await clients.claim()}catch(e){}})())});
+self.addEventListener('message',event=>{const d=event.data||{};if(d.type==='AUTOCARE_REFRESH_STATIC')event.waitUntil(cacheFreshStatic());if(d.type==='ONIT_ACTIVATE_UPDATE')event.waitUntil((async()=>{try{await cacheFreshStatic()}catch(e){}await self.skipWaiting()})())});
 self.addEventListener('fetch',event=>{
   const req=event.request;if(req.method!=='GET')return;const url=new URL(req.url);if(url.origin!==self.location.origin)return;
   const path=url.pathname.toLowerCase();

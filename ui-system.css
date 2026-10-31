@@ -204,3 +204,17 @@ button{line-height:1.2;white-space:normal}
   .card,.morecard,.memoryResult,.trafficQueueCard{padding-left:14px!important;padding-right:14px!important}
   .actions>.new,.actions>.secondary,.trafficActions>.new,.trafficActions>.secondary{width:100%;flex-basis:100%}
 }
+
+
+/* ONIT safe release manager */
+.onitUpdateNotice{position:fixed;z-index:1000000;right:20px;bottom:20px;width:min(430px,calc(100vw - 32px));filter:drop-shadow(0 22px 50px rgba(0,0,0,.22))}
+.onitUpdateNotice.hidden{display:none!important}
+.onitUpdateCard{background:#171717;color:#fff;border:1px solid #34312e;border-radius:20px;padding:18px;box-shadow:0 24px 60px rgba(0,0,0,.28)}
+.onitUpdateKicker{font-size:10px;font-weight:900;letter-spacing:.15em;color:#ff7a48;margin-bottom:7px}
+.onitUpdateTitle{font-size:20px;font-weight:900;line-height:1.1;color:#fff!important}
+.onitUpdateCopy{margin-top:8px;color:#d6d2cc!important;font-size:13px;line-height:1.5}
+.onitUpdateActions{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+.onitUpdateActions button{min-height:44px;flex:1 1 140px}
+.onitUpdateActions .secondary{background:#292826!important;color:#fff!important;border-color:#55514d!important;-webkit-text-fill-color:#fff!important}
+.onitUpdateActions button:disabled{opacity:.62;cursor:not-allowed}
+@media(max-width:620px){.onitUpdateNotice{left:16px;right:16px;bottom:92px;width:auto}.onitUpdateCard{border-radius:18px}.onitUpdateActions button{flex-basis:100%}}
