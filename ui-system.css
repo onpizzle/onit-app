@@ -1,4 +1,4 @@
-/* ONIT UI System v1.0.0 — production-grade shared frontend primitives */
+/* ONIT UI System v1.1.0 — production-grade shared frontend primitives */
 :root{
   --onit-bg:#f5f5f3;
   --onit-surface:#ffffff;
@@ -72,3 +72,135 @@ button:disabled,[aria-disabled="true"]{cursor:not-allowed!important;opacity:.5!i
 }
 @media(max-width:480px){.row,.detailMeta{grid-template-columns:1fr!important}.onitUIState{align-items:flex-start}.onitUIStateIcon{width:32px;height:32px}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.new,.secondary,.mini,.back,.linkbtn,.tabs button,.filterRow button{transition:none!important}.onitUISpinner{animation:none!important}.onitConfettiLayer{display:none!important}}
+
+
+/* =============================================================
+   ONIT v0.38.0 — Universal Workstation Consistency Layer
+   Applies to every role without changing permissions/workflows.
+   ============================================================= */
+:root{
+  --onit-dark:#171717;
+  --onit-dark-2:#242321;
+  --onit-dark-text:#ffffff;
+  --onit-dark-muted:#d0cdc7;
+  --onit-page-gap:24px;
+}
+
+/* Shell and typography consistency */
+.main{padding:30px clamp(22px,3vw,36px)!important}
+.main h1,.main h2,.main h3,.main b,.main strong{overflow-wrap:anywhere}
+.hello{margin-bottom:18px}
+.hello h1{letter-spacing:-.035em;line-height:1.05}
+.section{margin-top:var(--onit-page-gap)!important}
+.actions{align-items:center}
+.actions button{max-width:100%}
+.reportTable,.activationTable{max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}
+
+/* Light surfaces: principal text stays dark. */
+.card,.morecard,.dashboardPanel,.memoryResult,.memorySourceStat,.trafficQueueCard,
+.brandCardBody,.brandPortfolioMetric,.commandMetric,.commandAction,.commandSection,
+.activationCard,.activationPanel,.activationStat,.ideasPanel,.ideasPattern,.ideasOpportunity,
+.ideasSignal,.ideasStat,.ideasCompose,.pulseCard,.notifPanel,.modalBox{
+  color:var(--onit-text)!important;
+}
+
+/* Dark/strong surfaces: typography is always readable. */
+.memoryHero,.brandCardTop,.brandModalIntel,.commandLaunch,.commandCenterTop,
+.activationHero,.ideasHero,.buzzerHero,.buzzerPopupTop,.workReplayHero,.workReplayShell,
+.workReplayStat,.radarMorning,.onitRadarDark,.radarShell,.v030AssistHero,.caseHeroPreview,
+.caseScore,.toast,.systemMaintenanceBanner,.onitSyncChip,.stagingInstallRetired{
+  color:var(--onit-dark-text)!important;
+}
+.memoryHero :is(h1,h2,h3,h4,p,b,strong,span,small,label),
+.brandCardTop :is(h1,h2,h3,h4,p,b,strong,span,small,label),
+.brandModalIntel :is(h1,h2,h3,h4,p,b,strong,span,small,label),
+.commandLaunch :is(h1,h2,h3,h4,p,b,strong,span,small,label),
+.commandCenterTop :is(h1,h2,h3,h4,p,b,strong,span,small,label),
+.activationHero :is(h1,h2,h3,h4,p,b,strong,span,small,label),
+.ideasHero :is(h1,h2,h3,h4,p,b,strong,span,small,label),
+.buzzerHero :is(h1,h2,h3,h4,p,b,strong,span,small,label),
+.buzzerPopupTop :is(h1,h2,h3,h4,p,b,strong,span,small,label),
+.workReplayHero :is(h1,h2,h3,h4,p,b,strong,span,small,label),
+.workReplayShell :is(h1,h2,h3,h4,p,b,strong,span,small,label),
+.radarShell :is(h1,h2,h3,h4,p,b,strong,span,small,label),
+.v030AssistHero :is(h1,h2,h3,h4,p,b,strong,span,small,label),
+.caseHeroPreview :is(h1,h2,h3,h4,p,b,strong,span,small,label),
+.toast :is(h1,h2,h3,h4,p,b,strong,span,small,label),
+.systemMaintenanceBanner :is(h1,h2,h3,h4,p,b,strong,span,small,label){
+  color:var(--onit-dark-text)!important;
+}
+.memoryHero p,.commandCenterTop p,.brandCardClient,.brandModalIntel span,
+.radarShell .radarSub,.radarShell .radarCard p,.workReplayShell .muted{
+  color:var(--onit-dark-muted)!important;
+}
+.memoryHero .memoryEyebrow,.commandCenterTop .commandKicker{color:#ff8a5c!important}
+.systemMaintenanceBanner b{color:#ff8a5c!important}
+
+/* Light controls placed inside dark surfaces must stay dark-on-light. */
+.memoryHero input,.memoryHero select,.memoryHero textarea,
+.commandLaunch button,.commandCenterTop button,.brandCardTop .brandCompleteness,
+.brandCardTop .brandCompleteness *,.radarShell .radarAction,.radarShell .radarAction *,
+.radarShell .morningStartBtn,.radarShell .morningStartBtn *,
+.stagingInstallRetired button,.stagingInstallRetired button *{
+  background:#fff!important;color:#171717!important;border-color:#fff!important;
+  -webkit-text-fill-color:#171717!important;
+}
+.memoryHero .memorySearchBtn,.memoryHero .memorySearchBtn *{
+  background:#ff7b43!important;color:#fff!important;border-color:#ff7b43!important;
+  -webkit-text-fill-color:#fff!important;
+}
+.memoryHero .memoryRefresh,.memoryHero .memoryRefresh *{
+  background:#262522!important;color:#fff!important;border-color:#55514c!important;
+  -webkit-text-fill-color:#fff!important;
+}
+.memoryHero .memoryPrompt button,.memoryHero .memoryPrompt button *{
+  background:transparent!important;color:#dedbd6!important;border-color:#5a5650!important;
+  -webkit-text-fill-color:#dedbd6!important;
+}
+.radarShell .radarIgnore,.radarShell .radarIgnore *{
+  background:transparent!important;color:#d0cdc7!important;border-color:#55534f!important;
+  -webkit-text-fill-color:#d0cdc7!important;
+}
+
+/* Prevent legacy !important rules from creating invisible button labels. */
+button{line-height:1.2;white-space:normal}
+.new,.nav button.active,.tabs button.active,.filterRow button.active,.dataToolbar button.active,
+.authTabs button.active,.memoryFilters button.active,.pulseTabs button.active,.casesSubnav button.active,
+.activationSubnav button.active,.ideasTabs button.active,.v030AssistTabs button.active,
+.v031TrafficModes button.active,.buzzerBtn,.primaryBuzzResponse,.onitDialogBtn.primary{
+  -webkit-text-fill-color:#fff!important;
+}
+.secondary,.mini,.back,.linkbtn{ -webkit-text-fill-color:currentColor }
+
+/* Role/workstation card consistency */
+.stats,.brandPortfolioSummary,.commandMetricGrid{align-items:stretch}
+.card,.morecard,.brandPortfolioMetric,.memorySourceStat,.commandMetric,.commandAction,.commandSection,
+.trafficQueueCard,.brandCard,.memoryResult{box-shadow:0 4px 16px rgba(17,17,17,.035)}
+.card h2,.card h3,.morecard h3,.commandSection h3{line-height:1.2}
+
+/* Safer responsive behaviour across all department workstations. */
+@media(max-width:1100px){
+  .stats{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  .commandMetricGrid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+}
+@media(max-width:820px){
+  .main{padding:18px 16px 110px!important}
+  .hello{gap:10px;align-items:flex-start}
+  .hello h1{font-size:26px!important}
+  .actions{width:100%}
+  .actions>.new,.actions>.secondary{flex:1 1 150px}
+  .searchbar{flex-wrap:wrap}
+  .searchbar input{flex:1 1 100%}
+  .searchbar button{flex:1 1 100%}
+  .memoryHero{padding:18px 16px!important}
+  .memoryHeroTop{gap:10px}
+  .memoryRefresh{width:100%;margin-top:12px!important}
+  .trafficActions button{min-width:0}
+  .reportTable,.activationTable{display:block;width:100%;overflow-x:auto}
+}
+@media(max-width:520px){
+  .stats,.commandMetricGrid,.brandPortfolioSummary{grid-template-columns:1fr!important}
+  .teamgrid,.moregrid{grid-template-columns:1fr!important}
+  .card,.morecard,.memoryResult,.trafficQueueCard{padding-left:14px!important;padding-right:14px!important}
+  .actions>.new,.actions>.secondary,.trafficActions>.new,.trafficActions>.secondary{width:100%;flex-basis:100%}
+}

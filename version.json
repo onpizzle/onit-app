@@ -1,8 +1,8 @@
 {
-  "version": "0.37.9",
-  "build": "0.37.9",
-  "uiRevision": 37900,
-  "dashboardUiRevision": 37901,
+  "version": "0.38.0",
+  "build": "0.38.0",
+  "uiRevision": 38000,
+  "dashboardUiRevision": 38001,
   "mandatoryUiSync": false,
   "universalDashboardUi": true,
   "authorityEngineVersion": "1.0.0",
@@ -12,8 +12,8 @@
   "dialogSystemVersion": "1.0.0",
   "workflowControlVersion": "1.0.0",
   "activationCommandVersion": "0.2.0",
-  "label": "ONIT Production UI System v1",
-  "releasedAt": "2026-10-31T09:30:00+01:00",
+  "label": "ONIT Universal Workstation Consistency",
+  "releasedAt": "2026-10-31T09:05:00+01:00",
   "ideasDumpVersion": "0.2.0",
   "visualContrastVersion": "1.0.3",
   "attentionLoopVersion": "0.1.2",
@@ -28,9 +28,10 @@
   "securityPreviewVersion": "1.0.0",
   "rewardsVersion": "1.0.2",
   "securityClickjackingVersion": "1.0.0",
-  "notes": "Introduces the shared ONIT production UI system: design tokens, reusable button/card/form/state/modal primitives, accessibility/focus rules, mobile control sizing, reduced-motion support, and shared Rewards/Data loading/error states. No backend or workflow changes.",
+  "notes": "Universal workstation consistency pass across all roles: fixes dark-surface contrast, invisible action labels, Memory/Command Center/Brand Portfolio dark panels, shared spacing and card hierarchy, and responsive action/grid/table behaviour. No backend, permission, tab, brief or workflow changes.",
   "staffSearchVersion": "1.0.0",
   "workstationTabControlVersion": "1.1.0",
   "commandCenterVersion": "1.0.1",
-  "uiSystemVersion": "1.0.0"
+  "uiSystemVersion": "1.1.0",
+  "workstationConsistencyVersion": "1.0.0"
 }

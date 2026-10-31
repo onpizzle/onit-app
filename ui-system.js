@@ -1,7 +1,7 @@
-/* ONIT UI System v1.0.0 — shared DOM primitives and state handling */
+/* ONIT UI System v1.1.0 — shared DOM primitives and state handling */
 (function(){
   'use strict';
-  const VERSION='1.0.0';
+  const VERSION='1.1.0';
   const iconFor=t=>({loading:'',error:'!',success:'✓',warning:'!',empty:'—',info:'i'}[t]||'i');
   const asElement=ref=>typeof ref==='string'?document.querySelector(ref):ref;
   function clear(el){while(el&&el.firstChild)el.removeChild(el.firstChild)}
