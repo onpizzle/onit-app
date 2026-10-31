@@ -218,3 +218,29 @@ button{line-height:1.2;white-space:normal}
 .onitUpdateActions .secondary{background:#292826!important;color:#fff!important;border-color:#55514d!important;-webkit-text-fill-color:#fff!important}
 .onitUpdateActions button:disabled{opacity:.62;cursor:not-allowed}
 @media(max-width:620px){.onitUpdateNotice{left:16px;right:16px;bottom:92px;width:auto}.onitUpdateCard{border-radius:18px}.onitUpdateActions button{flex-basis:100%}}
+
+
+/* ONIT v0.38.2 — Command Center operational feedback */
+.commandAction{position:relative;overflow:hidden;transition:border-color .16s ease,background-color .16s ease,box-shadow .16s ease,transform .16s ease}
+.commandAction:not(:disabled):active{transform:scale(.992)}
+.commandAction.running{border-color:#d89132!important;background:#fffaf1!important;box-shadow:0 0 0 3px rgba(216,145,50,.10)!important}
+.commandAction.completed{border-color:#b8d8c5!important}
+.commandAction.failed{border-color:#e1b4ae!important;background:#fff9f8!important}
+.commandActionTop{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.commandActionState{margin-top:12px;padding-top:10px;border-top:1px solid #ece8e1;display:grid;grid-template-columns:auto 1fr;column-gap:8px;row-gap:2px;align-items:center;min-height:32px}
+.commandActionState>span:not(.commandMiniSpinner){font-size:9px;font-weight:950;letter-spacing:.09em}
+.commandActionState small{grid-column:2;color:#706b64!important;font-size:10px;line-height:1.35;overflow-wrap:anywhere}
+.commandActionState.ready>span{color:#777}.commandActionState.running>span{color:#9c6508}.commandActionState.success>span{color:#177742}.commandActionState.error>span{color:#a92f27}
+.commandMiniSpinner{width:15px;height:15px;border-radius:50%;border:2px solid #d5d0c8;border-top-color:#171717;display:inline-block;animation:onitUISpin .72s linear infinite;flex:0 0 auto}
+.commandOperationBanner{display:flex;align-items:flex-start;gap:12px;padding:14px 16px;border:1px solid #e7c88e;background:#fff9ed;border-radius:14px;margin-bottom:12px;box-shadow:0 8px 22px rgba(18,18,18,.04)}
+.commandOperationBanner b{font-size:14px}.commandOperationBanner .bigTiny{margin-top:2px}
+.commandMaintenance{display:flex!important;align-items:center;justify-content:space-between;gap:12px}
+.commandModePill{flex:0 0 auto;min-width:48px;text-align:center;padding:6px 10px;border-radius:999px;font-size:10px;font-weight:950;letter-spacing:.09em;border:1px solid #cfcac2;background:#fff;color:#555}
+.commandModePill.on{background:#171717;color:#fff;border-color:#171717}.commandModePill.off{background:#eef7f1;color:#17643b;border-color:#bfd9c8}
+.commandActivityRow{display:grid;grid-template-columns:10px minmax(0,1fr) auto;gap:10px;align-items:start;padding:11px 0;border-top:1px solid #efebe5}
+.commandActivityRow:first-of-type{border-top:0}.commandActivityMark{width:8px;height:8px;margin-top:6px;border-radius:50%;background:#ff6537}.commandActivityRow b{font-size:13px}.commandActivityRow small{font-size:10px;color:#777}.commandActivityRow time{font-size:10px;color:#777;white-space:nowrap}
+.commandLoading{display:flex;align-items:center;justify-content:center;gap:10px}
+@media(max-width:800px){.commandActionState{grid-template-columns:auto minmax(0,1fr)}.commandActivityRow{grid-template-columns:8px minmax(0,1fr)}.commandActivityRow time{grid-column:2;white-space:normal}.commandMaintenance{align-items:flex-start}.commandOperationBanner{position:sticky;top:0;z-index:5}}
+@media(prefers-reduced-motion:reduce){.commandMiniSpinner{animation:none}}
+
+.commandAction.running:disabled{opacity:1!important}.commandAction:disabled:not(.running){opacity:.58!important}
