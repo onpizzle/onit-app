@@ -1,8 +1,8 @@
 {
-  "version": "0.37.6",
-  "build": "0.37.6",
-  "uiRevision": 37600,
-  "dashboardUiRevision": 37601,
+  "version": "0.37.7",
+  "build": "0.37.7",
+  "uiRevision": 37700,
+  "dashboardUiRevision": 37701,
   "mandatoryUiSync": false,
   "universalDashboardUi": true,
   "authorityEngineVersion": "1.0.0",
@@ -12,8 +12,8 @@
   "dialogSystemVersion": "1.0.0",
   "workflowControlVersion": "1.0.0",
   "activationCommandVersion": "0.2.0",
-  "label": "ONIT Workstation Checkbox Control + Staff Search + Rewards V1",
-  "releasedAt": "2026-10-30T15:20:00+01:00",
+  "label": "ONIT System Owner Command Center + Workstation Control + Rewards V1",
+  "releasedAt": "2026-10-30T16:20:00+01:00",
   "ideasDumpVersion": "0.2.0",
   "visualContrastVersion": "1.0.3",
   "attentionLoopVersion": "0.1.2",
@@ -28,7 +28,8 @@
   "securityPreviewVersion": "1.0.0",
   "rewardsVersion": "1.0.0",
   "securityClickjackingVersion": "1.0.0",
-  "notes": "System Owner workstation tab checkbox control; deployment changes no staff automatically. Includes staff search, Rewards V1 and security hardening.",
+  "notes": "System Owner Command Center: health diagnostics, Error Center, Safe Repair, workstation repair, Maintenance Mode, controlled Recovery Mode, live activity and release status. Existing staff workstations remain unchanged.",
   "staffSearchVersion": "1.0.0",
-  "workstationTabControlVersion": "1.1.0"
+  "workstationTabControlVersion": "1.1.0",
+  "commandCenterVersion": "1.0.0"
 }
