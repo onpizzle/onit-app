@@ -1255,9 +1255,9 @@ html.onitReduceMotion *,html.onitReduceMotion *::before,html.onitReduceMotion *:
 <script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-messaging-compat.js"></script>
-<script>const APP_VERSION='0.38.3';
-const UI_REVISION=38300;
-const DASHBOARD_UI_REVISION=38301;
+<script>const APP_VERSION='0.38.4';
+const UI_REVISION=38400;
+const DASHBOARD_UI_REVISION=38401;
 const DASHBOARD_UI_STORAGE_KEY='onit-dashboard-ui-state-v1';
 window.ONIT_RUNTIME={version:APP_VERSION,uiRevision:UI_REVISION,dashboardUiRevision:DASHBOARD_UI_REVISION};
 const BACKEND_DATASETS=['USERS','CLIENTS','BRIEFS','ASSIGNMENTS','ITERATIONS','ACTIVITY_LOG','NOTIFICATIONS','REPORTS'];
@@ -2765,7 +2765,7 @@ function renderMore(){if(!currentUser)return;const names=backendAccess();let htm
   if(isOwner()||dashboardMode()==='LEADERSHIP'){html+=`<div class='morecard leadershipReportCard' style='grid-column:1/-1'><h3>LEADERSHIP OPERATIONS REPORT</h3><div class='bigTiny'>Download one current PDF covering workload, overdue jobs, review bottlenecks, turnaround time, Traffic pressure and department utilisation.</div><div class='actions'><button class='new' onclick='downloadLeadershipReport(this)'>DOWNLOAD LEADERSHIP REPORT</button></div></div>`}
   html+=dataExportRequestsMarkup();
   if(typeof autoCareMoreCardMarkup==='function')html+=autoCareMoreCardMarkup();
-  html+=isStagingEnvironment()?`<div class='morecard' style='grid-column:1/-1'><h3>STAGING • BROWSER ONLY</h3><div class='bigTiny'>This test environment cannot be installed as ONIT. Use it only in the browser. Install ONIT only from the current production Cloudflare Pages address.</div><div class='actions'><button class='secondary linkbtn' onclick="window.open(productionOnitUrl(),'_blank','noopener')">OPEN PRODUCTION ONIT</button></div></div>`:`<div class='morecard' style='grid-column:1/-1'><h3>INSTALL / UPDATE ONIT</h3><div class='bigTiny'>Install ONIT on this device for quick access. ONIT now detects published UI updates automatically and offers UPDATE NOW. It waits through unsaved work and active actions, and can apply safely when the workstation is idle or on normal close/reopen.</div><div class='actions'><button class='secondary linkbtn' onclick='installOnit()'>INSTALL ON THIS DEVICE</button><button class='secondary linkbtn' onclick='forceFrontendUpdate()'>CHECK / REPAIR UPDATE</button></div></div>`;
+  html+=isStagingEnvironment()?`<div class='morecard' style='grid-column:1/-1'><h3>STAGING • BROWSER ONLY</h3><div class='bigTiny'>This test environment cannot be installed as ONIT. Use it only in the browser. Install ONIT only from the current production Cloudflare Pages address.</div><div class='actions'><button class='secondary linkbtn' onclick="window.open(productionOnitUrl(),'_blank','noopener')">OPEN PRODUCTION ONIT</button></div></div>`:`<div class='morecard' style='grid-column:1/-1'><h3>INSTALL / UPDATE ONIT</h3><div class='bigTiny'>Install ONIT on this device for quick access. ONIT detects published UI updates automatically and always offers UPDATE NOW. If unsaved work or an active action exists, ONIT warns before reloading; automatic background updating still waits for a safe idle moment.</div><div class='actions'><button class='secondary linkbtn' onclick='installOnit()'>INSTALL ON THIS DEVICE</button><button class='secondary linkbtn' onclick='forceFrontendUpdate()'>CHECK / REPAIR UPDATE</button></div></div>`;
   html+=`<div class='morecard' style='grid-column:1/-1'><div class='streamlineAbout'><div><h3>ABOUT ONIT</h3><div class='bigTiny'>Frontend v${APP_VERSION} • Dashboard UI r${DASHBOARD_UI_REVISION} • Authority v1 • Sync v1 • Backend ${backendVersion||'checking…'}</div></div><button class='secondary linkbtn' onclick="showToast('ONIT','Work. People. Attention. Proof.')">VIEW DETAILS</button></div></div></div>`;document.getElementById('moreContent').innerHTML=html;hydrateProfilePhotos()}
 async function approvePending(id){
   const targetUserId=decodeURIComponent(id),target=pendingUsers.find(u=>String(rowVal(u,'User ID'))===String(targetUserId)),name=target?rowVal(target,'Full Name'):'The member';
@@ -2911,8 +2911,8 @@ function makeId(){return crypto.randomUUID?crypto.randomUUID():Array.from(crypto
 
 
 // ===== Safe frontend release manager =====
-// ONIT detects deployed UI releases automatically, but never reloads through unsaved work.
-// A release can be applied explicitly, after a safe idle window, or on normal close/reopen.
+// ONIT detects deployed UI releases automatically.
+// Manual UPDATE NOW is always available; automatic updating still waits for a safe idle window.
 const UI_NOTICE_KEY='onit-ui-notice-v4';
 const UI_EXPECTED_KEY='onit-ui-expected-version-v3';
 const UI_RELOAD_GUARD_KEY='onit-ui-reload-guard-v3';
@@ -2940,7 +2940,7 @@ function uiUpdateBlocker(){
 function uiSafeToUpdate(){return uiUpdateBlocker().safe}
 function uiUpdateStatusText(){return uiUpdateBlocker().detail}
 function ensureUiUpdateNotice(){let el=document.getElementById('onitUpdateNotice');if(el)return el;el=document.createElement('div');el.id='onitUpdateNotice';el.className='onitUpdateNotice hidden';el.setAttribute('role','dialog');el.setAttribute('aria-modal','false');el.setAttribute('aria-labelledby','onitUpdateTitle');el.innerHTML=`<div class="onitUpdateCard"><div class="onitUpdateKicker">ONIT UPDATE READY</div><div id="onitUpdateTitle" class="onitUpdateTitle">A newer ONIT interface is ready.</div><div id="onitUpdateState" class="onitUpdateState"></div><div id="onitUpdateCopy" class="onitUpdateCopy"></div><div class="onitUpdateActions"><button id="onitUpdateNowBtn" class="new" type="button" onclick="acceptUiUpdateSignal()">UPDATE NOW</button><button class="secondary" type="button" onclick="dismissUiUpdateNotice()">LATER</button></div></div>`;document.body.appendChild(el);return el}
-function showUiUpdateNotice(){if(!pendingFrontendRelease)return;const el=ensureUiUpdateNotice(),title=el.querySelector('#onitUpdateTitle'),state=el.querySelector('#onitUpdateState'),copy=el.querySelector('#onitUpdateCopy'),btn=el.querySelector('#onitUpdateNowBtn'),blocker=uiUpdateBlocker();if(title)title.textContent=`ONIT v${pendingFrontendVersion} is ready.`;if(state){state.textContent=blocker.label;state.dataset.state=blocker.code}if(copy)copy.textContent=blocker.detail;if(btn){btn.disabled=!blocker.safe;btn.textContent=blocker.safe?'UPDATE NOW':blocker.code==='sync'?'FINISHING SYNC…':blocker.code==='action'?'FINISHING ACTION…':blocker.code==='dialog'?'CLOSE DIALOG FIRST':'WAITING SAFELY'}el.classList.remove('hidden')}
+function showUiUpdateNotice(){if(!pendingFrontendRelease)return;const el=ensureUiUpdateNotice(),title=el.querySelector('#onitUpdateTitle'),state=el.querySelector('#onitUpdateState'),copy=el.querySelector('#onitUpdateCopy'),btn=el.querySelector('#onitUpdateNowBtn'),blocker=uiUpdateBlocker();if(title)title.textContent=`ONIT v${pendingFrontendVersion} is ready.`;if(state){state.textContent=blocker.label;state.dataset.state=blocker.code}if(copy)copy.textContent=blocker.safe?blocker.detail:`${blocker.detail} You can still choose UPDATE NOW; ONIT will confirm before reloading.`;if(btn){btn.disabled=uiUpdateInProgress;btn.textContent=uiUpdateInProgress?'UPDATING…':'UPDATE NOW'}el.classList.remove('hidden')}
 function hideUiUpdateNotice(){document.getElementById('onitUpdateNotice')?.classList.add('hidden')}
 function dismissUiUpdateNotice(){hideUiUpdateNotice();try{sessionStorage.setItem(UI_NOTICE_KEY,pendingFrontendVersion||'')}catch(e){}scheduleUiAutoUpdate()}
 function queueUiUpdate(release){if(!release||!remoteUiIsNewer(release))return false;pendingFrontendRelease=release;pendingFrontendVersion=String(release.version||'').trim();try{localStorage.setItem(UI_EXPECTED_KEY,pendingFrontendVersion);localStorage.setItem(UI_SIGNAL_KEY,JSON.stringify({version:pendingFrontendVersion,at:Date.now()}))}catch(e){}let dismissed='';try{dismissed=sessionStorage.getItem(UI_NOTICE_KEY)||''}catch(e){}if(dismissed!==pendingFrontendVersion)showUiUpdateNotice();scheduleUiAutoUpdate();return true}
@@ -2953,7 +2953,21 @@ async function activateWaitingWorker(reg){if(!reg)return false;await reg.update(
 async function performFrontendRefresh(mode='manual'){
   if(uiUpdateInProgress)return false;
   if(!pendingFrontendRelease){await checkFrontendRelease(true);if(!pendingFrontendRelease)return showToast('ONIT','You already have the latest interface.'),false}
-  if(!uiSafeToUpdate()){showUiUpdateNotice();if(mode==='manual')showToast('Update waiting safely','Finish or save the current action first. ONIT will not discard your work.');return false}
+  const blocker=uiUpdateBlocker();
+  if(mode!=='manual'&&!blocker.safe){showUiUpdateNotice();return false}
+  if(mode==='manual'&&!blocker.safe){
+    const warning=blocker.code==='dirty'
+      ?`${blocker.detail} Updating now may discard unsaved form changes.`
+      :blocker.code==='action'
+        ?`${blocker.detail} Updating now may interrupt the action currently being submitted.`
+        :blocker.code==='sync'
+          ?`${blocker.detail} Updating now will reload ONIT before this background sync finishes.`
+          :blocker.code==='dialog'
+            ?`${blocker.detail} Updating now will close the current dialog.`
+            :`${blocker.detail}`;
+    const proceed=await onitConfirm(`${warning}\n\nUpdate ONIT now anyway?`,{title:'Update ONIT now?',okLabel:'UPDATE NOW',cancelLabel:'KEEP WORKING'});
+    if(!proceed){showUiUpdateNotice();return false}
+  }
   uiUpdateInProgress=true;const target=pendingFrontendVersion||String(pendingFrontendRelease.version||'');try{localStorage.setItem(UI_EXPECTED_KEY,target);localStorage.setItem(UI_RELOAD_GUARD_KEY,JSON.stringify({from:APP_VERSION,to:target,at:Date.now(),mode}))}catch(e){}
   const btn=document.getElementById('onitUpdateNowBtn');if(btn){btn.disabled=true;btn.textContent='UPDATING…'}
   showToast('ONIT update','Applying the latest interface safely…');
