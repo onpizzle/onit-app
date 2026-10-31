@@ -1255,9 +1255,9 @@ html.onitReduceMotion *,html.onitReduceMotion *::before,html.onitReduceMotion *:
 <script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-messaging-compat.js"></script>
-<script>const APP_VERSION='0.38.2';
-const UI_REVISION=38200;
-const DASHBOARD_UI_REVISION=38201;
+<script>const APP_VERSION='0.38.3';
+const UI_REVISION=38300;
+const DASHBOARD_UI_REVISION=38301;
 const DASHBOARD_UI_STORAGE_KEY='onit-dashboard-ui-state-v1';
 window.ONIT_RUNTIME={version:APP_VERSION,uiRevision:UI_REVISION,dashboardUiRevision:DASHBOARD_UI_REVISION};
 const BACKEND_DATASETS=['USERS','CLIENTS','BRIEFS','ASSIGNMENTS','ITERATIONS','ACTIVITY_LOG','NOTIFICATIONS','REPORTS'];
@@ -1309,18 +1309,23 @@ try{if(typeof Notification!=='undefined'&&Notification.permission==='granted')pu
 let currentBuzzer=null,buzzerQueue=[];
 let audioReady=false,onitAudioContext=null,pendingBriefSoundIds=new Set(),pendingNotificationSound=false,currentDetailTab='brief';
 const uiDirtySections=new Set();
+const uiDirtyControls=new Map();
+const uiControlBaselines=new WeakMap();
 window.uiDirtySections=uiDirtySections;
+window.uiDirtyControls=uiDirtyControls;
 function uiSectionId(el){const s=el&&el.closest?el.closest('main>section'):null;return s?s.id:''}
-function markUiDirty(el){const id=uiSectionId(el);if(id)uiDirtySections.add(id)}
-function clearUiDirty(id){if(id)uiDirtySections.delete(id)}
-function uiSectionIsDirty(id){return uiDirtySections.has(id)}
-function transientUiControl(el){return !!el&&(el.id==='briefSearch'||el.id==='memorySearch'||el.id==='teamSort'||el.matches?.('[data-onit-transient]'))}
-function trackUiEdit(e){
-  const el=e.target;
-  if(!el||!el.matches||!el.matches('input, textarea, select'))return;
-  if(el.type==='button'||el.type==='submit'||el.type==='reset'||transientUiControl(el))return;
-  markUiDirty(el);
-}
+function uiSectionLabel(id){return({home:'Home',briefs:'Briefs / Approval',team:'Team',archive:'Archive',memory:'Memory',data:'Data',pulse:'Digital Pulse',ideas:'Ideas Dump',activation:'Activation',cases:'Cases',rewards:'My ONIT',more:'Settings'})[id]||String(id||'Current screen').replace(/[-_]+/g,' ').replace(/\b\w/g,m=>m.toUpperCase())}
+function uiControlValue(el){if(!el)return'';if(el.type==='checkbox'||el.type==='radio')return el.checked?'1':'0';if(el.type==='file')return Array.from(el.files||[]).map(f=>`${f.name}:${f.size}:${f.lastModified}`).join('|');if(el.tagName==='SELECT'&&el.multiple)return Array.from(el.selectedOptions||[]).map(o=>o.value).join('|');return String(el.value??'')}
+function transientUiControl(el){if(!el)return false;if(el.matches?.('[data-onit-transient]'))return true;const type=String(el.type||'').toLowerCase();if(type==='search')return true;const clue=[el.id,el.name,el.placeholder,el.getAttribute?.('aria-label')].filter(Boolean).join(' ').toLowerCase();return /(^|\b)(search|filter|sort|query)(\b|$)/.test(clue)}
+function editableUiControl(el){return !!el&&!!el.matches&&el.matches('input, textarea, select')&&!['button','submit','reset','hidden'].includes(String(el.type||'').toLowerCase())&&!transientUiControl(el)}
+function captureUiBaseline(el){if(!editableUiControl(el)||uiControlBaselines.has(el))return;uiControlBaselines.set(el,{value:uiControlValue(el),section:uiSectionId(el)})}
+function rebuildUiDirtySections(){uiDirtySections.clear();for(const [el,meta] of [...uiDirtyControls.entries()]){if(!el?.isConnected||transientUiControl(el)){uiDirtyControls.delete(el);continue}const base=uiControlBaselines.get(el);if(base&&uiControlValue(el)===base.value){uiDirtyControls.delete(el);continue}const id=(base&&base.section)||meta.section||uiSectionId(el);if(id)uiDirtySections.add(id)}}
+function markUiDirty(el){if(!editableUiControl(el))return;captureUiBaseline(el);const base=uiControlBaselines.get(el);if(!base)return;if(uiControlValue(el)===base.value)uiDirtyControls.delete(el);else uiDirtyControls.set(el,{section:base.section||uiSectionId(el)});rebuildUiDirtySections()}
+function clearUiDirty(id){if(!id)return;for(const [el,meta] of [...uiDirtyControls.entries()]){const base=uiControlBaselines.get(el);if((base&&base.section)===id||meta.section===id){uiDirtyControls.delete(el);if(el)uiControlBaselines.set(el,{value:uiControlValue(el),section:id})}}rebuildUiDirtySections()}
+function uiSectionIsDirty(id){rebuildUiDirtySections();return uiDirtySections.has(id)}
+function trackUiEdit(e){const el=e.target;if(!editableUiControl(el))return;markUiDirty(el)}
+document.addEventListener('focusin',e=>captureUiBaseline(e.target),true);
+document.addEventListener('pointerdown',e=>captureUiBaseline(e.target),true);
 document.addEventListener('input',trackUiEdit,true);
 document.addEventListener('change',trackUiEdit,true);
 const submissionRequests=new Map();
@@ -2921,11 +2926,21 @@ function remoteUiIsNewer(release){const remote=String(release&&release.version||
 async function fetchFrontendRelease(){const u=new URL('./version.json',location.href);u.searchParams.set('_release',Date.now());const r=await fetch(u.toString(),{cache:'no-store'});if(!r.ok)throw new Error('Frontend version check failed.');return r.json()}
 function clearStaleUiUpdateState(){pendingFrontendVersion='';pendingFrontendRelease=null;uiUpdateToastVersion='';try{localStorage.removeItem(UI_EXPECTED_KEY);localStorage.removeItem(UI_RELOAD_GUARD_KEY);localStorage.removeItem(UI_SIGNAL_KEY);localStorage.removeItem('onit-ui-release-signal-v1');localStorage.removeItem('onit-ui-notice-v2')}catch(e){}hideUiUpdateNotice()}
 function reconcileUiUpdateState(){try{const expected=localStorage.getItem(UI_EXPECTED_KEY)||'';if(expected&&compareUiVersions(APP_VERSION,expected)>=0)clearStaleUiUpdateState()}catch(e){}}
-function uiUpdateModalActive(){return !!document.querySelector('.modal:not(.hidden),.commandCenterOverlay:not(.hidden),.onitDialogOverlay:not(.hidden)')}
-function uiSafeToUpdate(){return !uiUpdateInProgress&&!mutationBusy&&!refreshInFlight&&uiDirtySections.size===0&&!uiUpdateModalActive()}
-function uiUpdateStatusText(){if(uiDirtySections.size)return 'Finish or save your current form first. ONIT will not discard your work.';if(mutationBusy||refreshInFlight)return 'ONIT is finishing an action. The update will wait until it is safe.';if(uiUpdateModalActive())return 'Finish the open dialog first. The update is queued safely.';return 'Your work is safe. You can update now, or ONIT will apply it automatically when this workstation is idle.'}
-function ensureUiUpdateNotice(){let el=document.getElementById('onitUpdateNotice');if(el)return el;el=document.createElement('div');el.id='onitUpdateNotice';el.className='onitUpdateNotice hidden';el.setAttribute('role','dialog');el.setAttribute('aria-modal','false');el.setAttribute('aria-labelledby','onitUpdateTitle');el.innerHTML=`<div class="onitUpdateCard"><div class="onitUpdateKicker">ONIT UPDATE READY</div><div id="onitUpdateTitle" class="onitUpdateTitle">A newer ONIT interface is ready.</div><div id="onitUpdateCopy" class="onitUpdateCopy"></div><div class="onitUpdateActions"><button id="onitUpdateNowBtn" class="new" type="button" onclick="acceptUiUpdateSignal()">UPDATE NOW</button><button class="secondary" type="button" onclick="dismissUiUpdateNotice()">LATER</button></div></div>`;document.body.appendChild(el);return el}
-function showUiUpdateNotice(){if(!pendingFrontendRelease)return;const el=ensureUiUpdateNotice(),title=el.querySelector('#onitUpdateTitle'),copy=el.querySelector('#onitUpdateCopy'),btn=el.querySelector('#onitUpdateNowBtn');if(title)title.textContent=`ONIT v${pendingFrontendVersion} is ready.`;if(copy)copy.textContent=uiUpdateStatusText();if(btn){btn.disabled=!uiSafeToUpdate();btn.textContent=uiSafeToUpdate()?'UPDATE NOW':'WAITING SAFELY'}el.classList.remove('hidden')}
+function uiUpdateModalElement(){return document.querySelector('.modal:not(.hidden),.commandCenterOverlay:not(.hidden),.onitDialogOverlay:not(.hidden)')}
+function uiUpdateModalActive(){return !!uiUpdateModalElement()}
+function uiUpdateBlocker(){
+  rebuildUiDirtySections();
+  if(uiUpdateInProgress)return{safe:false,code:'updating',label:'UPDATING',detail:'ONIT is already applying the interface update.'};
+  if(uiDirtySections.size){const names=[...uiDirtySections].map(uiSectionLabel);return{safe:false,code:'dirty',label:'UNSAVED WORK',detail:`Unsaved changes: ${names.slice(0,2).join(' + ')}${names.length>2?` + ${names.length-2} more`:''}. Save or cancel those changes first.`}}
+  if(mutationBusy)return{safe:false,code:'action',label:'ACTION IN PROGRESS',detail:'ONIT is finishing your current action. The update will unlock automatically when it completes.'};
+  if(refreshInFlight)return{safe:false,code:'sync',label:'BACKGROUND SYNC',detail:'ONIT is syncing fresh workspace data. The update will unlock as soon as the sync completes.'};
+  const modal=uiUpdateModalElement();if(modal)return{safe:false,code:'dialog',label:'DIALOG OPEN',detail:'Close or finish the open dialog first. The update is queued safely.'};
+  return{safe:true,code:'safe',label:'SAFE TO UPDATE NOW',detail:'Your work is safe. Update now, or ONIT will apply it automatically when this workstation is idle.'};
+}
+function uiSafeToUpdate(){return uiUpdateBlocker().safe}
+function uiUpdateStatusText(){return uiUpdateBlocker().detail}
+function ensureUiUpdateNotice(){let el=document.getElementById('onitUpdateNotice');if(el)return el;el=document.createElement('div');el.id='onitUpdateNotice';el.className='onitUpdateNotice hidden';el.setAttribute('role','dialog');el.setAttribute('aria-modal','false');el.setAttribute('aria-labelledby','onitUpdateTitle');el.innerHTML=`<div class="onitUpdateCard"><div class="onitUpdateKicker">ONIT UPDATE READY</div><div id="onitUpdateTitle" class="onitUpdateTitle">A newer ONIT interface is ready.</div><div id="onitUpdateState" class="onitUpdateState"></div><div id="onitUpdateCopy" class="onitUpdateCopy"></div><div class="onitUpdateActions"><button id="onitUpdateNowBtn" class="new" type="button" onclick="acceptUiUpdateSignal()">UPDATE NOW</button><button class="secondary" type="button" onclick="dismissUiUpdateNotice()">LATER</button></div></div>`;document.body.appendChild(el);return el}
+function showUiUpdateNotice(){if(!pendingFrontendRelease)return;const el=ensureUiUpdateNotice(),title=el.querySelector('#onitUpdateTitle'),state=el.querySelector('#onitUpdateState'),copy=el.querySelector('#onitUpdateCopy'),btn=el.querySelector('#onitUpdateNowBtn'),blocker=uiUpdateBlocker();if(title)title.textContent=`ONIT v${pendingFrontendVersion} is ready.`;if(state){state.textContent=blocker.label;state.dataset.state=blocker.code}if(copy)copy.textContent=blocker.detail;if(btn){btn.disabled=!blocker.safe;btn.textContent=blocker.safe?'UPDATE NOW':blocker.code==='sync'?'FINISHING SYNC…':blocker.code==='action'?'FINISHING ACTION…':blocker.code==='dialog'?'CLOSE DIALOG FIRST':'WAITING SAFELY'}el.classList.remove('hidden')}
 function hideUiUpdateNotice(){document.getElementById('onitUpdateNotice')?.classList.add('hidden')}
 function dismissUiUpdateNotice(){hideUiUpdateNotice();try{sessionStorage.setItem(UI_NOTICE_KEY,pendingFrontendVersion||'')}catch(e){}scheduleUiAutoUpdate()}
 function queueUiUpdate(release){if(!release||!remoteUiIsNewer(release))return false;pendingFrontendRelease=release;pendingFrontendVersion=String(release.version||'').trim();try{localStorage.setItem(UI_EXPECTED_KEY,pendingFrontendVersion);localStorage.setItem(UI_SIGNAL_KEY,JSON.stringify({version:pendingFrontendVersion,at:Date.now()}))}catch(e){}let dismissed='';try{dismissed=sessionStorage.getItem(UI_NOTICE_KEY)||''}catch(e){}if(dismissed!==pendingFrontendVersion)showUiUpdateNotice();scheduleUiAutoUpdate();return true}

@@ -212,6 +212,10 @@ button{line-height:1.2;white-space:normal}
 .onitUpdateCard{background:#171717;color:#fff;border:1px solid #34312e;border-radius:20px;padding:18px;box-shadow:0 24px 60px rgba(0,0,0,.28)}
 .onitUpdateKicker{font-size:10px;font-weight:900;letter-spacing:.15em;color:#ff7a48;margin-bottom:7px}
 .onitUpdateTitle{font-size:20px;font-weight:900;line-height:1.1;color:#fff!important}
+.onitUpdateState{display:inline-flex;align-items:center;gap:7px;margin-top:10px;padding:6px 9px;border:1px solid #4f4b46;border-radius:999px;background:#242321;color:#fff!important;font-size:10px;font-weight:900;letter-spacing:.08em;text-transform:uppercase}
+.onitUpdateState[data-state="safe"]{background:#17351f;border-color:#315c3a;color:#d8f5df!important}
+.onitUpdateState[data-state="dirty"]{background:#47261a;border-color:#87462f;color:#ffd8ca!important}
+.onitUpdateState[data-state="sync"],.onitUpdateState[data-state="action"],.onitUpdateState[data-state="dialog"]{background:#383226;border-color:#675b42;color:#fff2c8!important}
 .onitUpdateCopy{margin-top:8px;color:#d6d2cc!important;font-size:13px;line-height:1.5}
 .onitUpdateActions{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
 .onitUpdateActions button{min-height:44px;flex:1 1 140px}
