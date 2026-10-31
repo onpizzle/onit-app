@@ -1,4 +1,4 @@
-/* ONIT Rewards v1.0.0 */
+/* ONIT Rewards v1.0.1 */
 (function(){
   'use strict';
   const state={my:null,owner:null,loading:false,queue:[],showing:false,lastLoad:0};
@@ -37,8 +37,12 @@
     if(!SESSION_TOKEN||state.loading)return;if(!force&&state.my&&Date.now()-state.lastLoad<45000){render();return}
     state.loading=true;renderLoading();
     try{
-      const mine=await apiPost('REWARDS_MY',{});state.my=mine.data||mine;
-      if(typeof isOwner==='function'&&isOwner()){const owner=await apiPost('REWARDS_OWNER_DASHBOARD',{});state.owner=owner.data||owner;}else state.owner=null;
+      if(typeof isOwner==='function'&&isOwner()){
+        const owner=await apiPost('REWARDS_OWNER_DASHBOARD',{});state.owner=owner.data||owner;state.my=state.owner.my||null;
+        if(!state.my){const mine=await apiPost('REWARDS_MY',{});state.my=mine.data||mine;}
+      }else{
+        const mine=await apiPost('REWARDS_MY',{});state.my=mine.data||mine;state.owner=null;
+      }
       state.lastLoad=Date.now();render();
     }catch(e){renderError(e)}finally{state.loading=false}
   }

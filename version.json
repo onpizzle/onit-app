@@ -1,8 +1,8 @@
 {
-  "version": "0.37.7",
-  "build": "0.37.7",
-  "uiRevision": 37700,
-  "dashboardUiRevision": 37701,
+  "version": "0.37.8",
+  "build": "0.37.8",
+  "uiRevision": 37800,
+  "dashboardUiRevision": 37801,
   "mandatoryUiSync": false,
   "universalDashboardUi": true,
   "authorityEngineVersion": "1.0.0",
@@ -12,8 +12,8 @@
   "dialogSystemVersion": "1.0.0",
   "workflowControlVersion": "1.0.0",
   "activationCommandVersion": "0.2.0",
-  "label": "ONIT System Owner Command Center + Workstation Control + Rewards V1",
-  "releasedAt": "2026-10-30T16:20:00+01:00",
+  "label": "ONIT Command Center Corrective Release + Rewards Performance Fix",
+  "releasedAt": "2026-10-31T08:20:00+01:00",
   "ideasDumpVersion": "0.2.0",
   "visualContrastVersion": "1.0.3",
   "attentionLoopVersion": "0.1.2",
@@ -26,10 +26,10 @@
   "updatePropagationVersion": "3.0.0",
   "closedAppPushVersion": "1.0.4",
   "securityPreviewVersion": "1.0.0",
-  "rewardsVersion": "1.0.0",
+  "rewardsVersion": "1.0.1",
   "securityClickjackingVersion": "1.0.0",
-  "notes": "System Owner Command Center: health diagnostics, Error Center, Safe Repair, workstation repair, Maintenance Mode, controlled Recovery Mode, live activity and release status. Existing staff workstations remain unchanged.",
+  "notes": "Corrects System Owner Rewards timeout by using single-pass reward reads, fixes Command Center dark-card text contrast, and adds explicit Sync All Workstations control. Run Full Check remains diagnostic-only.",
   "staffSearchVersion": "1.0.0",
   "workstationTabControlVersion": "1.1.0",
-  "commandCenterVersion": "1.0.0"
+  "commandCenterVersion": "1.0.1"
 }
