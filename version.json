@@ -1,8 +1,8 @@
 {
-  "version": "0.37.8",
-  "build": "0.37.8",
-  "uiRevision": 37800,
-  "dashboardUiRevision": 37801,
+  "version": "0.37.9",
+  "build": "0.37.9",
+  "uiRevision": 37900,
+  "dashboardUiRevision": 37901,
   "mandatoryUiSync": false,
   "universalDashboardUi": true,
   "authorityEngineVersion": "1.0.0",
@@ -12,8 +12,8 @@
   "dialogSystemVersion": "1.0.0",
   "workflowControlVersion": "1.0.0",
   "activationCommandVersion": "0.2.0",
-  "label": "ONIT Command Center Corrective Release + Rewards Performance Fix",
-  "releasedAt": "2026-10-31T08:20:00+01:00",
+  "label": "ONIT Production UI System v1",
+  "releasedAt": "2026-10-31T09:30:00+01:00",
   "ideasDumpVersion": "0.2.0",
   "visualContrastVersion": "1.0.3",
   "attentionLoopVersion": "0.1.2",
@@ -26,10 +26,11 @@
   "updatePropagationVersion": "3.0.0",
   "closedAppPushVersion": "1.0.4",
   "securityPreviewVersion": "1.0.0",
-  "rewardsVersion": "1.0.1",
+  "rewardsVersion": "1.0.2",
   "securityClickjackingVersion": "1.0.0",
-  "notes": "Corrects System Owner Rewards timeout by using single-pass reward reads, fixes Command Center dark-card text contrast, and adds explicit Sync All Workstations control. Run Full Check remains diagnostic-only.",
+  "notes": "Introduces the shared ONIT production UI system: design tokens, reusable button/card/form/state/modal primitives, accessibility/focus rules, mobile control sizing, reduced-motion support, and shared Rewards/Data loading/error states. No backend or workflow changes.",
   "staffSearchVersion": "1.0.0",
   "workstationTabControlVersion": "1.1.0",
-  "commandCenterVersion": "1.0.1"
+  "commandCenterVersion": "1.0.1",
+  "uiSystemVersion": "1.0.0"
 }

@@ -1,0 +1,74 @@
+/* ONIT UI System v1.0.0 — production-grade shared frontend primitives */
+:root{
+  --onit-bg:#f5f5f3;
+  --onit-surface:#ffffff;
+  --onit-surface-soft:#f8f7f4;
+  --onit-text:#171717;
+  --onit-muted:#66635f;
+  --onit-border:#dedbd5;
+  --onit-border-strong:#c9c5bd;
+  --onit-accent:#ff5b22;
+  --onit-success:#177742;
+  --onit-danger:#a92f27;
+  --onit-warning:#8b5b12;
+  --onit-radius-sm:10px;
+  --onit-radius-md:14px;
+  --onit-radius-lg:20px;
+  --onit-shadow-sm:0 5px 18px rgba(17,17,17,.06);
+  --onit-shadow-md:0 18px 45px rgba(17,17,17,.12);
+  --onit-focus:0 0 0 3px rgba(255,91,34,.24);
+  --onit-control-h:44px;
+  --onit-space-1:4px;
+  --onit-space-2:8px;
+  --onit-space-3:12px;
+  --onit-space-4:16px;
+  --onit-space-5:20px;
+  --onit-space-6:24px;
+  --onit-space-8:32px;
+}
+html{scroll-behavior:smooth}
+body{line-height:1.45;background:var(--onit-bg);color:var(--onit-text);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+button,input,select,textarea{font:inherit}
+button,.new,.secondary,.mini,.back,.linkbtn,.tabs button,.filterRow button{min-height:var(--onit-control-h)}
+button{border-radius:var(--onit-radius-sm)}
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--onit-accent)!important;outline-offset:2px!important;box-shadow:var(--onit-focus)!important}
+button:disabled,[aria-disabled="true"]{cursor:not-allowed!important;opacity:.5!important}
+.new,.secondary,.mini,.back,.linkbtn,.tabs button,.filterRow button{transition:background-color .16s ease,border-color .16s ease,box-shadow .16s ease,transform .16s ease}
+@media(hover:hover){.new:not(:disabled):hover,.secondary:not(:disabled):hover,.mini:not(:disabled):hover{transform:translateY(-1px)}}
+.card,.morecard,.dashboardPanel,.accessTarget,.replyState,.replyReady,.uploadbox,.notifPanel,.modalBox{border-color:var(--onit-border)!important;border-radius:var(--onit-radius-md)!important}
+.card,.morecard,.dashboardPanel,.accessTarget{background:var(--onit-surface)!important}
+.modalBox,.notifPanel{box-shadow:var(--onit-shadow-md)}
+.field input,.field textarea,.field select,.searchbar input,.staffFinderInput,.userselect,input[type="search"],input[type="email"],input[type="password"]{border:1px solid var(--onit-border-strong)!important;border-radius:var(--onit-radius-sm)!important;background:var(--onit-surface)!important;color:var(--onit-text)!important;min-height:var(--onit-control-h)}
+.field input:focus,.field textarea:focus,.field select:focus,.searchbar input:focus,.staffFinderInput:focus,.userselect:focus{border-color:var(--onit-accent)!important}
+.muted,.tiny,.bigTiny,.roleNote,.code,.inlineInfo span{color:var(--onit-muted)!important}
+/* Shared state system */
+.onitUIState{display:flex;align-items:flex-start;gap:14px;padding:18px;border:1px solid var(--onit-border);border-radius:var(--onit-radius-md);background:var(--onit-surface);min-height:86px}
+.onitUIStateIcon{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;flex:0 0 auto;background:var(--onit-surface-soft);border:1px solid var(--onit-border);font-size:15px;font-weight:900}
+.onitUIStateBody{min-width:0;flex:1}.onitUIStateTitle{font-weight:900;font-size:15px;margin:1px 0 4px}.onitUIStateMessage{font-size:13px;color:var(--onit-muted);line-height:1.5;overflow-wrap:anywhere}.onitUIStateActions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.onitUIState[data-state="error"]{border-color:#e5b8b3;background:#fff9f8}.onitUIState[data-state="error"] .onitUIStateIcon{color:var(--onit-danger);border-color:#e5b8b3;background:#fff}
+.onitUIState[data-state="success"]{border-color:#b9dcc9;background:#f7fcf9}.onitUIState[data-state="success"] .onitUIStateIcon{color:var(--onit-success);border-color:#b9dcc9;background:#fff}
+.onitUIState[data-state="warning"]{border-color:#e6d1a6;background:#fffaf1}.onitUIState[data-state="warning"] .onitUIStateIcon{color:var(--onit-warning);border-color:#e6d1a6;background:#fff}
+.onitUISpinner{width:18px;height:18px;border-radius:50%;border:2px solid #d4d0c8;border-top-color:var(--onit-text);animation:onitUISpin .75s linear infinite}
+@keyframes onitUISpin{to{transform:rotate(360deg)}}
+.loadingState,.empty{border:1px dashed var(--onit-border);border-radius:var(--onit-radius-md);padding:18px!important;background:var(--onit-surface-soft);color:var(--onit-muted)!important}
+.dangerText{color:var(--onit-danger)!important}
+/* Shared status treatment */
+.notice,.approvalWarning,.approvalOk,.success{border-radius:var(--onit-radius-sm)!important}
+.toast{border-radius:var(--onit-radius-md)!important;box-shadow:var(--onit-shadow-md)!important}
+/* Shared modal behaviour */
+.modal{overscroll-behavior:contain}.modalBox{max-width:calc(100vw - 24px)}
+/* Consistent interaction sizing without changing workflows */
+.tabs button,.filterRow button,.mini{padding-inline:12px!important}.new,.secondary{padding-inline:16px!important}
+/* Accessible screen-reader utility */
+.onitSROnly{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}
+/* Mobile production rules */
+@media(max-width:820px){
+  :root{--onit-control-h:46px}
+  input,select,textarea{font-size:16px!important}
+  .main{padding-left:16px!important;padding-right:16px!important}
+  .card,.morecard,.dashboardPanel{border-radius:16px!important}
+  .onitUIState{padding:16px;gap:12px}
+  .actions>.new,.actions>.secondary{min-width:0}
+}
+@media(max-width:480px){.row,.detailMeta{grid-template-columns:1fr!important}.onitUIState{align-items:flex-start}.onitUIStateIcon{width:32px;height:32px}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.new,.secondary,.mini,.back,.linkbtn,.tabs button,.filterRow button{transition:none!important}.onitUISpinner{animation:none!important}.onitConfettiLayer{display:none!important}}

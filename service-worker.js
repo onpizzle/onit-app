@@ -23,11 +23,11 @@ const FIREBASE_CONFIG={apiKey:'AIzaSyAmpqFDMfo6zAorD-f14hTQnSNFDFU6VHM',authDoma
 let messaging=null;
 try{firebase.initializeApp(FIREBASE_CONFIG);messaging=firebase.messaging();}catch(e){}
 
-const UI_VERSION='0.37.8';
-const UI_REVISION=37800;
-const DASHBOARD_UI_REVISION=37801;
-const CACHE='onit-v0.37.8-command-center-fix';
-const STATIC=['./offline.html','./manifest.webmanifest','./icons/icon-192.png','./icons/icon-512.png','./icons/apple-touch-icon.png','./assets/onit-logo-horizontal.png','./assets/onit-logo-full.png','./icons/favicon-32.png','./cases-module.css','./cases-module.js','./activation-command.css','./activation-command.js','./ideas-dump.css','./ideas-dump.js','./visual-contrast.css','./pulse-module.css','./pulse-module.js','./assist-traffic-module.css','./assist-traffic-module.js','./core-intelligence.css','./core-intelligence.js','./autocare-module.css','./autocare-module.js','./authority-engine.js','./sync-engine.js','./release-guard.js','./command-palette.css','./command-palette.js','./dialog-system.css','./dialog-system.js','./attention-loop.css','./attention-loop.js','./rewards-module.css','./rewards-module.js'];
+const UI_VERSION='0.37.9';
+const UI_REVISION=37900;
+const DASHBOARD_UI_REVISION=37901;
+const CACHE='onit-v0.37.9-production-ui-system';
+const STATIC=['./offline.html','./manifest.webmanifest','./icons/icon-192.png','./icons/icon-512.png','./icons/apple-touch-icon.png','./assets/onit-logo-horizontal.png','./assets/onit-logo-full.png','./icons/favicon-32.png','./cases-module.css','./cases-module.js','./activation-command.css','./activation-command.js','./ideas-dump.css','./ideas-dump.js','./visual-contrast.css','./pulse-module.css','./pulse-module.js','./assist-traffic-module.css','./assist-traffic-module.js','./core-intelligence.css','./core-intelligence.js','./autocare-module.css','./autocare-module.js','./authority-engine.js','./sync-engine.js','./release-guard.js','./command-palette.css','./command-palette.js','./dialog-system.css','./dialog-system.js','./attention-loop.css','./attention-loop.js','./rewards-module.css','./rewards-module.js','./ui-system.css','./ui-system.js'];
 
 // Notification+data messages are displayed automatically by FCM in the background.
 // Keep this callback only as a fallback for any legacy data-only message.
