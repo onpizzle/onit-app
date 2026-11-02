@@ -1,8 +1,8 @@
 {
-  "version": "0.38.5",
-  "build": "0.38.5",
-  "uiRevision": 38500,
-  "dashboardUiRevision": 38501,
+  "version": "0.38.6",
+  "build": "0.38.6",
+  "uiRevision": 38600,
+  "dashboardUiRevision": 38601,
   "mandatoryUiSync": false,
   "universalDashboardUi": true,
   "authorityEngineVersion": "1.0.0",
@@ -13,7 +13,7 @@
   "workflowControlVersion": "1.0.0",
   "activationCommandVersion": "0.2.0",
   "label": "ONIT Update Anytime",
-  "releasedAt": "2026-11-02T09:20:00+01:00",
+  "releasedAt": "2026-11-02T09:45:00+01:00",
   "ideasDumpVersion": "0.2.0",
   "visualContrastVersion": "1.0.3",
   "attentionLoopVersion": "0.1.2",
@@ -28,7 +28,7 @@
   "securityPreviewVersion": "1.0.0",
   "rewardsVersion": "1.0.2",
   "securityClickjackingVersion": "1.0.0",
-  "notes": "Live operations hotfix: Traffic and the creating Account Manager can cancel an Assigned brief before work starts or any submission exists. System Owner workstation-tab changes now propagate immediately to the affected active client through a silent Firebase configuration signal, with existing state-version fallback preserved.",
+  "notes": "Traffic cancellation visibility hotfix: recognise Traffic staff across Traffic position/department naming variants and show CANCEL BRIEF directly on eligible brief cards as well as brief detail. Existing backend safeguards still block cancellation after work starts or a submission exists.",
   "staffSearchVersion": "1.0.0",
   "workstationTabControlVersion": "1.2.0",
   "commandCenterVersion": "1.2.0",
@@ -36,5 +36,5 @@
   "workstationConsistencyVersion": "1.1.0",
   "safeUpdateManagerVersion": "1.2.0",
   "commandFeedbackVersion": "1.0.0",
-  "trafficCancellationVersion": "1.1.0"
+  "trafficCancellationVersion": "1.2.0"
 }
