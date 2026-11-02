@@ -1255,9 +1255,9 @@ html.onitReduceMotion *,html.onitReduceMotion *::before,html.onitReduceMotion *:
 <script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-messaging-compat.js"></script>
-<script>const APP_VERSION='0.38.6';
-const UI_REVISION=38600;
-const DASHBOARD_UI_REVISION=38601;
+<script>const APP_VERSION='0.38.7';
+const UI_REVISION=38700;
+const DASHBOARD_UI_REVISION=38701;
 const DASHBOARD_UI_STORAGE_KEY='onit-dashboard-ui-state-v1';
 window.ONIT_RUNTIME={version:APP_VERSION,uiRevision:UI_REVISION,dashboardUiRevision:DASHBOARD_UI_REVISION};
 const BACKEND_DATASETS=['USERS','CLIENTS','BRIEFS','ASSIGNMENTS','ITERATIONS','ACTIVITY_LOG','NOTIFICATIONS','REPORTS'];
@@ -1522,11 +1522,42 @@ function scheduleWorkstationAccessRefresh_(signal){
   const run=async()=>{
     if(!SESSION_TOKEN||!currentUser){workstationAccessRefreshScheduled=false;return}
     if(refreshInFlight){workstationAccessRefreshScheduled=false;setTimeout(()=>scheduleWorkstationAccessRefresh_(signal),500);return}
-    try{const refreshed=await loadFromGoogle(false,true);if(refreshed)showToast('Workstation updated','Your ONIT workstation access has been refreshed.');}
+    try{const changed=await checkWorkstationAuthority_(true);if(!changed)await loadFromGoogle(false,true);}
     catch(e){console.warn('ONIT workstation access refresh:',e)}
     finally{workstationAccessRefreshScheduled=false}
   };
   setTimeout(run,80);
+}
+let workstationAuthorityCheckInFlight=false,lastWorkstationAuthorityCheckAt=0;
+const WORKSTATION_AUTHORITY_CHECK_MS=15000;
+function workstationAccessFingerprint_(user=currentUser){
+  if(!user)return'';
+  return String(rowVal(user,'User ID')||'')+'|'+String(rowVal(user,'Organisation ID')||'')+'|'+String(rowVal(user,'Workstation Tabs Updated At')||'')+'|'+String(rowVal(user,'Workstation Tab Overrides')||'');
+}
+async function checkWorkstationAuthority_(force=false){
+  if(!SESSION_TOKEN||!CURRENT_USER_ID||!ORG_ID||!currentUser||document.hidden||navigator.onLine===false||mutationBusy||workstationAuthorityCheckInFlight)return false;
+  const now=Date.now();if(!force&&now-lastWorkstationAuthorityCheckAt<WORKSTATION_AUTHORITY_CHECK_MS)return false;
+  lastWorkstationAuthorityCheckAt=now;workstationAuthorityCheckInFlight=true;
+  const expectedToken=SESSION_TOKEN,expectedUser=CURRENT_USER_ID,expectedOrg=ORG_ID,before=workstationAccessFingerprint_();
+  try{
+    await ensureBackendResolved(false);
+    const pm=onitPresenceMeta(),url=API_URL+'?action=authority&token='+encodeURIComponent(expectedToken)+'&fv='+encodeURIComponent(pm._clientVersion)+'&ur='+encodeURIComponent(pm._uiRevision)+'&dur='+encodeURIComponent(pm._dashboardUiRevision)+'&dm='+encodeURIComponent(pm._displayMode)+'&t='+Date.now();
+    const r=await fetchWithTimeout(url,{cache:'no-store',redirect:'follow'},18000);if(!r.ok)throw new Error('API '+r.status);
+    const data=await r.json();if(data.success!==true)throw new Error(data.error||'Could not refresh workstation authority.');
+    if(expectedToken!==SESSION_TOKEN||expectedUser!==CURRENT_USER_ID||expectedOrg!==ORG_ID)return false;
+    const ws=data.workstation||{};if(String(ws.userId||'')!==String(expectedUser)||String(ws.organisationId||'')!==String(expectedOrg))return false;
+    authority=data.authority||authority;permissions=data.authority||permissions;if(window.ONITAuthority)window.ONITAuthority.set(authority);
+    currentUser['Workstation Tab Overrides']=String(ws.rawOverrides||'');
+    currentUser['Workstation Tabs Updated At']=String(ws.updatedAt||'');
+    currentUser['Workstation Tabs Updated By']=String(ws.updatedBy||'');
+    const changed=before!==workstationAccessFingerprint_();
+    if(changed){
+      const uiUser=users.find(u=>String(rowVal(u,'User ID'))===String(expectedUser));if(uiUser){uiUser['Workstation Tab Overrides']=currentUser['Workstation Tab Overrides'];uiUser['Workstation Tabs Updated At']=currentUser['Workstation Tabs Updated At'];uiUser['Workstation Tabs Updated By']=currentUser['Workstation Tabs Updated By'];}
+      applyPermissions();renderMore();runWhenIdle(()=>writeStartupSnapshot(),250);showToast('Workstation updated','Your ONIT workstation access has been refreshed.');
+    }
+    return changed;
+  }catch(e){console.warn('ONIT workstation authority refresh:',e);return false}
+  finally{workstationAuthorityCheckInFlight=false}
 }
 function applyFirebaseNotificationSnapshot_(snap){
   const live=snap.docs.map(d=>{const x=firebasePlain_(d.data()||{});return x.row||x||{}}),signals=live.filter(isWorkstationAccessSignal_);
@@ -1560,7 +1591,7 @@ async function startFirebaseRealtime(){
 }
 
 function saveSession(result){const d=result.data||result;if(!d.sessionToken)throw new Error('No session token returned.');SESSION_TOKEN=d.sessionToken;CURRENT_USER_ID=rowVal(d.user,'User ID');ORG_ID=rowVal(d.organisation,'Organisation ID');localStorage.setItem('onit-session',SESSION_TOKEN);localStorage.setItem('onit-user',CURRENT_USER_ID);localStorage.setItem('onit-org',ORG_ID);announcedNotifications=new Set(JSON.parse(localStorage.getItem(announcedKey(CURRENT_USER_ID))||'[]'));loadPendingBriefSounds_();}
-function clearSession(){clearRefreshRetry();stopFirebaseRealtime();clearStartupSnapshot().catch(()=>{});try{if(typeof firebase!=='undefined'&&firebase.auth().currentUser)firebase.auth().signOut().catch(()=>{})}catch(e){}SESSION_TOKEN='';CURRENT_USER_ID='';ORG_ID='';currentUser=null;current=null;localStorage.removeItem('onit-session');localStorage.removeItem('onit-user');localStorage.removeItem('onit-org');}
+function clearSession(){clearRefreshRetry();stopFirebaseRealtime();workstationAuthorityCheckInFlight=false;lastWorkstationAuthorityCheckAt=0;clearStartupSnapshot().catch(()=>{});try{if(typeof firebase!=='undefined'&&firebase.auth().currentUser)firebase.auth().signOut().catch(()=>{})}catch(e){}SESSION_TOKEN='';CURRENT_USER_ID='';ORG_ID='';currentUser=null;current=null;localStorage.removeItem('onit-session');localStorage.removeItem('onit-user');localStorage.removeItem('onit-org');}
 function showAuthMessage(message,type=''){const el=document.getElementById('authMessage');el.textContent=message||'';el.className='authMessage'+(message?' '+type:' hidden')}
 function showAuthMode(mode){showAuthMessage('');['signInForm','signUpForm','resetForm'].forEach(id=>document.getElementById(id).classList.add('hidden'));document.getElementById('signInTab').classList.toggle('active',mode==='signin');document.getElementById('signUpTab').classList.toggle('active',mode==='signup');document.getElementById('signInForm').classList.toggle('hidden',mode!=='signin');document.getElementById('signUpForm').classList.toggle('hidden',mode!=='signup');if(mode==='signup')updateSignupMode();if(mode==='reset')document.getElementById('resetForm').classList.remove('hidden')}
 function updateSignupMode(){const code=(document.getElementById('signupCode')?.value||'').trim(),owner=/^OWNER-/i.test(code),fields=document.getElementById('staffIdentityFields'),hint=document.getElementById('ownerSignupHint'),position=document.getElementById('signupPosition');if(fields)fields.classList.toggle('hidden',owner);if(hint)hint.classList.toggle('hidden',!owner);if(position)position.required=!owner}
@@ -3065,7 +3096,7 @@ async function checkForUpdates(){
     console.warn('ONIT pulse:',e);
   }
 }
-function refreshWhenActive(){if(document.hidden||!SESSION_TOKEN||mutationBusy)return;const now=Date.now();if(now-lastFocusRefresh<15000)return;lastFocusRefresh=now;if(now-lastPulseCheckAt>=60000)checkForUpdates()}
+function refreshWhenActive(){if(document.hidden||!SESSION_TOKEN||mutationBusy)return;checkWorkstationAuthority_(true);const now=Date.now();if(now-lastFocusRefresh<15000)return;lastFocusRefresh=now;if(now-lastPulseCheckAt>=60000)checkForUpdates()}
 window.addEventListener('focus',refreshWhenActive);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)refreshWhenActive()});
 window.addEventListener('online',()=>{connectionNotice('');setTimeout(()=>{if(SESSION_TOKEN&&!document.hidden)checkForUpdates()},1500)});
@@ -3079,13 +3110,15 @@ if('serviceWorker' in navigator && isHttpsApp() && !isStagingEnvironment()){
 refreshInstallButton();
 
 setInterval(()=>{if(!document.getElementById('briefs').classList.contains('hidden'))renderBriefs();if(current&&!document.getElementById('detail').classList.contains('hidden')){const t=timeInfo(current),el=document.getElementById('dtimer');el.textContent=t.text;el.className='num '+t.cls}renderApprovalClocks()},1000);
+// Targeted workstation authority refresh is lightweight and independent of Firebase delivery.
+setInterval(()=>{if(SESSION_TOKEN&&!document.hidden&&navigator.onLine!==false&&!mutationBusy)checkWorkstationAuthority_(false)},5000);
 // Lightweight fallback pulse only. Full workspace hydration is owned by ONITSync.
 setInterval(()=>{const now=Date.now(),gap=firebaseRealtimeHealthy?180000:60000;if(now-lastFallbackPulseAt>=gap){lastFallbackPulseAt=now;checkForUpdates()}},5000);
 async function boot(){
   if(SESSION_TOKEN){
     document.getElementById('authGate').classList.add('hidden');document.getElementById('appShell').classList.remove('hidden');
     try{await ensureBackendResolved(true)}catch(e){showBackendRecovery(e);return}
-    const hydrateLater=()=>setTimeout(()=>{if(SESSION_TOKEN&&!document.hidden&&!refreshInFlight)loadFromGoogle(false,true)},3000);
+    const hydrateLater=()=>setTimeout(()=>{if(SESSION_TOKEN&&!document.hidden&&!refreshInFlight){checkWorkstationAuthority_(true);loadFromGoogle(false,true)}},3000);
     const cached=await readStartupSnapshot();if(cached&&restoreStartupState(cached)){hydrateLater();return}
     const fast=await loadFastHome();if(fast){hydrateLater();return}
     const full=await loadFromGoogle(false,false);if(full||currentUser)return;
