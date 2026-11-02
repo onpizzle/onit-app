@@ -1255,9 +1255,9 @@ html.onitReduceMotion *,html.onitReduceMotion *::before,html.onitReduceMotion *:
 <script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-messaging-compat.js"></script>
-<script>const APP_VERSION='0.38.4';
-const UI_REVISION=38400;
-const DASHBOARD_UI_REVISION=38401;
+<script>const APP_VERSION='0.38.5';
+const UI_REVISION=38500;
+const DASHBOARD_UI_REVISION=38501;
 const DASHBOARD_UI_STORAGE_KEY='onit-dashboard-ui-state-v1';
 window.ONIT_RUNTIME={version:APP_VERSION,uiRevision:UI_REVISION,dashboardUiRevision:DASHBOARD_UI_REVISION};
 const BACKEND_DATASETS=['USERS','CLIENTS','BRIEFS','ASSIGNMENTS','ITERATIONS','ACTIVITY_LOG','NOTIFICATIONS','REPORTS'];
@@ -1511,8 +1511,27 @@ function applyFirebaseBriefChange_(change){
   const i=briefs.findIndex(x=>x.code===code);if(i>=0)briefs[i]=b;else briefs.push(b);if(current&&current.code===code)current=b;firebaseRenderLive_();
 }
 function applyFirebaseActivityChange_(change){const data=firebasePlain_(change.doc.data()||{}),row=data.row||{},id=rowVal(row,'Activity ID')||data.activityId||change.doc.id;if(change.type==='removed')firebaseActivityRows.delete(id);else firebaseActivityRows.set(id,row);briefs.forEach(b=>{const rows=[...firebaseActivityRows.values()].filter(a=>sameBrief(a,b.code)).sort((a,z)=>new Date(rowVal(a,'Timestamp','timestamp')||0)-new Date(rowVal(z,'Timestamp','timestamp')||0));if(rows.length){b.activityRows=rows;b.activity=rows.map(r=>`${formatTime(rowVal(r,'Timestamp','timestamp'))} — ${rowVal(r,'Action','action')}${rowVal(r,'Reason','reason')?' — '+rowVal(r,'Reason','reason'):''}`)}});firebaseRenderLive_();}
+const WORKSTATION_ACCESS_SIGNAL_TYPE='WORKSTATION_ACCESS_CHANGED';
+let workstationAccessRefreshScheduled=false;
+function isWorkstationAccessSignal_(n){return String(rowVal(n,'Type')||'').toUpperCase()===WORKSTATION_ACCESS_SIGNAL_TYPE}
+function workstationAccessUpdatedAtMs_(){const t=new Date(rowVal(currentUser,'Workstation Tabs Updated At')||0).getTime();return Number.isFinite(t)?t:0}
+function scheduleWorkstationAccessRefresh_(signal){
+  if(!SESSION_TOKEN||!currentUser||workstationAccessRefreshScheduled)return;
+  const signalAt=new Date(rowVal(signal,'Workstation Tabs Updated At')||rowVal(signal,'Created At')||0).getTime();if(!Number.isFinite(signalAt)||signalAt<=workstationAccessUpdatedAtMs_())return;
+  workstationAccessRefreshScheduled=true;
+  const run=async()=>{
+    if(!SESSION_TOKEN||!currentUser){workstationAccessRefreshScheduled=false;return}
+    if(refreshInFlight){workstationAccessRefreshScheduled=false;setTimeout(()=>scheduleWorkstationAccessRefresh_(signal),500);return}
+    try{const refreshed=await loadFromGoogle(false,true);if(refreshed)showToast('Workstation updated','Your ONIT workstation access has been refreshed.');}
+    catch(e){console.warn('ONIT workstation access refresh:',e)}
+    finally{workstationAccessRefreshScheduled=false}
+  };
+  setTimeout(run,80);
+}
 function applyFirebaseNotificationSnapshot_(snap){
-  const live=snap.docs.map(d=>{const x=firebasePlain_(d.data()||{});return x.row||x||{}}),byId=new Map(notifications.map(n=>[rowVal(n,'Notification ID'),n]));live.forEach(n=>byId.set(rowVal(n,'Notification ID'),n));notifications=[...byId.values()];if(window.ONITSync)ONITSync.emit('NOTIFICATIONS_CHANGED');else{renderNotifications();showNextBroadcast();}
+  const live=snap.docs.map(d=>{const x=firebasePlain_(d.data()||{});return x.row||x||{}}),signals=live.filter(isWorkstationAccessSignal_);
+  if(signals.length){signals.sort((a,b)=>new Date(rowVal(b,'Created At')||0)-new Date(rowVal(a,'Created At')||0));scheduleWorkstationAccessRefresh_(signals[0]);}
+  const visibleLive=live.filter(n=>!isWorkstationAccessSignal_(n)),byId=new Map(notifications.filter(n=>!isWorkstationAccessSignal_(n)).map(n=>[rowVal(n,'Notification ID'),n]));visibleLive.forEach(n=>byId.set(rowVal(n,'Notification ID'),n));notifications=[...byId.values()];if(window.ONITSync)ONITSync.emit('NOTIFICATIONS_CHANGED');else{renderNotifications();showNextBroadcast();}
 }
 
 function applyFirebaseBuzzerSnapshot_(snap){
@@ -1556,7 +1575,7 @@ function applyHomeBootstrap(data){
   if(!data||data.success!==true||!data.currentUser)return false;
   backendVersion=data.version||backendVersion||'';serverOffset=data.serverTime?new Date(data.serverTime).getTime()-Date.now():serverOffset;lastStateVersion=String(data.stateVersion||lastStateVersion||'');
   organisations=data.organisations||[];users=data.users||[];pendingUsers=data.pendingUsers||[];accessDirectory=data.accessDirectory||[];securityInfo=data.security||null;systemControl=data.systemControl||{};permissions=data.permissions||{};authority=data.authority||data.permissions||{};if(window.ONITAuthority)ONITAuthority.set(authority);
-  clients=data.clients||[];allAssignments=data.assignments||[];notifications=data.notifications||[];currentUser=data.currentUser||null;CURRENT_USER_ID=rowVal(currentUser,'User ID')||CURRENT_USER_ID;ORG_ID=rowVal(currentUser,'Organisation ID')||ORG_ID;localStorage.setItem('onit-user',CURRENT_USER_ID);localStorage.setItem('onit-org',ORG_ID);
+  clients=data.clients||[];allAssignments=data.assignments||[];notifications=(data.notifications||[]).filter(n=>!isWorkstationAccessSignal_(n));currentUser=data.currentUser||null;CURRENT_USER_ID=rowVal(currentUser,'User ID')||CURRENT_USER_ID;ORG_ID=rowVal(currentUser,'Organisation ID')||ORG_ID;localStorage.setItem('onit-user',CURRENT_USER_ID);localStorage.setItem('onit-org',ORG_ID);
   briefs=(data.briefs||[]).map(sheetBriefToUI);briefs.forEach(b=>{const as=allAssignments.filter(r=>sameBrief(r,b.code)&&String(rowVal(r,'Assignment Type','assignmentType')).toUpperCase()==='TO'&&String(rowVal(r,'Active','active')).toLowerCase()!=='false');if(as.length){b.assignee=as.map(r=>rowVal(r,'Full Name','fullName')||'Assigned team').join(' + ');b.assigneeUserId=rowVal(as[0],'User ID','userId');b.assigneeFullName=rowVal(as[0],'Full Name','fullName')||b.assignee}});
   apiOnline=true;lastSuccessfulSyncAt=Date.now();try{localStorage.setItem('onit-last-sync',String(lastSuccessfulSyncAt))}catch(e){}updateLastSyncLabel(false);connectionNotice('');applyPermissions();applySystemControlState();populateClients();populateAssignees();renderHome();renderNotifications();queuePendingBuzzers_();showSyncChip('LOADING FULL WORKSPACE');dispatchWorkspaceReady('home');return true
 }
@@ -1574,7 +1593,7 @@ async function loadFromGoogle(strict=false,silent=false){
         const data=await apiGet('bootstrap');if(generation!==loadGeneration)return false;
         backendVersion=data.version||'';serverOffset=data.serverTime?new Date(data.serverTime).getTime()-Date.now():0;
         if(!versionAtLeast(backendVersion,'0.15.7'))throw new Error('Backend '+backendVersion+' is older than the ONIT V0.15.7 shared-account backend required by this frontend. Deploy backend V0.15.7 first.');
-        lastStateVersion=String(data.stateVersion||lastStateVersion||'');organisations=data.organisations||[];users=table(data,'USERS');pendingUsers=data.pendingUsers||[];accessDirectory=data.accessDirectory||[];securityInfo=data.security||null;systemControl=data.systemControl||{};permissions=data.permissions||{};authority=data.authority||data.permissions||{};if(window.ONITAuthority)ONITAuthority.set(authority);clients=table(data,'CLIENTS');allAssignments=table(data,'ASSIGNMENTS');notifications=table(data,'NOTIFICATIONS');buzzers=data.buzzers||[];reports=table(data,'REPORTS');dataExports=data.dataExports||[];teamWorkload=data.teamWorkload||[];reportSummary=data.reportSummary||null;homeAnalytics=data.homeAnalytics||null;currentUser=data.currentUser||users.find(u=>rowVal(u,'User ID','userId')===CURRENT_USER_ID)||null;
+        lastStateVersion=String(data.stateVersion||lastStateVersion||'');organisations=data.organisations||[];users=table(data,'USERS');pendingUsers=data.pendingUsers||[];accessDirectory=data.accessDirectory||[];securityInfo=data.security||null;systemControl=data.systemControl||{};permissions=data.permissions||{};authority=data.authority||data.permissions||{};if(window.ONITAuthority)ONITAuthority.set(authority);clients=table(data,'CLIENTS');allAssignments=table(data,'ASSIGNMENTS');notifications=table(data,'NOTIFICATIONS').filter(n=>!isWorkstationAccessSignal_(n));buzzers=data.buzzers||[];reports=table(data,'REPORTS');dataExports=data.dataExports||[];teamWorkload=data.teamWorkload||[];reportSummary=data.reportSummary||null;homeAnalytics=data.homeAnalytics||null;currentUser=data.currentUser||users.find(u=>rowVal(u,'User ID','userId')===CURRENT_USER_ID)||null;
         if(!currentUser)throw new Error('Your signed-in profile is not available.');CURRENT_USER_ID=rowVal(currentUser,'User ID');ORG_ID=rowVal(currentUser,'Organisation ID');localStorage.setItem('onit-user',CURRENT_USER_ID);localStorage.setItem('onit-org',ORG_ID);
         const rows=table(data,'BRIEFS'),iterations=table(data,'ITERATIONS'),activities=table(data,'ACTIVITY_LOG');briefs=rows.map(sheetBriefToUI);briefs.forEach(b=>{const as=allAssignments.filter(r=>sameBrief(r,b.code)&&String(rowVal(r,'Assignment Type','assignmentType')).toUpperCase()==='TO'&&String(rowVal(r,'Active','active')).toLowerCase()!=='false');if(as.length){b.assignee=as.map(r=>rowVal(r,'Full Name','fullName')||'Assigned team').join(' + ');b.assigneeUserId=rowVal(as[0],'User ID','userId');b.assigneeFullName=rowVal(as[0],'Full Name','fullName')||b.assignee}b.iterations=iterations.filter(r=>sameBrief(r,b.code)).sort((a,z)=>Number(rowVal(a,'Version Number','versionNumber')||0)-Number(rowVal(z,'Version Number','versionNumber')||0)).map(r=>{
           let fileIds=parseJsonArray(rowVal(r,'Work File IDs')),fileNames=parseJsonArray(rowVal(r,'Work File Names')),fileTypes=parseJsonArray(rowVal(r,'Work File Types')),fileUrls=parseJsonArray(rowVal(r,'Work File URLs'));
@@ -2251,7 +2270,10 @@ async function confirmHandover(button){
 }
 
 function canCancelBriefRecord(b){
-  if(!b||!isTrafficQueuedBrief(b))return false;
+  if(!b)return false;
+  const status=String(b.status||'');if(!isTrafficQueuedBrief(b)&&status!=='Assigned')return false;
+  if(Array.isArray(b.iterations)&&b.iterations.length)return false;
+  const started=allAssignments.some(a=>sameBrief(a,b.code)&&!!rowVal(a,'Started At','startedAt'));if(started)return false;
   if(isTrafficManagerUser())return true;
   return isAccountManagerUser()&&String(b.createdByUserId||'')===String(CURRENT_USER_ID||'');
 }
@@ -2259,7 +2281,7 @@ function canCancelCurrentBrief(){return canCancelBriefRecord(current)}
 async function cancelBriefByCode(encodedCode,button){
   const code=decodeURIComponent(String(encodedCode||'')),b=briefs.find(x=>String(x.code)===code);
   if(!b)return onitAlert('Brief not found. Refresh ONIT and try again.');
-  if(!canCancelBriefRecord(b))return onitAlert('Only the Account Manager who sent this queued brief or the Traffic Manager can cancel it before production starts.');
+  if(!canCancelBriefRecord(b))return onitAlert('Only the Account Manager who sent this brief or the Traffic Manager can cancel it before production starts.');
   const reason=await onitPrompt('Why is this brief being cancelled?','',{title:'Cancel brief',multiline:true,placeholder:'Add the reason for the audit trail…',okLabel:'CONTINUE'});
   if(!reason||!reason.trim())return onitAlert('A cancellation reason is required.');
   if(!await onitConfirm(`Cancel ${code}? It will leave active dashboards and move to Archive → Cancelled.`,{title:'Cancel brief',okLabel:'CANCEL BRIEF'}))return;
@@ -2463,7 +2485,7 @@ function notificationRouteTarget_(n){const code=String(rowVal(n,'Brief Code')||'
 async function openNotificationTarget(id){const n=notifications.find(x=>String(rowVal(x,'Notification ID'))===String(id));if(!n)return;const nid=rowVal(n,'Notification ID');document.getElementById('notifPanel')?.classList.add('hidden');if(!truthy(rowVal(n,'Read'))){n['Read']=true;n['Read At']=new Date().toISOString();renderNotifications();if(nid)apiPost('markNotificationsRead',{notificationIds:[nid]}).catch(e=>console.warn('Notification read receipt:',e))}const go=notificationRouteTarget_(n);setTimeout(()=>{try{go()}catch(e){console.warn('Notification route:',e);show('home')}},0)}
 window.openNotificationTarget=openNotificationTarget;
 function renderNotifications(){
-  const list=notifications.slice().sort((a,b)=>new Date(rowVal(b,'Created At')||0)-new Date(rowVal(a,'Created At')||0));
+  const list=notifications.filter(n=>!isWorkstationAccessSignal_(n)).slice().sort((a,b)=>new Date(rowVal(b,'Created At')||0)-new Date(rowVal(a,'Created At')||0));
   const unread=list.filter(n=>!truthy(rowVal(n,'Read')));
   const badge=document.getElementById('notifBadge');
   badge.textContent=unread.length;
