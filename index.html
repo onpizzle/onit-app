@@ -915,7 +915,7 @@ img,video,canvas,svg{max-width:100%}
 <link rel="stylesheet" href="./cases-module.css?v=0.37.6">
 <link rel="stylesheet" href="./activation-command.css?v=0.37.6">
 <link rel="stylesheet" href="./ideas-dump.css?v=0.37.6">
-<link rel="stylesheet" href="./pulse-module.css?v=0.38.8">
+<link rel="stylesheet" href="./pulse-module.css?v=0.38.9">
 
 <style id="onit-mobile-nav-v0212">
 .navLabelMobile{display:none!important}
@@ -1255,9 +1255,9 @@ html.onitReduceMotion *,html.onitReduceMotion *::before,html.onitReduceMotion *:
 <script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-messaging-compat.js"></script>
-<script>const APP_VERSION='0.38.8';
-const UI_REVISION=38800;
-const DASHBOARD_UI_REVISION=38801;
+<script>const APP_VERSION='0.38.9';
+const UI_REVISION=38900;
+const DASHBOARD_UI_REVISION=38901;
 const DASHBOARD_UI_STORAGE_KEY='onit-dashboard-ui-state-v1';
 window.ONIT_RUNTIME={version:APP_VERSION,uiRevision:UI_REVISION,dashboardUiRevision:DASHBOARD_UI_REVISION};
 const BACKEND_DATASETS=['USERS','CLIENTS','BRIEFS','ASSIGNMENTS','ITERATIONS','ACTIVITY_LOG','NOTIFICATIONS','REPORTS'];
@@ -2309,6 +2309,8 @@ function canCancelBriefRecord(b){
   return isAccountManagerUser()&&String(b.createdByUserId||'')===String(CURRENT_USER_ID||'');
 }
 function canCancelCurrentBrief(){return canCancelBriefRecord(current)}
+function cancellationRequestId_(){try{return 'CXL-'+crypto.randomUUID()}catch(e){return 'CXL-'+Date.now()+'-'+Math.random().toString(36).slice(2,12)}}
+function cancellationRetryableError_(e){const m=String(e&&e.message||e||'');return /another onit update is finishing|failed to fetch|networkerror|load failed|timeout|timed out|api 5\d\d/i.test(m)}
 async function cancelBriefByCode(encodedCode,button){
   const code=decodeURIComponent(String(encodedCode||'')),b=briefs.find(x=>String(x.code)===code);
   if(!b)return onitAlert('Brief not found. Refresh ONIT and try again.');
@@ -2316,9 +2318,24 @@ async function cancelBriefByCode(encodedCode,button){
   const reason=await onitPrompt('Why is this brief being cancelled?','',{title:'Cancel brief',multiline:true,placeholder:'Add the reason for the audit trail…',okLabel:'CONTINUE'});
   if(!reason||!reason.trim())return onitAlert('A cancellation reason is required.');
   if(!await onitConfirm(`Cancel ${code}? It will leave active dashboards and move to Archive → Cancelled.`,{title:'Cancel brief',okLabel:'CANCEL BRIEF'}))return;
-  const old=button?.textContent;if(button){button.disabled=true;button.textContent='CANCELLING…'};
-  try{await apiPost('cancelBrief',{briefCode:code,reason:reason.trim()});await loadFromGoogle(true,true);renderHome();renderBriefs();renderArchive();showToast('Brief cancelled',`${code} moved to Archive → Cancelled.`);return true}
-  catch(e){onitAlert('ONIT could not cancel this brief. '+e.message);return false}
+  const old=button?.textContent,requestId=cancellationRequestId_();if(button){button.disabled=true;button.textContent='CANCELLING…'};
+  try{
+    let result=null,lastError=null;
+    for(let attempt=0;attempt<2;attempt++){
+      try{result=await apiPost('cancelBrief',{briefCode:code,reason:reason.trim(),requestId});lastError=null;break}
+      catch(e){lastError=e;if(attempt===0&&cancellationRetryableError_(e)){if(button)button.textContent='CONFIRMING…';await sleep(850);continue}throw e}
+    }
+    if(lastError)throw lastError;
+    await loadFromGoogle(true,true);renderHome();renderBriefs();renderArchive();showToast('Brief cancelled',`${code} moved to Archive → Cancelled.`);return true
+  }
+  catch(e){
+    // A transport failure can happen after Apps Script already committed the cancellation.
+    // Refresh once before telling the user it failed so ONIT never reports a false negative.
+    if(cancellationRetryableError_(e)){
+      try{await loadFromGoogle(false,true);const latest=briefs.find(x=>String(x.code)===code);if(latest&&String(latest.status)==='Cancelled'){renderHome();renderBriefs();renderArchive();showToast('Brief cancelled',`${code} moved to Archive → Cancelled.`);return true}}catch(_){ }
+    }
+    onitAlert('ONIT could not cancel this brief. '+e.message);return false
+  }
   finally{if(button){button.disabled=false;button.textContent=old}}
 }
 async function cancelCurrentBrief(button){if(!current)return;const code=encodeURIComponent(current.code);const ok=await cancelBriefByCode(code,button);if(ok){current=briefs.find(b=>b.code===decodeURIComponent(code));if(current)renderDetail()}}
@@ -3138,7 +3155,7 @@ document.addEventListener('DOMContentLoaded',()=>boot(),{once:true});
 <script src="./cases-module.js?v=0.37.6"></script>
 <script src="./activation-command.js?v=0.37.6"></script>
 <script src="./ideas-dump.js?v=0.37.6"></script>
-<script src="./pulse-module.js?v=0.38.8"></script>
+<script src="./pulse-module.js?v=0.38.9"></script>
 <script src="./assist-traffic-module.js?v=0.37.6"></script>
 <script src="./core-intelligence.js?v=0.37.6"></script>
 <script src="./ui-system.js?v=0.38.0"></script>
