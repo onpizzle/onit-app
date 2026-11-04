@@ -42,14 +42,14 @@
     if(type==='OWNER_BROADCAST')return()=>{try{showNextBroadcast()}catch(e){show('home')}};
     return()=>show('home');
   }
-  async function openNotification(id){
+  async function openNotification(id){let __onitScope3535=ONITAccount.capture();
     if(typeof window.openNotificationTarget==='function')return window.openNotificationTarget(id);
     const n=(notifications||[]).find(x=>String(val(x,'Notification ID','notificationId'))===String(id));if(!n)return;
     const nid=val(n,'Notification ID','notificationId');n['Read']=true;n['Read At']=new Date().toISOString();
-    try{renderNotifications()}catch(e){}
+    try{renderNotifications()}catch(e){ONITAccount.assert(__onitScope3535);}
     document.getElementById('notifPanel')?.classList.add('hidden');
-    if(nid)apiPost('markNotificationsRead',{notificationIds:[nid]}).catch(e=>console.warn('Notification read receipt:',e));
-    const go=notificationRoute(n);setTimeout(go,0);
+    if(nid)apiPost('markNotificationsRead',{notificationIds:[nid]}).catch(ONITAccount.guard(e=>console.warn('Notification read receipt:',e)));
+    const go=notificationRoute(n);ONITAccount.later(go,0);
   }
   window.openOnitNotification=openNotification;
   function notifLevel(n){try{return typeof notificationLevel==='function'?notificationLevel(n):(notificationNeedsAction(n)?'loud':'normal')}catch(e){return notificationNeedsAction(n)?'loud':'normal'}}
@@ -69,7 +69,7 @@
     }catch(e){console.warn('Attention notifications:',e)}
   }
   window.renderNotifications=enhancedRenderNotifications;
-  window.toggleNotifications=async function(){const panel=document.getElementById('notifPanel');if(!panel)return;panel.classList.toggle('hidden');if(!panel.classList.contains('hidden'))enhancedRenderNotifications()};
+  window.toggleNotifications=async function(){let __onitScope7509=ONITAccount.capture();const panel=document.getElementById('notifPanel');if(!panel)return;panel.classList.toggle('hidden');if(!panel.classList.contains('hidden'))enhancedRenderNotifications()};
   window.showSystemNotification=function(title,message,note){
     try{if(!('Notification'in window)||Notification.permission!=='granted')return;const sys=new Notification(title,{body:message,data:{notificationId:val(note,'Notification ID','notificationId')||'',briefCode:val(note,'Brief Code','briefCode')||''}});sys.onclick=()=>{try{window.focus()}catch(e){}const id=sys.data?.notificationId;if(id)openNotification(id);else if(sys.data?.briefCode&&briefByCode(sys.data.briefCode))detail(sys.data.briefCode);sys.close()}}catch(e){}
   };
@@ -84,7 +84,7 @@
   }
   if(typeof acknowledgeTask==='function'){
     const baseAcknowledgeTask=acknowledgeTask;
-    window.acknowledgeTask=async function(button){const r=await baseAcknowledgeTask(button);lastVisualSignature='';setTimeout(cycle,100);return r}
+    window.acknowledgeTask=async function(button){let __onitScope8788=ONITAccount.capture();const r=await ONITAccount.wait(baseAcknowledgeTask(button),__onitScope8788);lastVisualSignature='';ONITAccount.later(cycle,100);return r}
   }
   if(typeof buildRadarItems==='function'){
     const baseBuildRadarItems=buildRadarItems;
@@ -94,16 +94,16 @@
       const codes=new Set(mine.map(x=>x.code));return mine.concat(base.filter(x=>!x.code||!codes.has(x.code))).slice(0,3)
     }
   }
-  async function reminderPrompt(){
+  async function reminderPrompt(){let __onitScope9796=ONITAccount.capture();
     if(promptBusy||document.hidden||!CURRENT_USER_ID||typeof onitConfirm!=='function')return;const b=unattendedBriefs().find(x=>!snoozed(x.code)&&!currentBriefVisible(x.code));if(!b)return;
     if(document.querySelector('.onitDialogLayer,.modal:not(.hidden)'))return;
-    promptBusy=true;try{const open=await onitConfirm(`${b.client||'A client'} — ${b.project||b.code} is still waiting for your acknowledgement. Open the brief now?`,{title:'Brief needs your attention',okLabel:'OPEN BRIEF',cancelLabel:'REMIND ME IN 10 MIN'});if(open){detail(b.code)}else{snooze(b.code)}}finally{promptBusy=false}
+    promptBusy=true;try{const open=await ONITAccount.wait(onitConfirm(`${b.client||'A client'} — ${b.project||b.code} is still waiting for your acknowledgement. Open the brief now?`,{title:'Brief needs your attention',okLabel:'OPEN BRIEF',cancelLabel:'REMIND ME IN 10 MIN'}),__onitScope9796);if(open){detail(b.code)}else{snooze(b.code)}}finally{if(ONITAccount.isCurrent(__onitScope9796)){promptBusy=false}}
   }
   function handleStartupDeepLink(){
     if(bootDeepLinkHandled)return;let code='';try{code=new URL(location.href).searchParams.get('brief')||''}catch(e){}if(!code)return;
     if(briefByCode(code)){bootDeepLinkHandled=true;detail(code);try{const u=new URL(location.href);u.searchParams.delete('brief');history.replaceState({},'',u.pathname+u.search+u.hash)}catch(e){}}
   }
   function cycle(){try{enhancedRenderNotifications();handleStartupDeepLink();reminderPrompt()}catch(e){console.warn('ONIT attention loop:',e)}}
-  let warmChecks=0;const warmTimer=setInterval(()=>{cycle();warmChecks++;if(warmChecks>=12||(typeof briefs!=='undefined'&&briefs.length))clearInterval(warmTimer)},1500);setTimeout(cycle,500);setInterval(cycle,CHECK_MS);window.addEventListener('focus',()=>setTimeout(cycle,250));document.addEventListener('visibilitychange',()=>{if(!document.hidden)setTimeout(cycle,250)});
+  let warmChecks=0;const warmTimer=setInterval(()=>{cycle();warmChecks++;if(warmChecks>=12||(typeof briefs!=='undefined'&&briefs.length))clearInterval(warmTimer)},1500);ONITAccount.later(cycle,500);setInterval(cycle,CHECK_MS);window.addEventListener('focus',()=>ONITAccount.later(cycle,250));document.addEventListener('visibilitychange',()=>{if(!document.hidden)ONITAccount.later(cycle,250)});
   window.ONITAttention={version:VERSION,unattendedBriefs,isUnattendedBrief,openNotification,cycle};
 })();

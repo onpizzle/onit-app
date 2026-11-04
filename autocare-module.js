@@ -38,92 +38,92 @@ function frontendDashboardMode(){try{return typeof dashboardMode==='function'?da
 function backendModeFromPermissions(){try{return String((authority&&authority.dashboardMode)||(permissions&&permissions.dashboardMode)||'').toUpperCase()||'UNKNOWN'}catch(e){return'UNKNOWN'}}
 function refreshLocalSnapshot(){lastHealth.network=online()?'OK':'OFFLINE';lastHealth.realtime=currentRealtimeStatus();lastHealth.session=currentSessionStatus();lastHealth.serviceWorker=currentServiceWorkerStatus();if(typeof window.getDashboardUiHealth==='function'&&signedIn()){const d=window.getDashboardUiHealth();if(d&&d.healthy===false&&d.mountedRevision)lastHealth.dashboardUi='MISMATCH';else if(d&&d.revision)lastHealth.dashboardUi='CURRENT'}try{const rg=window.ONITReleaseGuard&&ONITReleaseGuard.diagnostics?ONITReleaseGuard.diagnostics():null;lastHealth.release=rg?(rg.status==='OK'?'OK':rg.status):lastHealth.release}catch(e){}try{lastHealth.sync=window.ONITSync?'ACTIVE':'UNKNOWN'}catch(e){}if(!lastHealth.checkedAt)lastHealth.checkedAt=now();return lastHealth}
 
-async function backendHealth(){
+async function backendHealth(){let __onitScope4906=ONITAccount.capture();
   if(!signedIn())return null;
-  try{if(typeof currentUser!=='undefined'&&!currentUser)return null}catch(e){}
+  try{if(typeof currentUser!=='undefined'&&!currentUser)return null}catch(e){ONITAccount.assert(__onitScope4906);}
   try{
     let data;
-    try{data=await apiGet('autocare')}catch(e){
-      if(/Unknown GET action/i.test(shortMessage(e))){data=await apiGet('pulse');data.autocareFallback=true}else throw e;
+    try{data=await ONITAccount.wait(apiGet('autocare'),__onitScope4906)}catch(e){ONITAccount.assert(__onitScope4906);
+      if(/Unknown GET action/i.test(shortMessage(e))){data=await ONITAccount.wait(apiGet('pulse'),__onitScope4906);data.autocareFallback=true}else throw e;
     }
     lastBackendOkAt=now();lastHealth.backend='OK';lastHealth.backendAutoCare=!data.autocareFallback;
-    if(data.authority&&window.ONITAuthority){try{authority=data.authority;permissions=data.authority;ONITAuthority.set(data.authority)}catch(e){recordIssue('AUTHORITY_APPLY',e)}}
+    if(data.authority&&window.ONITAuthority){try{authority=data.authority;permissions=data.authority;ONITAuthority.set(data.authority)}catch(e){ONITAccount.assert(__onitScope4906);recordIssue('AUTHORITY_APPLY',e)}}
     const backendMode=String((data.authority&&data.authority.dashboardMode)||(data.permissions&&data.permissions.dashboardMode)||backendModeFromPermissions()).toUpperCase();
     const frontendMode=String(frontendDashboardMode()).toUpperCase();
     if(backendMode&&backendMode!=='UNKNOWN'&&frontendMode&&frontendMode!=='UNKNOWN'&&backendMode!==frontendMode){
       lastHealth.permissions='MISMATCH';
       recordIssue('PERMISSION_MISMATCH',`Frontend ${frontendMode}; backend ${backendMode}`,'warning');
-      await repairPermissions('Authority mismatch detected');
+      await ONITAccount.wait(repairPermissions('Authority mismatch detected'),__onitScope4906);
     }else lastHealth.permissions='SYNCED';
-    if(data.modules&&data.modules.digitalPulse&&window.DigitalPulse&&typeof window.DigitalPulse.refreshCapabilities==='function'&&now()-lastPulseCapabilitySyncAt>300000){try{lastPulseCapabilitySyncAt=now();await window.DigitalPulse.refreshCapabilities(true)}catch(e){recordIssue('PULSE_CAPABILITY_SYNC',e)}}
+    if(data.modules&&data.modules.digitalPulse&&window.DigitalPulse&&typeof window.DigitalPulse.refreshCapabilities==='function'&&now()-lastPulseCapabilitySyncAt>300000){try{lastPulseCapabilitySyncAt=now();await ONITAccount.wait(window.DigitalPulse.refreshCapabilities(true),__onitScope4906)}catch(e){ONITAccount.assert(__onitScope4906);recordIssue('PULSE_CAPABILITY_SYNC',e)}}
     if(data.stateVersion&&typeof lastStateVersion!=='undefined'&&lastStateVersion&&String(data.stateVersion)!==String(lastStateVersion)&&safeForRepair()){
       recordRepair('STATE_RESYNC','Backend state changed; Unified Sync is refreshing ONIT data.');
       if(window.ONITSync)ONITSync.emit('STATE_CHANGED',{reason:'autocare-state-version',stateVersion:String(data.stateVersion||'')});else scheduleFullRefreshRetry();
     }
     return data;
-  }catch(e){lastHealth.backend='DEGRADED';recordIssue('BACKEND_HEALTH',e);signalApiFailure('autocare',e,true);return null}
+  }catch(e){ONITAccount.assert(__onitScope4906);lastHealth.backend='DEGRADED';recordIssue('BACKEND_HEALTH',e);signalApiFailure('autocare',e,true);return null}
 }
 
-async function frontendHealth(){
+async function frontendHealth(){let __onitScope7008=ONITAccount.capture();
   if(!online()||typeof fetchFrontendRelease!=='function')return null;
   try{
-    const release=await fetchFrontendRelease(),remote=String(release&&release.version||'').trim();
-    lastFrontendCheckAt=now();lastHealth.frontend=currentFrontendStatus(release);lastHealth.dashboardUi=currentDashboardUiStatus(release);if(window.ONITReleaseGuard&&ONITReleaseGuard.check){const rg=await ONITReleaseGuard.check();lastHealth.release=rg.status==='OK'?'OK':'MISMATCH';if(rg.issues&&rg.issues.length)recordIssue('RELEASE_GUARD',rg.issues.join(' • '),'warning')}
-    if(remote&&typeof APP_VERSION!=='undefined'&&((typeof remoteUiIsNewer==='function'&&remoteUiIsNewer(release))||(typeof remoteUiIsNewer!=='function'&&remote!==APP_VERSION))){const dashboardOnly=Number(release.dashboardUiRevision||0)>(typeof DASHBOARD_UI_REVISION!=='undefined'?DASHBOARD_UI_REVISION:0)&&typeof compareUiVersions==='function'&&compareUiVersions(remote,APP_VERSION)===0;recordIssue(dashboardOnly?'DASHBOARD_UI_STALE':'FRONTEND_STALE',dashboardOnly?`Dashboard UI r${DASHBOARD_UI_REVISION||0}; published r${release.dashboardUiRevision}`:`Installed ${APP_VERSION}; published ${remote}`,'warning');if(typeof checkFrontendRelease==='function')await checkFrontendRelease(false)}
-    if(lastHealth.dashboardUi==='MISMATCH'&&typeof checkFrontendRelease==='function'){recordIssue('DASHBOARD_UI_MISMATCH','Dashboard renderer did not mount the current universal dashboard shell.','warning');await checkFrontendRelease(false)}
+    const release=await ONITAccount.wait(fetchFrontendRelease(),__onitScope7008),remote=String(release&&release.version||'').trim();
+    lastFrontendCheckAt=now();lastHealth.frontend=currentFrontendStatus(release);lastHealth.dashboardUi=currentDashboardUiStatus(release);if(window.ONITReleaseGuard&&ONITReleaseGuard.check){const rg=await ONITAccount.wait(ONITReleaseGuard.check(),__onitScope7008);lastHealth.release=rg.status==='OK'?'OK':'MISMATCH';if(rg.issues&&rg.issues.length)recordIssue('RELEASE_GUARD',rg.issues.join(' • '),'warning')}
+    if(remote&&typeof APP_VERSION!=='undefined'&&((typeof remoteUiIsNewer==='function'&&remoteUiIsNewer(release))||(typeof remoteUiIsNewer!=='function'&&remote!==APP_VERSION))){const dashboardOnly=Number(release.dashboardUiRevision||0)>(typeof DASHBOARD_UI_REVISION!=='undefined'?DASHBOARD_UI_REVISION:0)&&typeof compareUiVersions==='function'&&compareUiVersions(remote,APP_VERSION)===0;recordIssue(dashboardOnly?'DASHBOARD_UI_STALE':'FRONTEND_STALE',dashboardOnly?`Dashboard UI r${DASHBOARD_UI_REVISION||0}; published r${release.dashboardUiRevision}`:`Installed ${APP_VERSION}; published ${remote}`,'warning');if(typeof checkFrontendRelease==='function')await ONITAccount.wait(checkFrontendRelease(false),__onitScope7008)}
+    if(lastHealth.dashboardUi==='MISMATCH'&&typeof checkFrontendRelease==='function'){recordIssue('DASHBOARD_UI_MISMATCH','Dashboard renderer did not mount the current universal dashboard shell.','warning');await ONITAccount.wait(checkFrontendRelease(false),__onitScope7008)}
     return release;
-  }catch(e){lastHealth.frontend='CHECK FAILED';recordIssue('FRONTEND_VERSION',e);return null}
+  }catch(e){ONITAccount.assert(__onitScope7008);lastHealth.frontend='CHECK FAILED';recordIssue('FRONTEND_VERSION',e);return null}
 }
 
-async function repairPermissions(reason){
+async function repairPermissions(reason){let __onitScope8641=ONITAccount.capture();
   if(!signedIn()||!online()||!safeForRepair()||now()-lastPermissionRepairAt<PERMISSION_REPAIR_COOLDOWN_MS)return false;
   lastPermissionRepairAt=now();
-  try{await loadFromGoogle(false,true);recordRepair('PERMISSION_RESYNC',reason||'Permissions refreshed from backend.');lastHealth.permissions='SYNCED';return true}catch(e){recordIssue('PERMISSION_REPAIR',e);return false}
+  try{await ONITAccount.wait(loadFromGoogle(false,true),__onitScope8641);recordRepair('PERMISSION_RESYNC',reason||'Permissions refreshed from backend.');lastHealth.permissions='SYNCED';return true}catch(e){ONITAccount.assert(__onitScope8641);recordIssue('PERMISSION_REPAIR',e);return false}
 }
-async function repairRealtime(reason){
-  try{if(typeof firebaseStarting!=='undefined'&&firebaseStarting)return false}catch(e){}
+async function repairRealtime(reason){let __onitScope9058=ONITAccount.capture();
+  try{if(typeof firebaseStarting!=='undefined'&&firebaseStarting)return false}catch(e){ONITAccount.assert(__onitScope9058);}
   if(!signedIn()||!online()||typeof stopFirebaseRealtime!=='function'||typeof startFirebaseRealtime!=='function'||now()-lastRealtimeRepairAt<REALTIME_REPAIR_COOLDOWN_MS)return false;
   lastRealtimeRepairAt=now();
-  try{stopFirebaseRealtime();await new Promise(r=>setTimeout(r,350));await startFirebaseRealtime();recordRepair('REALTIME_RECONNECT',reason||'Realtime listeners restarted.');refreshLocalSnapshot();return true}catch(e){recordIssue('REALTIME_REPAIR',e);return false}
+  try{stopFirebaseRealtime();await ONITAccount.wait(new Promise(r=>setTimeout(r,350)),__onitScope9058);await ONITAccount.wait(startFirebaseRealtime(),__onitScope9058);recordRepair('REALTIME_RECONNECT',reason||'Realtime listeners restarted.');refreshLocalSnapshot();return true}catch(e){ONITAccount.assert(__onitScope9058);recordIssue('REALTIME_REPAIR',e);return false}
 }
-async function repairServiceWorker(reason){
+async function repairServiceWorker(reason){let __onitScope9666=ONITAccount.capture();
   if(!('serviceWorker'in navigator)||!online())return false;
-  try{const regs=await navigator.serviceWorker.getRegistrations();await Promise.all(regs.map(r=>r.update().catch(()=>null)));try{navigator.serviceWorker.controller&&navigator.serviceWorker.controller.postMessage({type:'AUTOCARE_REFRESH_STATIC'})}catch(e){}recordRepair('SERVICE_WORKER_REFRESH',reason||'Service worker update and static-cache refresh requested.');lastHealth.serviceWorker=currentServiceWorkerStatus();return true}catch(e){recordIssue('SERVICE_WORKER_REPAIR',e);return false}
+  try{const regs=await ONITAccount.wait(navigator.serviceWorker.getRegistrations(),__onitScope9666);await ONITAccount.wait(Promise.all(regs.map(r=>r.update().catch(ONITAccount.guard(()=>null)))),__onitScope9666);try{navigator.serviceWorker.controller&&navigator.serviceWorker.controller.postMessage({type:'AUTOCARE_REFRESH_STATIC'})}catch(e){ONITAccount.assert(__onitScope9666);}recordRepair('SERVICE_WORKER_REFRESH',reason||'Service worker update and static-cache refresh requested.');lastHealth.serviceWorker=currentServiceWorkerStatus();return true}catch(e){ONITAccount.assert(__onitScope9666);recordIssue('SERVICE_WORKER_REPAIR',e);return false}
 }
-async function repairKnownIssue(kind,detail){
+async function repairKnownIssue(kind,detail){let __onitScope10264=ONITAccount.capture();
   if(kind==='realtime')return repairRealtime(detail);
   if(kind==='permissions')return repairPermissions(detail);
   if(kind==='service-worker')return repairServiceWorker(detail);
-  if(kind==='frontend'&&typeof checkFrontendRelease==='function'){try{await checkFrontendRelease(false);recordRepair('FRONTEND_CHECK',detail||'Frontend release checked.');return true}catch(e){recordIssue('FRONTEND_REPAIR',e);return false}}
-  if(kind==='data'&&signedIn()&&online()&&safeForRepair()){try{await loadFromGoogle(false,true);recordRepair('DATA_RESYNC',detail||'ONIT data refreshed.');return true}catch(e){recordIssue('DATA_REPAIR',e);return false}}
+  if(kind==='frontend'&&typeof checkFrontendRelease==='function'){try{await ONITAccount.wait(checkFrontendRelease(false),__onitScope10264);recordRepair('FRONTEND_CHECK',detail||'Frontend release checked.');return true}catch(e){ONITAccount.assert(__onitScope10264);recordIssue('FRONTEND_REPAIR',e);return false}}
+  if(kind==='data'&&signedIn()&&online()&&safeForRepair()){try{await ONITAccount.wait(loadFromGoogle(false,true),__onitScope10264);recordRepair('DATA_RESYNC',detail||'ONIT data refreshed.');return true}catch(e){ONITAccount.assert(__onitScope10264);recordIssue('DATA_REPAIR',e);return false}}
   return false;
 }
 
 function signalApiFailure(action,err,readOnly){
   recordIssue('API_'+String(action||'UNKNOWN').toUpperCase(),err);
   if(!readOnly||!online()||!signedIn())return;
-  if(/timed out|failed to fetch|network|load failed/i.test(shortMessage(err))){setTimeout(()=>runCheck(false),2500)}
+  if(/timed out|failed to fetch|network|load failed/i.test(shortMessage(err))){ONITAccount.later(()=>runCheck(false),2500)}
 }
-function signalRealtimeFailure(err){try{firebaseRealtimeHealthy=false}catch(e){}recordIssue('REALTIME',err);setTimeout(()=>repairRealtime('Realtime connection became unhealthy.'),1800)}
+function signalRealtimeFailure(err){try{firebaseRealtimeHealthy=false}catch(e){}recordIssue('REALTIME',err);ONITAccount.later(()=>repairRealtime('Realtime connection became unhealthy.'),1800)}
 function signalRealtimeHealthy(){try{firebaseRealtimeHealthy=true}catch(e){}lastHealth.realtime='CONNECTED'}
 function markHealthy(){try{localStorage.setItem(LAST_GOOD_KEY,String(APP_VERSION))}catch(e){}lastHealth.backend='OK';lastHealth.session=currentSessionStatus();lastHealth.permissions='SYNCED';lastHealth.checkedAt=now();refreshLocalSnapshot()}
 
-async function runCheck(manual=false){
+async function runCheck(manual=false){let __onitScope11787=ONITAccount.capture();
   if(checking)return lastHealth;checking=true;lastHealth.checkedAt=now();refreshLocalSnapshot();
   try{
     if(!online()){lastHealth.backend='OFFLINE';lastHealth.frontend='OFFLINE';return lastHealth}
     const tasks=[];
     if(signedIn())tasks.push(backendHealth());
     if(manual)tasks.push(frontendHealth());
-    await Promise.allSettled(tasks);
-    if(signedIn()&&!firebaseRealtimeHealthy&&online())await repairRealtime('AutoCare health check found realtime fallback mode.');
+    await ONITAccount.wait(Promise.allSettled(tasks),__onitScope11787);
+    if(signedIn()&&!firebaseRealtimeHealthy&&online())await ONITAccount.wait(repairRealtime('AutoCare health check found realtime fallback mode.'),__onitScope11787);
     if('serviceWorker'in navigator&&isHttpsApp&&isHttpsApp()&&!navigator.serviceWorker.controller){lastHealth.serviceWorker='STARTING';recordIssue('SERVICE_WORKER_STARTING','No active service-worker controller yet. ONIT will not force a worker takeover during an active session.','warning');}
     refreshLocalSnapshot();
     if(lastBackendOkAt&&now()-lastBackendOkAt<HEALTH_INTERVAL_MS*2&&lastHealth.backend!=='DEGRADED')lastHealth.backend='OK';
     if(manual){showToast('ONIT AutoCare',healthHeadline())}
     if(document.getElementById('autoCareHealthModal')&&!document.getElementById('autoCareHealthModal').classList.contains('hidden'))renderHealthModal();
     return lastHealth;
-  }finally{checking=false}
+  }finally{if(ONITAccount.isCurrent(__onitScope11787)){checking=false}}
 }
 function healthHeadline(){refreshLocalSnapshot();const bad=[lastHealth.network,lastHealth.backend,lastHealth.frontend,lastHealth.dashboardUi,lastHealth.realtime,lastHealth.permissions,lastHealth.release].filter(v=>!['OK','CURRENT','CONNECTED','SYNCED','VALID','IDLE'].includes(v));return bad.length?'AutoCare found something to watch. Open System Health for details.':'All core ONIT checks are healthy.'}
 function overallStatus(){refreshLocalSnapshot();if(!online())return'OFFLINE';if(['DEGRADED','MISMATCH','CHECK FAILED'].includes(lastHealth.backend)||lastHealth.dashboardUi==='MISMATCH'||lastHealth.dashboardUi==='UPDATE READY'||lastHealth.permissions==='MISMATCH'||lastHealth.release==='MISMATCH'||lastHealth.realtime==='FALLBACK')return'NEEDS ATTENTION';return'ACTIVE'}
@@ -131,17 +131,17 @@ function autoCareMoreCardMarkup(){const status=overallStatus();return `<div clas
 function healthRow(label,value,detail){return `<div class='autoCareHealthRow'><div><b>${escapeHTML(label)}</b>${detail?`<div class='bigTiny'>${escapeHTML(detail)}</div>`:''}</div><span class='autoCareState ${statusClass(value)}'>${escapeHTML(value)}</span></div>`}
 function ensureModal(){let el=document.getElementById('autoCareHealthModal');if(el)return el;el=document.createElement('div');el.id='autoCareHealthModal';el.className='modal hidden';el.setAttribute('role','dialog');el.setAttribute('aria-modal','true');el.onclick=e=>{if(e.target===el)closeAutoCareHealth()};el.innerHTML=`<div class='modalBox autoCareModalBox'><div class='modalTop'><div><div class='tiny'>ONIT AUTOCARE v${AUTOCARE_VERSION}</div><h2>SYSTEM HEALTH</h2></div><button class='secondary' onclick='closeAutoCareHealth()'>CLOSE</button></div><div id='autoCareHealthBody'></div></div>`;document.body.appendChild(el);return el}
 function renderHealthModal(){const body=document.getElementById('autoCareHealthBody');if(!body)return;refreshLocalSnapshot();const issues=readLog(ISSUE_KEY).slice(0,8),repairs=readLog(REPAIR_KEY).slice(0,8);body.innerHTML=`<div class='autoCareHealthGrid'>${healthRow('Network',lastHealth.network,online()?'Device is online.':'ONIT will stay on last synced data until connection returns.')}${healthRow('Frontend',lastHealth.frontend,`Running v${typeof APP_VERSION!=='undefined'?APP_VERSION:'—'} • last known good ${localStorage.getItem(LAST_GOOD_KEY)||'—'}`)}${healthRow('Dashboard UI',lastHealth.dashboardUi,`Universal dashboard revision ${typeof DASHBOARD_UI_REVISION!=='undefined'?DASHBOARD_UI_REVISION:'—'} • applies to Owner, CD/DCD, Traffic, Account, Team Lead and Staff shells.`)}${healthRow('Backend',lastHealth.backend,`Backend ${typeof backendVersion!=='undefined'&&backendVersion?backendVersion:'checking'} • AutoCare endpoint ${lastHealth.backendAutoCare?'available':'compatibility mode'}`)}${healthRow('Realtime',currentRealtimeStatus(),firebaseRealtimeHealthy?'Firebase listeners are healthy.':'ONIT polling fallback remains available; AutoCare will attempt a reconnect.')}${healthRow('Session',currentSessionStatus(),signedIn()?'Authenticated session is present.':'No active ONIT session.')}${healthRow('Permissions',lastHealth.permissions,`Authority Engine ${window.ONITAuthority?.version||'—'} • frontend ${frontendDashboardMode()} • backend ${backendModeFromPermissions()}`)}${healthRow('Unified Sync',lastHealth.sync,window.ONITSync?`Sync Engine ${ONITSync.version} • full syncs ${ONITSync.diagnostics().fullSyncs}`:'Sync Engine not loaded.')}${healthRow('Release Guard',lastHealth.release,window.ONITReleaseGuard?`Release Guard ${ONITReleaseGuard.version} • ${ONITReleaseGuard.diagnostics().environment||'checking'}`:'Release Guard not loaded.')}${healthRow('Installed app',currentServiceWorkerStatus(),`Installed-app updates are passive during an active session; manual repair remains available when needed.`)}</div><div class='actions autoCareActions'><button class='new' onclick='runAutoCareCheck(true)'>CHECK & REPAIR</button><button class='secondary' onclick='autoCareRepairData()'>RESYNC DATA</button><button class='secondary' onclick='autoCareRepairRealtime()'>RECONNECT REALTIME</button><button class='secondary' onclick='forceFrontendUpdate()'>REPAIR INSTALLED APP</button><button class='secondary' onclick='copyAutoCareDiagnostics()'>COPY DIAGNOSTICS</button></div><div class='autoCareLogGrid'><div><h3>RECENT ISSUES</h3>${issues.length?issues.map(x=>`<div class='autoCareLog'><b>${escapeHTML(x.code)}</b><span>${escapeHTML(x.message)}</span><small>${escapeHTML(timeLabel(x.at))}${x.count>1?' • ×'+x.count:''}</small></div>`).join(''):`<div class='empty'>No recent AutoCare issues on this device.</div>`}</div><div><h3>AUTO REPAIRS</h3>${repairs.length?repairs.map(x=>`<div class='autoCareLog repair'><b>${escapeHTML(x.code)}</b><span>${escapeHTML(x.detail)}</span><small>${escapeHTML(timeLabel(x.at))}</small></div>`).join(''):`<div class='empty'>No repairs have been needed recently.</div>`}</div></div><div class='bigTiny autoCareFoot'>AutoCare only performs predefined safe repairs. It does not change briefs, approvals, user data or write new application code.</div>`}
-async function openHealth(){ensureModal().classList.remove('hidden');renderHealthModal();await runCheck(false);renderHealthModal()}
+async function openHealth(){let __onitScope19292=ONITAccount.capture();ensureModal().classList.remove('hidden');renderHealthModal();await ONITAccount.wait(runCheck(false),__onitScope19292);renderHealthModal()}
 function closeHealth(){document.getElementById('autoCareHealthModal')?.classList.add('hidden')}
-async function repairData(){await repairKnownIssue('data','Manual System Health resync.');renderHealthModal();showToast('ONIT AutoCare','Data resync completed.')}
-async function repairRealtimeManual(){await repairRealtime('Manual System Health reconnect.');renderHealthModal();showToast('ONIT AutoCare','Realtime reconnect requested.')}
-async function copyDiagnostics(){
+async function repairData(){let __onitScope19520=ONITAccount.capture();await ONITAccount.wait(repairKnownIssue('data','Manual System Health resync.'),__onitScope19520);renderHealthModal();showToast('ONIT AutoCare','Data resync completed.')}
+async function repairRealtimeManual(){let __onitScope19683=ONITAccount.capture();await ONITAccount.wait(repairRealtime('Manual System Health reconnect.'),__onitScope19683);renderHealthModal();showToast('ONIT AutoCare','Realtime reconnect requested.')}
+async function copyDiagnostics(){let __onitScope19857=ONITAccount.capture();
   refreshLocalSnapshot();
   const payload={autoCareVersion:AUTOCARE_VERSION,frontendVersion:typeof APP_VERSION!=='undefined'?APP_VERSION:'',dashboardUiRevision:typeof DASHBOARD_UI_REVISION!=='undefined'?DASHBOARD_UI_REVISION:0,backendVersion:typeof backendVersion!=='undefined'?backendVersion:'',health:lastHealth,authority:window.ONITAuthority?.summary?.()||null,sync:window.ONITSync?.diagnostics?.()||null,release:window.ONITReleaseGuard?.diagnostics?.()||null,recentIssues:readLog(ISSUE_KEY).slice(0,8),recentRepairs:readLog(REPAIR_KEY).slice(0,8)};
   const value=JSON.stringify(payload,null,2);
-  try{await navigator.clipboard.writeText(value);showToast('ONIT AutoCare','Diagnostics copied.');return true}catch(e){recordIssue('DIAGNOSTIC_COPY',e);return false}
+  try{await ONITAccount.wait(navigator.clipboard.writeText(value),__onitScope19857);showToast('ONIT AutoCare','Diagnostics copied.');return true}catch(e){ONITAccount.assert(__onitScope19857);recordIssue('DIAGNOSTIC_COPY',e);return false}
 }
-function start(){if(timer)return;refreshLocalSnapshot();timer=setInterval(()=>{if(!document.hidden)runCheck(false)},HEALTH_INTERVAL_MS);setTimeout(()=>runCheck(false),30000)}
+function start(){if(timer)return;refreshLocalSnapshot();timer=setInterval(()=>{if(!document.hidden)runCheck(false)},HEALTH_INTERVAL_MS);ONITAccount.later(()=>runCheck(false),30000)}
 function stop(){if(timer){clearInterval(timer);timer=null}}
 
 window.addEventListener('error',e=>{
@@ -150,7 +150,7 @@ window.addEventListener('error',e=>{
   if(e.error)recordIssue('WINDOW_ERROR',e.error);
 },true);
 window.addEventListener('unhandledrejection',e=>recordIssue('PROMISE_REJECTION',e.reason||'Unhandled promise rejection'));
-window.addEventListener('online',()=>setTimeout(()=>runCheck(false),900));
+window.addEventListener('online',()=>ONITAccount.later(()=>runCheck(false),900));
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&signedIn()&&now()-lastHealth.checkedAt>HEALTH_INTERVAL_MS)runCheck(false)});
 document.addEventListener('DOMContentLoaded',start,{once:true});
 

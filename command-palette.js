@@ -5,7 +5,7 @@ const VERSION='1.0.0';let overlay,input,results,items=[],active=0;
 function esc(v){return typeof escapeHTML==='function'?escapeHTML(v):String(v||'')}
 function authority(name,fallback=false){try{return window.ONITAuthority?ONITAuthority.allowed(name,fallback):!!fallback}catch(e){return !!fallback}}
 function close(){if(overlay)overlay.classList.add('hidden')}
-function open(seed=''){if(!overlay)mount();overlay.classList.remove('hidden');input.value=seed;active=0;render();setTimeout(()=>input.focus(),20)}
+function open(seed=''){if(!overlay)mount();overlay.classList.remove('hidden');input.value=seed;active=0;render();ONITAccount.later(()=>input.focus(),20)}
 function run(item){close();try{item.run()}catch(e){console.warn('ONIT command',e)}}
 function commands(){
  const out=[
@@ -21,7 +21,7 @@ function commands(){
  if(authority('createBrief',typeof canCreateBrief==='function'&&canCreateBrief()))out.unshift({group:'Quick actions',icon:'+',title:'New Brief',sub:'Create and send a new brief',type:'ACTION',keys:'new create send brief',run:()=>openNew()});
  if(authority('trafficManager',typeof isTrafficManagerUser==='function'&&isTrafficManagerUser())&&typeof openTrafficManager==='function')out.unshift({group:'Quick actions',icon:'↔',title:'Open Traffic Control',sub:'Queue, schedule and release work',type:'ACTION',keys:'traffic schedule queue',run:()=>openTrafficManager()});
  if(window.ActivationCommand&&!document.getElementById('navActivation')?.classList.contains('hiddenByRole'))out.push({group:'Go to',icon:'A',title:'Activation Command',sub:'Private on-ground operations',type:'PAGE',keys:'activation on-ground field vendors readiness',run:()=>show('activation')});
- if(window.AutoCare)out.push({group:'Quick actions',icon:'✓',title:'System Health',sub:'Open AutoCare diagnostics',type:'ACTION',keys:'system health autocare diagnostics repair',run:()=>{show('more');setTimeout(()=>window.openAutoCareHealth?.(),80)}});
+ if(window.AutoCare)out.push({group:'Quick actions',icon:'✓',title:'System Health',sub:'Open AutoCare diagnostics',type:'ACTION',keys:'system health autocare diagnostics repair',run:()=>{show('more');ONITAccount.later(()=>window.openAutoCareHealth?.(),80)}});
  return out;
 }
 function dataItems(){

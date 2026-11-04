@@ -2,6 +2,7 @@
 (function(){
   'use strict';
   const state={my:null,owner:null,loading:false,queue:[],showing:false,lastLoad:0};
+ONITAccount.onRetire(()=>{Object.keys(state).forEach(k=>delete state[k]);Object.assign(state,{my:null,owner:null,loading:false,queue:[],showing:false,lastLoad:0});});
   const esc=v=>typeof escapeHTML==='function'?escapeHTML(String(v??'')):String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
   const pct=(n,d)=>Math.max(0,Math.min(100,d?Math.round((Number(n||0)/Number(d))*100):0));
   const fmtDate=v=>{try{return typeof formatDateTime==='function'?formatDateTime(v):new Date(v).toLocaleString()}catch(e){return String(v||'')}};
@@ -28,23 +29,23 @@
     if(state.showing||!state.queue.length)return;state.showing=true;const a=state.queue.shift(),host=ensurePopupHost();
     document.getElementById('onitRewardHeadline').textContent=a.headline||'Nice one.';document.getElementById('onitRewardMessage').textContent=a.message||a.reason||'Good work.';document.getElementById('onitRewardCoins').textContent='+'+Number(a.coins||0)+' ONIT Coins';document.getElementById('onitRewardWeek').textContent=`${Number(a.week||0)} / ${Number(a.weekTarget||40)}`;document.getElementById('onitRewardMonth').textContent=`${Number(a.month||0)} / ${Number(a.monthTarget||160)}`;
     host.classList.remove('hidden');confetti(a.celebration||'small');
-    clearTimeout(showNext.timer);showNext.timer=setTimeout(dismissAward,a.milestone==='MONTHLY'?7000:a.milestone==='WEEKLY'?6000:4800);
+    clearTimeout(showNext.timer);showNext.timer=ONITAccount.later(dismissAward,a.milestone==='MONTHLY'?7000:a.milestone==='WEEKLY'?6000:4800);
   }
-  function dismissAward(){clearTimeout(showNext.timer);const host=document.getElementById('onitRewardPopupHost');if(host)host.classList.add('hidden');state.showing=false;setTimeout(showNext,180);if(document.getElementById('rewards')&&!document.getElementById('rewards').classList.contains('hidden'))load(true);}
+  function dismissAward(){clearTimeout(showNext.timer);const host=document.getElementById('onitRewardPopupHost');if(host)host.classList.add('hidden');state.showing=false;ONITAccount.later(showNext,180);if(document.getElementById('rewards')&&!document.getElementById('rewards').classList.contains('hidden'))load(true);}
   function handleApiRewards(items){const list=(Array.isArray(items)?items:[]).filter(x=>Number(x&&x.coins||0)>0);if(!list.length)return;state.queue.push(...list);showNext();}
 
-  async function load(force=false){
+  async function load(force=false){let __onitScope4251=ONITAccount.capture();
     if(!SESSION_TOKEN||state.loading)return;if(!force&&state.my&&Date.now()-state.lastLoad<45000){render();return}
     state.loading=true;renderLoading();
     try{
       if(typeof isOwner==='function'&&isOwner()){
-        const owner=await apiPost('REWARDS_OWNER_DASHBOARD',{});state.owner=owner.data||owner;state.my=state.owner.my||null;
-        if(!state.my){const mine=await apiPost('REWARDS_MY',{});state.my=mine.data||mine;}
+        const owner=await ONITAccount.wait(apiPost('REWARDS_OWNER_DASHBOARD',{}),__onitScope4251);state.owner=owner.data||owner;state.my=state.owner.my||null;
+        if(!state.my){const mine=await ONITAccount.wait(apiPost('REWARDS_MY',{}),__onitScope4251);state.my=mine.data||mine;}
       }else{
-        const mine=await apiPost('REWARDS_MY',{});state.my=mine.data||mine;state.owner=null;
+        const mine=await ONITAccount.wait(apiPost('REWARDS_MY',{}),__onitScope4251);state.my=mine.data||mine;state.owner=null;
       }
       state.lastLoad=Date.now();render();
-    }catch(e){renderError(e)}finally{state.loading=false}
+    }catch(e){ONITAccount.assert(__onitScope4251);renderError(e)}finally{if(ONITAccount.isCurrent(__onitScope4251)){state.loading=false}}
   }
 
   function renderLoading(){const root=document.getElementById('rewardsRoot');if(!root||state.my)return;if(window.ONITUI)return ONITUI.setState(root,{type:'loading',title:'ONIT Rewards is loading…',message:'Checking your private coin ledger.'});root.innerHTML=`<div class="card"><b>ONIT Rewards is loading…</b><div class="tiny">Checking your private coin ledger.</div></div>`;}
@@ -65,12 +66,12 @@
     root.innerHTML=`<div class="onitRewardsPage"><div class="onitRewardHero"><div><div class="onitRewardEyebrow">MY ONIT</div><h1>${Number(s.month||0)} ONIT COINS</h1><p>${esc(m.firstName||'You')}, this is your private record of consistent workflow. Forty coins represents the working week. Hit 160 in the month and the reward unlocks.</p></div><div class="onitCoinMark"><div class="onitCoinDisc">O</div></div></div><div class="onitRewardGrid">${progressCard('TODAY',s.day,s.dayTarget,'8 is the fun daily pace — no pressure if your workload lands differently.')}${progressCard('THIS WEEK',s.week,s.weekTarget,Number(s.week||0)>=Number(s.weekTarget||40)?'40/40. Weekly target complete.':`${Math.max(0,Number(s.weekTarget||40)-Number(s.week||0))} coins to the weekly target.`)}${progressCard('THIS MONTH',s.month,s.monthTarget,s.qualified?'160 reached. Reward unlocked.':`${Math.max(0,Number(s.monthTarget||160)-Number(s.month||0))} coins to qualification.`)}</div>${prizeCard(s)}${recentRows(s)}${ownerPanel()}</div>`;
   }
 
-  async function saveOwnerReward(btn){
+  async function saveOwnerReward(btn){let __onitScope11494=ONITAccount.capture();
     const title=document.getElementById('rewardOwnerTitle')?.value.trim(),description=document.getElementById('rewardOwnerDescription')?.value.trim(),winnerMessage=document.getElementById('rewardOwnerMessage')?.value.trim(),monthKey=document.getElementById('rewardOwnerMonth')?.value.trim(),active=!!document.getElementById('rewardOwnerActive')?.checked;if(!title)return onitAlert('Please type the reward first.');
-    const old=btn?.textContent;try{if(btn){if(window.ONITUI)ONITUI.setBusy(btn,true,'SAVING…');else{btn.disabled=true;btn.textContent='SAVING…'}}await apiPost('REWARDS_OWNER_SAVE_CONFIG',{rewardTitle:title,rewardDescription:description,winnerMessage,monthKey,active});if(typeof showToast==='function')showToast('ONIT Rewards','Monthly reward saved.');await load(true);}catch(e){onitAlert('Could not save the monthly reward. '+e.message)}finally{if(btn){if(window.ONITUI)ONITUI.setBusy(btn,false);else{btn.disabled=false;btn.textContent=old||'SAVE MONTHLY REWARD'}}}
+    const old=btn?.textContent;try{if(btn){if(window.ONITUI)ONITUI.setBusy(btn,true,'SAVING…');else{btn.disabled=true;btn.textContent='SAVING…'}}await ONITAccount.wait(apiPost('REWARDS_OWNER_SAVE_CONFIG',{rewardTitle:title,rewardDescription:description,winnerMessage,monthKey,active}),__onitScope11494);if(typeof showToast==='function')showToast('ONIT Rewards','Monthly reward saved.');await ONITAccount.wait(load(true),__onitScope11494);}catch(e){ONITAccount.assert(__onitScope11494);onitAlert('Could not save the monthly reward. '+e.message)}finally{if(ONITAccount.isCurrent(__onitScope11494)){if(btn){if(window.ONITUI)ONITUI.setBusy(btn,false);else{btn.disabled=false;btn.textContent=old||'SAVE MONTHLY REWARD'}}}}
   }
-  async function markFulfilled(id,btn){const old=btn?.textContent;try{if(btn){if(window.ONITUI)ONITUI.setBusy(btn,true,'SAVING…');else{btn.disabled=true;btn.textContent='SAVING…'}}await apiPost('REWARDS_OWNER_MARK_FULFILLED',{winnerId:id});if(typeof showToast==='function')showToast('Reward issued','ONIT recorded the fulfilment.');await load(true);}catch(e){onitAlert('Could not mark the reward as issued. '+e.message)}finally{if(btn){if(window.ONITUI)ONITUI.setBusy(btn,false);else{btn.disabled=false;btn.textContent=old||'MARK ISSUED'}}}}
+  async function markFulfilled(id,btn){let __onitScope12518=ONITAccount.capture();const old=btn?.textContent;try{if(btn){if(window.ONITUI)ONITUI.setBusy(btn,true,'SAVING…');else{btn.disabled=true;btn.textContent='SAVING…'}}await ONITAccount.wait(apiPost('REWARDS_OWNER_MARK_FULFILLED',{winnerId:id}),__onitScope12518);if(typeof showToast==='function')showToast('Reward issued','ONIT recorded the fulfilment.');await ONITAccount.wait(load(true),__onitScope12518);}catch(e){ONITAccount.assert(__onitScope12518);onitAlert('Could not mark the reward as issued. '+e.message)}finally{if(ONITAccount.isCurrent(__onitScope12518)){if(btn){if(window.ONITUI)ONITUI.setBusy(btn,false);else{btn.disabled=false;btn.textContent=old||'MARK ISSUED'}}}}}
   function open(force=false){load(force);}
   window.ONITRewards={open,load,render,handleApiRewards,dismissAward,saveOwnerReward,markFulfilled};
-  window.addEventListener('onit:workspace-ready',()=>{if(SESSION_TOKEN)setTimeout(()=>load(false),900)});
+  window.addEventListener('onit:workspace-ready',()=>{if(SESSION_TOKEN)ONITAccount.later(()=>load(false),900)});
 })();

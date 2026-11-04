@@ -1,7 +1,8 @@
 
 (function(){
   let active=null,lastFocus=null;
-  function close(value){if(!active)return;const a=active;active=null;a.layer.remove();if(lastFocus&&document.contains(lastFocus))setTimeout(()=>lastFocus.focus?.(),0);a.resolve(value)}
+  ONITAccount.onRetire(()=>{lastFocus=null;close(null)});
+  function close(value){if(!active)return;const a=active;active=null;a.layer.remove();if(lastFocus&&document.contains(lastFocus))ONITAccount.later(()=>lastFocus.focus?.(),0);a.resolve(value)}
   function open(opts){
     if(active)close(null);lastFocus=document.activeElement;
     return new Promise(resolve=>{
@@ -14,7 +15,7 @@
       const actions=document.createElement('div');actions.className='onitDialogActions';
       if(opts.kind!=='alert'){const cancel=document.createElement('button');cancel.type='button';cancel.className='onitDialogBtn';cancel.textContent=opts.cancelLabel||'CANCEL';cancel.onclick=()=>close(opts.kind==='confirm'?false:null);actions.appendChild(cancel)}
       const ok=document.createElement('button');ok.type='button';ok.className='onitDialogBtn primary';ok.textContent=opts.okLabel||'OK';ok.onclick=()=>close(opts.kind==='prompt'?(input?input.value:''):opts.kind==='confirm'?true:true);actions.appendChild(ok);card.appendChild(actions);layer.appendChild(card);document.body.appendChild(layer);active={layer,resolve,kind:opts.kind};
-      layer.addEventListener('click',e=>{if(e.target===layer&&opts.kind!=='alert')close(opts.kind==='confirm'?false:null)});layer.addEventListener('keydown',e=>{if(e.key==='Escape'){e.preventDefault();close(opts.kind==='confirm'?false:null)}if(e.key==='Enter'&&!e.shiftKey&&(opts.kind!=='prompt'||!opts.multiline)){e.preventDefault();ok.click()}});setTimeout(()=>{(input||ok).focus();if(input&&input.select)input.select()},0);
+      layer.addEventListener('click',e=>{if(e.target===layer&&opts.kind!=='alert')close(opts.kind==='confirm'?false:null)});layer.addEventListener('keydown',e=>{if(e.key==='Escape'){e.preventDefault();close(opts.kind==='confirm'?false:null)}if(e.key==='Enter'&&!e.shiftKey&&(opts.kind!=='prompt'||!opts.multiline)){e.preventDefault();ok.click()}});ONITAccount.later(()=>{(input||ok).focus();if(input&&input.select)input.select()},0);
     })
   }
   window.onitAlert=function(message,title='ONIT'){return open({kind:'alert',title,message,okLabel:'GOT IT'})};

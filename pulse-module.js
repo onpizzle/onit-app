@@ -1,10 +1,12 @@
 /* ONIT Digital Pulse v0.39.3 — Reports clarity + persistent output controls */
 (function(){
 'use strict';
-const state={cap:null,tab:'today',data:null,candidates:null,lastAt:0,lastCapAt:0,busy:false,dirty:false,dirtyGroups:new Set(),draftsLoaded:false,lastSavedAt:0,lastQuietSyncAt:0,quietSyncBusy:false,dataFingerprint:'',reportSetup:null,reportSetupAt:0,reportDraft:null,reportLoadedId:'',reportIntelligence:null,reportDelivery:null};
+const initialState=()=>({cap:null,tab:'today',data:null,candidates:null,lastAt:0,lastCapAt:0,busy:false,dirty:false,dirtyGroups:new Set(),draftsLoaded:false,lastSavedAt:0,lastQuietSyncAt:0,quietSyncBusy:false,dataFingerprint:'',reportSetup:null,reportSetupAt:0,reportDraft:null,reportLoadedId:'',reportIntelligence:null,reportDelivery:null,reportBusyOwner:null});
+const state=initialState();
+ONITAccount.onRetire(()=>{Object.keys(state).forEach(k=>delete state[k]);Object.assign(state,initialState());});
 const esc=v=>typeof escapeHTML==='function'?escapeHTML(String(v==null?'':v)):String(v==null?'':v).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 const val=(o,...ks)=>{for(const k of ks){if(o&&o[k]!==undefined&&o[k]!==null&&o[k]!=='')return o[k]}return ''};
-const api=(action,data={})=>apiPost(action,data,true).then(r=>r.data||r);
+const api=(action,data={})=>apiPost(action,data,true).then(ONITAccount.guard(r=>r.data||r));
 const root=()=>document.getElementById('pulseRoot');
 const nav=()=>document.getElementById('navPulse');
 const currentUserObj=()=>typeof currentUser!=='undefined'&&currentUser?currentUser:null;
@@ -105,23 +107,23 @@ function shell(body,title='Digital Pulse',sub='Always-on digital operations, lis
  return `<div class='dpShell'><div class='dpTop'><div><div class='dpEyebrow'>ONIT • DIGITAL</div><h1>${esc(title)}</h1><p class='muted'>${esc(sub)}</p></div><div class='actions'>${status}${reportOutput}<button class='secondary' onclick='DigitalPulse.refresh()'>REFRESH</button></div></div>${tabbar()}${body}</div>`;
 }
 function loading(label='Digital Pulse'){const r=root();if(r)r.innerHTML=shell(`<div class='dpLoading'><span class='dpSpinner'></span><div><b>Loading ${esc(label)}…</b><div class='tiny'>Your click registered. ONIT is refreshing Pulse.</div></div></div>`,label)}
-async function refreshCapabilities(force=false){if(typeof SESSION_TOKEN==='undefined'||!SESSION_TOKEN||typeof CURRENT_USER_ID==='undefined'||!CURRENT_USER_ID){state.cap=null;setNav();return null}if(!force&&state.cap&&Date.now()-state.lastCapAt<30000)return state.cap;try{state.cap=await api('PULSE_CAPABILITIES');state.lastCapAt=Date.now();setNav();return state.cap}catch(e){state.cap=fallbackCap();state.cap.capabilityError=String(e&&e.message||e||'Pulse capability check failed');state.lastCapAt=Date.now();setNav();return state.cap}}
+async function refreshCapabilities(force=false){let __onitScope9473=ONITAccount.capture();if(typeof SESSION_TOKEN==='undefined'||!SESSION_TOKEN||typeof CURRENT_USER_ID==='undefined'||!CURRENT_USER_ID){state.cap=null;setNav();return null}if(!force&&state.cap&&Date.now()-state.lastCapAt<30000)return state.cap;try{state.cap=await ONITAccount.wait(api('PULSE_CAPABILITIES'),__onitScope9473);state.lastCapAt=Date.now();setNav();return state.cap}catch(e){ONITAccount.assert(__onitScope9473);state.cap=fallbackCap();state.cap.capabilityError=String(e&&e.message||e||'Pulse capability check failed');state.lastCapAt=Date.now();setNav();return state.cap}}
 function pulseFingerprint(d){try{return JSON.stringify({today:d?.today||'',daily:d?.daily||null,teamReadiness:d?.teamReadiness||[],summary:d?.summary||{},engagement:d?.engagement||[],content:d?.content||[],insights:d?.insights||[],escalations:d?.escalations||[],metrics:d?.metrics||[]})}catch(e){return String(Date.now())}}
-async function load(force=false){if(!force&&state.data)return state.data;state.data=await api('PULSE_DASHBOARD');state.lastAt=Date.now();state.dataFingerprint=pulseFingerprint(state.data);return state.data}
-async function quietLeadershipSync(force=false){
+async function load(force=false){let __onitScope10334=ONITAccount.capture();if(!force&&state.data)return state.data;state.data=await ONITAccount.wait(api('PULSE_DASHBOARD'),__onitScope10334);state.lastAt=Date.now();state.dataFingerprint=pulseFingerprint(state.data);return state.data}
+async function quietLeadershipSync(force=false){let __onitScope10541=ONITAccount.capture();
  if(canWrite()||state.quietSyncBusy||!allowed()||document.getElementById('pulse')?.classList.contains('hidden'))return false;
  const now=Date.now();if(!force&&now-state.lastQuietSyncAt<55000)return false;
  state.quietSyncBusy=true;state.lastQuietSyncAt=now;
  try{
-   const fresh=await api('PULSE_DASHBOARD'),fp=pulseFingerprint(fresh);
+   const fresh=await ONITAccount.wait(api('PULSE_DASHBOARD'),__onitScope10541),fp=pulseFingerprint(fresh);
    if(fp===state.dataFingerprint)return false;
    const scrollTop=document.scrollingElement?document.scrollingElement.scrollTop:window.scrollY;
    state.data=fresh;state.dataFingerprint=fp;state.lastAt=Date.now();state.candidates=null;
-   if(state.tab==='today')today();else if(state.tab==='engagement')engagement();else if(state.tab==='content')content();else if(state.tab==='listening')listening();else if(state.tab==='reports')await reports();else if(state.tab==='cases')await cases();
-   requestAnimationFrame(()=>{try{window.scrollTo(0,scrollTop)}catch(e){}});
+    if(state.tab==='today')today();else if(state.tab==='engagement')engagement();else if(state.tab==='content')content();else if(state.tab==='listening')listening();else if(state.tab==='reports')await ONITAccount.wait(reports(),__onitScope10541);else if(state.tab==='cases')await ONITAccount.wait(cases(),__onitScope10541);
+    ONITAccount.frame(()=>{try{window.scrollTo(0,scrollTop)}catch(e){}},__onitScope10541);
    return true;
- }catch(e){console.warn('Pulse quiet sync:',e&&e.message||e);return false}
- finally{state.quietSyncBusy=false}
+ }catch(e){ONITAccount.assert(__onitScope10541);console.warn('Pulse quiet sync:',e&&e.message||e);return false}
+ finally{if(ONITAccount.isCurrent(__onitScope10541)){state.quietSyncBusy=false}}
 }
 function metric(label,value,hint=''){return `<div class='dpMetric'><span>${esc(label)}</span><b>${esc(value)}</b>${hint?`<small>${esc(hint)}</small>`:''}</div>`}
 function userName(id){const u=(state.data?.digitalUsers||[]).find(x=>val(x,'User ID','userId')===id);return u?val(u,'Full Name','fullName'):id||'Unassigned'}
@@ -152,7 +154,19 @@ function loadReportDraft(){if(state.reportDraft)return state.reportDraft;let d=n
 function persistReportDraft(){try{localStorage.setItem(reportStoreKey(),JSON.stringify(state.reportDraft||defaultReportDraft()))}catch(e){}}
 function clearReportDraft(){state.reportDraft=defaultReportDraft();state.reportLoadedId='';state.reportIntelligence=null;persistReportDraft()}
 function invalidateReportIntelligence(){state.reportLoadedId='';state.reportIntelligence=null;}
-async function ensureReportSetup(force=false){if(!force&&state.reportSetup&&Date.now()-state.reportSetupAt<60000)return state.reportSetup;state.reportSetup=await api('PULSE_REPORT_SETUP');state.reportSetupAt=Date.now();const d=loadReportDraft();if(d.clientId!=='ALL'&&!state.reportSetup.clients.some(c=>c.clientId===d.clientId))d.clientId='ALL';if(!d.platforms.length)d.platforms=['Instagram'];persistReportDraft();return state.reportSetup}
+async function ensureReportSetup(force=false){
+  const scope=ONITAccount.capture();
+  if(!force&&state.reportSetup&&Date.now()-state.reportSetupAt<60000)return state.reportSetup;
+  const setup=await ONITAccount.wait(api('PULSE_REPORT_SETUP'),scope);
+  ONITAccount.assert(scope);
+  state.reportSetup=setup;state.reportSetupAt=Date.now();
+  const d=loadReportDraft();
+  ONITAccount.assert(scope);
+  if(d.clientId!=='ALL'&&!state.reportSetup.clients.some(c=>c.clientId===d.clientId))d.clientId='ALL';
+  if(!d.platforms.length)d.platforms=['Instagram'];
+  ONITAccount.assert(scope);persistReportDraft();
+  return state.reportSetup;
+}
 function reportCatalog(){return state.reportSetup?.metricCatalog||[]}
 function reportDef(key){return reportCatalog().find(m=>m.key===key)||null}
 function reportFormatValue(v,unit){const n=Number(v);if(!Number.isFinite(n))return '—';if(unit==='%')return `${n.toLocaleString(undefined,{maximumFractionDigits:2})}%`;if(unit==='money')return n.toLocaleString(undefined,{maximumFractionDigits:2});if(unit==='minutes')return `${n.toLocaleString(undefined,{maximumFractionDigits:2})} min`;if(unit==='x')return `${n.toLocaleString(undefined,{maximumFractionDigits:2})}x`;return n.toLocaleString(undefined,{maximumFractionDigits:2})}
@@ -181,10 +195,22 @@ function reportPasteToggle(){const el=document.getElementById('dpReportPaste');i
 function parseReportPaste(){invalidateReportIntelligence();const raw=document.getElementById('prPasteText')?.value||'';if(!raw.trim())return;const d=loadReportDraft(),catalog=reportCatalog(),byName={};catalog.forEach(m=>{byName[m.key.toLowerCase()]=m;byName[m.name.toLowerCase()]=m});let added=0,skipped=0;const lines=raw.trim().split(/\r?\n/);lines.forEach((line,idx)=>{let cols=line.includes('\t')?line.split('\t'):line.split(',');cols=cols.map(x=>String(x||'').trim());if(idx===0&&/metric/i.test(cols[0]||'')&&/value/i.test(cols.join(' ')))return;const def=byName[String(cols[0]||'').toLowerCase()];if(!def){skipped++;return}const platform=(state.reportSetup?.platforms||[]).find(p=>p.toLowerCase()===String(cols[1]||'').toLowerCase())||d.platforms[0];if(!d.platforms.includes(platform)){skipped++;return}const cleaned=String(cols[2]||'').replace(/[,₦$£€%]/g,'');const value=Number(cleaned);if(!Number.isFinite(value)){skipped++;return}const row=reportMetricSeed(def.key);row.platform=platform;row.value=String(value);const src=String(cols[3]||'').toLowerCase();if(src.includes('client'))row.sourceType='client_report';else if(src.includes('manual'))row.sourceType='manual_count';row.sourceUrl=cols[4]||'';row.note=cols.slice(5).join(' ')||'';d.metrics.push(row);added++});recalculateReportMetrics();persistReportDraft();showToast('Digital Pulse',`${added} metric row${added===1?'':'s'} added${skipped?` • ${skipped} skipped`:''}.`);reports()}
 function reportFilterHistory(){const d=loadReportDraft(),list=state.reportSetup?.recentReports||[];return list.filter(r=>{if(d.clientId!=='ALL'&&r.clientId!==d.clientId)return false;if(d.campaign&&String(r.campaign||'').toLowerCase()!==String(d.campaign).toLowerCase())return false;if(d.reportType&&String(r.reportType||'')!==d.reportType)return false;if(r.startDate&&r.endDate&&(String(r.startDate)>String(d.endDate)||String(r.endDate)<String(d.startDate)))return false;const rp=Array.isArray(r.platforms)?r.platforms:[];if(d.platforms.length&&!d.platforms.some(p=>rp.includes(p)))return false;return true})}
 function reportPreviewCards(){const d=loadReportDraft();return d.metrics.slice(0,8).map(row=>{const def=reportDef(row.metricKey)||{};return `<div class='dpMetric'><span>${esc(def.name||row.metricKey)} · ${esc(row.platform)}</span><b>${esc(reportFormatValue(row.value,def.unit))}</b><small>${esc(def.unit||'')}</small></div>`}).join('')}
+function reportOperation_(reportId=state.reportLoadedId){return{scope:ONITAccount.capture(),reportId:String(reportId||'')}}
+function reportOperationCurrent_(op,requireReport=true){return !!op&&ONITAccount.isCurrent(op.scope)&&(!requireReport||String(state.reportLoadedId||'')===String(op.reportId||''))}
+function reportOperationError_(e,op,requireReport=true){return !(e&&e.code==='ONIT_STALE_ACCOUNT')&&reportOperationCurrent_(op,requireReport)}
+function reportBusyStart_(op){if(state.busy)return false;state.busy=true;state.reportBusyOwner=op.scope;return true}
+function reportBusyEnd_(op){if(reportOperationCurrent_(op,false)&&state.reportBusyOwner===op.scope){state.busy=false;state.reportBusyOwner=null}}
 async function loadReportIntelligence(reportId){
   if(!reportId){state.reportIntelligence=null;return null}
-  try{state.reportIntelligence=await api('PULSE_REPORT_INTELLIGENCE',{reportId});state.reportDelivery=null;return state.reportIntelligence}
-  catch(e){state.reportIntelligence={error:String(e&&e.message||e||'Report intelligence could not load.')};return state.reportIntelligence}
+  const op=reportOperation_(reportId);
+  try{
+    const value=await ONITAccount.wait(api('PULSE_REPORT_INTELLIGENCE',{reportId:op.reportId}),op.scope);
+    if(!reportOperationCurrent_(op))return null;
+    state.reportIntelligence=value;state.reportDelivery=null;return value;
+  }catch(e){
+    if(!reportOperationError_(e,op))return null;
+    state.reportIntelligence={error:String(e&&e.message||e||'Report intelligence could not load.')};return state.reportIntelligence;
+  }
 }
 function reportDeltaLabel(k){
   if(k.previousValue===null||k.previousValue===undefined)return 'NO MATCHING COMPARISON';
@@ -210,10 +236,25 @@ function reportM3Html(x){
 }
 function reportPerformanceEditor(p){const k=reportDomKey(p.reportContentId||p.contentId),url=reportSafeUrl(p.postUrl);const f=(key,label,val)=>`<div class='field'><label>${label}</label><input id='rpc_${k}_${key}' inputmode='decimal' type='number' min='0' step='any' value='${esc(val===null||val===undefined?'':val)}'></div>`;return `<details class='dpPerfItem' open><summary><div><b>${esc(p.title||'Untitled content')}</b><small>${esc(p.platform||'')} • ${esc(p.contentType||'')}${p.publishedAt?' • '+esc(fmtDate(p.publishedAt)):''}</small></div><span>${p.engagementRate!==null&&p.engagementRate!==undefined?esc(reportFormatValue(p.engagementRate,'%')):'ADD METRICS'}</span></summary><div class='dpPerfGrid'>${f('reach','REACH',p.reach)}${f('views','VIEWS',p.views)}${f('impressions','IMPRESSIONS',p.impressions)}${f('likes','LIKES',p.likes)}${f('comments','COMMENTS',p.comments)}${f('shares','SHARES',p.shares)}${f('saves','SAVES',p.saves)}${f('videoViews','VIDEO VIEWS',p.videoViews)}${f('linkClicks','LINK CLICKS',p.linkClicks)}${f('engagementRate','ENGAGEMENT RATE %',p.engagementRate)}</div><div class='field'><label>NOTE</label><input id='rpc_${k}_note' value='${esc(p.note||'')}' placeholder='Optional context for this post'></div><div class='actions'>${url?`<a class='secondary buttonLike' href='${esc(url)}' target='_blank' rel='noopener'>OPEN POST</a>`:''}<button class='new' onclick="DigitalPulse.saveReportContent('${esc(p.reportContentId)}','${esc(p.contentId)}')">SAVE PERFORMANCE</button><button class='secondary dangerLite' onclick="DigitalPulse.archiveReportContent('${esc(p.reportContentId)}')">REMOVE</button></div></details>`}
 function reportPerformancePayload(reportContentId,contentId){const k=reportDomKey(reportContentId||contentId),read=id=>document.getElementById(`rpc_${k}_${id}`)?.value??'';return{reportId:state.reportLoadedId,reportContentId,contentId,reach:read('reach'),views:read('views'),impressions:read('impressions'),likes:read('likes'),comments:read('comments'),shares:read('shares'),saves:read('saves'),videoViews:read('videoViews'),linkClicks:read('linkClicks'),engagementRate:read('engagementRate'),note:read('note')}}
-async function addReportContent(contentId){if(!canWrite()||!state.reportLoadedId||state.busy)return;state.busy=true;try{await api('PULSE_SAVE_REPORT_CONTENT',{reportId:state.reportLoadedId,contentId});await loadReportIntelligence(state.reportLoadedId);showToast('Digital Pulse','Published content attached to this report.');await reports()}catch(e){onitAlert(e.message)}finally{state.busy=false}}
-async function saveReportContent(reportContentId,contentId){if(!canWrite()||!state.reportLoadedId||state.busy)return;state.busy=true;try{await api('PULSE_SAVE_REPORT_CONTENT',reportPerformancePayload(reportContentId,contentId));await loadReportIntelligence(state.reportLoadedId);showToast('Digital Pulse','Post performance saved.');await reports()}catch(e){onitAlert(e.message)}finally{state.busy=false}}
-async function archiveReportContent(reportContentId){if(!canWrite()||state.busy)return;if(!await onitConfirm('Remove this post performance from the report?'))return;state.busy=true;try{await api('PULSE_ARCHIVE_REPORT_CONTENT',{reportContentId});await loadReportIntelligence(state.reportLoadedId);showToast('Digital Pulse','Post performance removed from this report.');await reports()}catch(e){onitAlert(e.message)}finally{state.busy=false}}
-async function openLinkedCase(caseId){if(!caseId)return;try{const cap=await api('CASES_CAPABILITIES');if(!cap.canUse)return onitAlert('Cases is private for this account. Ask the System Owner for access.');if(typeof CasesModule==='undefined'||typeof show!=='function')return onitAlert('Cases is not available in this ONIT build.');await CasesModule.refreshCapabilities(true);show('cases');setTimeout(()=>CasesModule.selectCase(caseId),80)}catch(e){onitAlert(e.message)}}
+async function addReportContent(contentId){
+  if(!canWrite()||!state.reportLoadedId||state.busy)return;const op=reportOperation_();if(!reportBusyStart_(op))return;
+  try{await ONITAccount.wait(api('PULSE_SAVE_REPORT_CONTENT',{reportId:op.reportId,contentId}),op.scope);if(!reportOperationCurrent_(op))return;await ONITAccount.wait(loadReportIntelligence(op.reportId),op.scope);if(!reportOperationCurrent_(op))return;showToast('Digital Pulse','Published content attached to this report.');await ONITAccount.wait(reports(),op.scope)}
+  catch(e){if(reportOperationError_(e,op))onitAlert(e.message)}finally{reportBusyEnd_(op)}
+}
+async function saveReportContent(reportContentId,contentId){
+  if(!canWrite()||!state.reportLoadedId||state.busy)return;const op=reportOperation_();if(!reportBusyStart_(op))return;const payload=reportPerformancePayload(reportContentId,contentId);payload.reportId=op.reportId;
+  try{await ONITAccount.wait(api('PULSE_SAVE_REPORT_CONTENT',payload),op.scope);if(!reportOperationCurrent_(op))return;await ONITAccount.wait(loadReportIntelligence(op.reportId),op.scope);if(!reportOperationCurrent_(op))return;showToast('Digital Pulse','Post performance saved.');await ONITAccount.wait(reports(),op.scope)}
+  catch(e){if(reportOperationError_(e,op))onitAlert(e.message)}finally{reportBusyEnd_(op)}
+}
+async function archiveReportContent(reportContentId){
+  if(!canWrite()||state.busy)return;const op=reportOperation_();
+  try{const ok=await ONITAccount.wait(onitConfirm('Remove this post performance from the report?'),op.scope);if(!ok||!reportOperationCurrent_(op))return;if(!reportBusyStart_(op))return;await ONITAccount.wait(api('PULSE_ARCHIVE_REPORT_CONTENT',{reportContentId}),op.scope);if(!reportOperationCurrent_(op))return;await ONITAccount.wait(loadReportIntelligence(op.reportId),op.scope);if(!reportOperationCurrent_(op))return;showToast('Digital Pulse','Post performance removed from this report.');await ONITAccount.wait(reports(),op.scope)}
+  catch(e){if(reportOperationError_(e,op))onitAlert(e.message)}finally{reportBusyEnd_(op)}
+}
+async function openLinkedCase(caseId){
+  if(!caseId)return;const op=reportOperation_(state.reportLoadedId);const expectedCaseId=String(caseId);
+  try{const cap=await ONITAccount.wait(api('CASES_CAPABILITIES'),op.scope);if(!reportOperationCurrent_(op,false))return;if(!cap.canUse)return onitAlert('Cases is private for this account. Ask the System Owner for access.');if(typeof CasesModule==='undefined'||typeof show!=='function')return onitAlert('Cases is not available in this ONIT build.');await ONITAccount.wait(CasesModule.refreshCapabilities(true),op.scope);if(!reportOperationCurrent_(op,false))return;show('cases');ONITAccount.later(()=>CasesModule.selectCase(expectedCaseId),80,op.scope)}catch(e){if(reportOperationError_(e,op,false))onitAlert(e.message)}
+}
 
 function reportIntelligenceHtml(){
   const x=state.reportIntelligence;if(!state.reportLoadedId)return '';
@@ -246,43 +287,65 @@ function reportGoalsHtml(){
 async function saveReportGoal(){
   if(!canWrite())return showToast('Digital Pulse','View only.');
   const d=loadReportDraft(),metricKey=document.getElementById('prGoalMetric')?.value,target=document.getElementById('prGoalTarget')?.value;
-  if(d.clientId==='ALL')return onitAlert('Choose one client before saving a goal.');
-  if(target===''||!Number.isFinite(Number(target))||Number(target)<0)return onitAlert('Enter a valid weekly target.');
-  if(state.busy)return;state.busy=true;
-  try{await api('PULSE_SAVE_GOAL',{clientId:d.clientId,metricKey,weeklyTarget:Number(target)});state.reportSetupAt=0;await ensureReportSetup(true);if(state.reportLoadedId)await loadReportIntelligence(state.reportLoadedId);showToast('Digital Pulse','Weekly goal saved.');await reports()}
-  catch(e){onitAlert(e.message)}finally{state.busy=false}
+  if(d.clientId==='ALL')return onitAlert('Choose one client before saving a goal.');if(target===''||!Number.isFinite(Number(target))||Number(target)<0)return onitAlert('Enter a valid weekly target.');if(state.busy)return;
+  const op=reportOperation_();if(!reportBusyStart_(op))return;
+  try{await ONITAccount.wait(api('PULSE_SAVE_GOAL',{clientId:d.clientId,metricKey,weeklyTarget:Number(target)}),op.scope);if(!reportOperationCurrent_(op,false))return;state.reportSetupAt=0;await ONITAccount.wait(ensureReportSetup(true),op.scope);if(!reportOperationCurrent_(op,false))return;if(op.reportId&&String(state.reportLoadedId||'')===op.reportId)await ONITAccount.wait(loadReportIntelligence(op.reportId),op.scope);if(!reportOperationCurrent_(op,false))return;showToast('Digital Pulse','Weekly goal saved.');await ONITAccount.wait(reports(),op.scope)}
+  catch(e){if(reportOperationError_(e,op,false))onitAlert(e.message)}finally{reportBusyEnd_(op)}
 }
 async function archiveReportGoal(goalId){
-  if(!canWrite()||state.busy)return;
-  if(!await onitConfirm('Remove this weekly goal?'))return;
-  state.busy=true;try{await api('PULSE_ARCHIVE_GOAL',{goalId});state.reportSetupAt=0;await ensureReportSetup(true);if(state.reportLoadedId)await loadReportIntelligence(state.reportLoadedId);showToast('Digital Pulse','Weekly goal removed.');await reports()}catch(e){onitAlert(e.message)}finally{state.busy=false}
+  if(!canWrite()||state.busy)return;const op=reportOperation_();
+  try{const ok=await ONITAccount.wait(onitConfirm('Remove this weekly goal?'),op.scope);if(!ok||!reportOperationCurrent_(op,false))return;if(!reportBusyStart_(op))return;await ONITAccount.wait(api('PULSE_ARCHIVE_GOAL',{goalId}),op.scope);if(!reportOperationCurrent_(op,false))return;state.reportSetupAt=0;await ONITAccount.wait(ensureReportSetup(true),op.scope);if(!reportOperationCurrent_(op,false))return;if(op.reportId&&String(state.reportLoadedId||'')===op.reportId)await ONITAccount.wait(loadReportIntelligence(op.reportId),op.scope);if(!reportOperationCurrent_(op,false))return;showToast('Digital Pulse','Weekly goal removed.');await ONITAccount.wait(reports(),op.scope)}
+  catch(e){if(reportOperationError_(e,op,false))onitAlert(e.message)}finally{reportBusyEnd_(op)}
 }
 async function openSavedReport(reportId){
-  if(state.busy)return;state.busy=true;
-  try{
-    const x=await api('PULSE_GET_REPORT',{reportId}),r=x.report||{},metrics=x.metrics||[];
-    state.reportDraft={clientId:String(val(r,'Client ID')||'ALL'),campaign:String(val(r,'Campaign')||''),reportType:String(val(r,'Report Type')||'Daily'),startDate:String(val(r,'Start Date')||reportToday()),endDate:String(val(r,'End Date')||reportToday()),compareWith:String(val(r,'Compare With')||'previous_period'),platforms:String(val(r,'Platforms')||'').split(',').filter(Boolean),metrics:metrics.map(m=>({id:'loaded-'+String(val(m,'Report Metric ID')||Math.random()),metricKey:String(val(m,'Metric Key')||''),platform:String(val(m,'Platform')||''),startDate:String(val(m,'Start Date')||val(r,'Start Date')||''),endDate:String(val(m,'End Date')||val(r,'End Date')||''),value:String(val(m,'Value')||''),sourceType:String(val(m,'Source Type')||'platform_analytics'),sourceUrl:String(val(m,'Source URL')||''),note:String(val(m,'Note')||''),calculated:String(val(m,'Calculated')).toLowerCase()==='true'})),whatHappened:String(val(r,'What Happened')||''),why:String(val(r,'Why')||''),nextSteps:String(val(r,'Next Steps')||'')};
-    state.reportLoadedId=reportId;persistReportDraft();await loadReportIntelligence(reportId);await reports();
-  }catch(e){onitAlert(e.message)}finally{state.busy=false}
+  if(state.busy)return;const op=reportOperation_(reportId);if(!reportBusyStart_(op))return;
+  try{const x=await ONITAccount.wait(api('PULSE_GET_REPORT',{reportId:op.reportId}),op.scope);if(!reportOperationCurrent_(op,false))return;const r=x.report||{},metrics=x.metrics||[];state.reportDraft={clientId:String(val(r,'Client ID')||'ALL'),campaign:String(val(r,'Campaign')||''),reportType:String(val(r,'Report Type')||'Daily'),startDate:String(val(r,'Start Date')||reportToday()),endDate:String(val(r,'End Date')||reportToday()),compareWith:String(val(r,'Compare With')||'previous_period'),platforms:String(val(r,'Platforms')||'').split(',').filter(Boolean),metrics:metrics.map(m=>({id:'loaded-'+String(val(m,'Report Metric ID')||Math.random()),metricKey:String(val(m,'Metric Key')||''),platform:String(val(m,'Platform')||''),startDate:String(val(m,'Start Date')||val(r,'Start Date')||''),endDate:String(val(m,'End Date')||val(r,'End Date')||''),value:String(val(m,'Value')||''),sourceType:String(val(m,'Source Type')||'platform_analytics'),sourceUrl:String(val(m,'Source URL')||''),note:String(val(m,'Note')||''),calculated:String(val(m,'Calculated')).toLowerCase()==='true'})),whatHappened:String(val(r,'What Happened')||''),why:String(val(r,'Why')||''),nextSteps:String(val(r,'Next Steps')||'')};state.reportLoadedId=op.reportId;persistReportDraft();await ONITAccount.wait(loadReportIntelligence(op.reportId),op.scope);if(!reportOperationCurrent_(op))return;await ONITAccount.wait(reports(),op.scope)}
+  catch(e){if(reportOperationError_(e,op,false))onitAlert(e.message)}finally{reportBusyEnd_(op)}
 }
 async function saveStructuredReport(){
   if(!canWrite()){showToast('Digital Pulse','View only. Only users in the Digital department can save reports.');return}
   const d=loadReportDraft();if(d.clientId==='ALL')return onitAlert('Choose one client before saving a report. “All clients” is for the combined report history view.');if(!d.platforms.length)return onitAlert('Choose at least one platform.');if(!d.metrics.length)return onitAlert('Add at least one metric.');if(state.busy)return;
-  state.busy=true;recalculateReportMetrics();persistReportDraft();
-  try{
-    const out=await api('PULSE_SAVE_REPORT',{clientId:d.clientId,campaign:d.campaign,reportType:d.reportType,startDate:d.startDate,endDate:d.endDate,compareWith:d.compareWith,platforms:d.platforms,metrics:d.metrics.map(x=>({metricKey:x.metricKey,platform:x.platform,startDate:x.startDate,endDate:x.endDate,value:x.value,sourceType:x.sourceType,sourceUrl:x.sourceUrl,note:x.note,calculated:x.calculated})),whatHappened:d.whatHappened,why:d.why,nextSteps:d.nextSteps});
-    state.reportLoadedId=out.reportId||'';state.reportSetupAt=0;await ensureReportSetup(true);await loadReportIntelligence(state.reportLoadedId);showToast('Saved to ONIT',`Digital report saved with ${out.metricCount||d.metrics.length} metric rows.`);await reports();
-  }catch(e){onitAlert(e.message)}finally{state.busy=false}
+  const op=reportOperation_(state.reportLoadedId);if(!reportBusyStart_(op))return;recalculateReportMetrics();persistReportDraft();
+  try{const out=await ONITAccount.wait(api('PULSE_SAVE_REPORT',{clientId:d.clientId,campaign:d.campaign,reportType:d.reportType,startDate:d.startDate,endDate:d.endDate,compareWith:d.compareWith,platforms:d.platforms,metrics:d.metrics.map(x=>({metricKey:x.metricKey,platform:x.platform,startDate:x.startDate,endDate:x.endDate,value:x.value,sourceType:x.sourceType,sourceUrl:x.sourceUrl,note:x.note,calculated:x.calculated})),whatHappened:d.whatHappened,why:d.why,nextSteps:d.nextSteps}),op.scope);if(!reportOperationCurrent_(op,false))return;state.reportLoadedId=out.reportId||'';state.reportSetupAt=0;const savedId=state.reportLoadedId;await ONITAccount.wait(ensureReportSetup(true),op.scope);if(!ONITAccount.isCurrent(op.scope)||String(state.reportLoadedId||'')!==String(savedId||''))return;await ONITAccount.wait(loadReportIntelligence(savedId),op.scope);if(!ONITAccount.isCurrent(op.scope)||String(state.reportLoadedId||'')!==String(savedId||''))return;showToast('Saved to ONIT',`Digital report saved with ${out.metricCount||d.metrics.length} metric rows.`);await ONITAccount.wait(reports(),op.scope)}
+  catch(e){if(reportOperationError_(e,op,false))onitAlert(e.message)}finally{reportBusyEnd_(op)}
 }
 
-async function loadReportDelivery(reportId,force=false){if(!reportId)return null;if(!force&&state.reportDelivery)return state.reportDelivery;try{state.reportDelivery=await api('PULSE_REPORT_DELIVERY_STATE',{reportId});return state.reportDelivery}catch(e){state.reportDelivery={canDeliver:false,shares:[],schedules:[],error:e.message};return state.reportDelivery}}
+async function loadReportDelivery(reportId,force=false){
+  if(!reportId)return null;if(!force&&state.reportDelivery)return state.reportDelivery;const op=reportOperation_(reportId);
+  try{const value=await ONITAccount.wait(api('PULSE_REPORT_DELIVERY_STATE',{reportId:op.reportId}),op.scope);if(!reportOperationCurrent_(op))return null;state.reportDelivery=value;return value}
+  catch(e){if(!reportOperationError_(e,op))return null;state.reportDelivery={canDeliver:false,shares:[],schedules:[],error:e.message};return state.reportDelivery}
+}
 function deliveryHtml(){if(!state.reportLoadedId)return'';const d=state.reportDelivery||{},can=canDeliverReport()&&d.canDeliver!==false,shares=d.shares||[],schedules=d.schedules||[],snap=state.reportIntelligence||{},dailyWeekly=['Daily','Weekly'].includes(String(snap.reportType||'')),share=shares[0],schedule=schedules[0];if(!can)return`<div class='dpCard dpDelivery'><div class='dpCardHead'><div><h3>REPORT OUTPUT</h3><p>PDF, share, email and automatic delivery are managed by Digital contributors or leadership.</p></div><span class='pill'>M4</span></div></div>`;return `<div class='dpCard dpDelivery'><div class='dpCardHead'><div><h3>REPORT OUTPUT</h3><p>Deliver this saved report without changing its numbers.</p></div><span class='pill'>M4</span></div><div class='dpDeliveryActions'><button class='new' onclick='DigitalPulse.downloadStructuredReport()'>DOWNLOAD PDF</button><button class='secondary' onclick='DigitalPulse.createReportShare()'>${share?'REPLACE SHARE LINK':'CREATE SHARE LINK'}</button><button class='secondary' onclick='DigitalPulse.emailStructuredReport()'>EMAIL REPORT</button></div>${share?`<div class='dpDeliveryStatus'><b>ACTIVE SHARE LINK</b><span>Expires ${esc(fmtDate(share.expiresAt))} • ${num(share.viewCount)} view${num(share.viewCount)===1?'':'s'}</span><button class='linkbtn' onclick="DigitalPulse.revokeReportShare('${esc(share.shareId)}')">REVOKE</button></div>`:''}${dailyWeekly?`<div class='dpScheduleBox'><h4>AUTOMATIC ${esc(snap.reportType||'')} DELIVERY</h4><p class='tiny'>ONIT sends the newest saved, unsent matching report. It never invents a report in the background.</p><div class='dpScheduleGrid'><div class='field'><label>RECIPIENTS</label><input id='prScheduleRecipients' value='${esc(schedule?(schedule.recipients||[]).join(', '):'')}' placeholder='name@company.com, another@company.com'></div>${snap.reportType==='Weekly'?`<div class='field'><label>SEND DAY</label><select id='prScheduleDay'>${['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'].map(x=>`<option ${String(schedule?.dayOfWeek||'Monday')===x?'selected':''}>${x}</option>`).join('')}</select></div>`:''}<div class='field'><label>SEND TIME</label><input id='prScheduleTime' type='time' value='${esc(schedule?.sendTime||'09:00')}'></div><div class='field'><label>TIMEZONE</label><input id='prScheduleTimezone' value='${esc(schedule?.timezone||Intl.DateTimeFormat().resolvedOptions().timeZone||'Africa/Lagos')}'></div></div><div class='actions'><button class='secondary' onclick="DigitalPulse.saveReportSchedule('${esc(schedule?.scheduleId||'')}')">${schedule?'UPDATE SCHEDULE':'SAVE SCHEDULE'}</button>${schedule?`<button class='secondary danger' onclick="DigitalPulse.disableReportSchedule('${esc(schedule.scheduleId)}')">DISABLE</button>`:''}</div>${schedule?`<div class='tiny'>${schedule.enabled?'Enabled':'Disabled'}${schedule.lastSentAt?' • Last sent '+esc(fmtDate(schedule.lastSentAt)):''}${schedule.lastResult?' • '+esc(schedule.lastResult):''}</div>`:''}</div>`:`<div class='tiny dpDeliveryNote'>Automatic delivery is available for Daily and Weekly reports, matching the Digital Team workflow.</div>`}</div>`}
-async function downloadStructuredReport(){if(!state.reportLoadedId||!canDeliverReport())return showToast('Digital Pulse','Open a saved report first.');if(state.busy)return;state.busy=true;try{showToast('Digital Pulse','Building saved report PDF…');const d=await api('PULSE_EXPORT_STRUCTURED_REPORT',{reportId:state.reportLoadedId});downloadPdfPayload(d);showToast('Digital Pulse','PDF downloaded.')}catch(e){onitAlert(e.message)}finally{state.busy=false}}
-async function createReportShare(){if(!state.reportLoadedId||!canDeliverReport())return;try{const d=await api('PULSE_CREATE_REPORT_SHARE',{reportId:state.reportLoadedId,expiresDays:30});state.reportDelivery=null;await loadReportDelivery(state.reportLoadedId,true);let copied=false;try{await navigator.clipboard.writeText(d.url);copied=true}catch(e){}if(copied)showToast('Digital Pulse','Share link copied. It expires in 30 days.');else await onitPrompt('Copy this view-only report link:',d.url);await reports()}catch(e){onitAlert(e.message)}}
-async function revokeReportShare(shareId){if(!await onitConfirm('Revoke this report share link?'))return;try{await api('PULSE_REVOKE_REPORT_SHARE',{shareId});state.reportDelivery=null;await loadReportDelivery(state.reportLoadedId,true);showToast('Digital Pulse','Share link revoked.');await reports()}catch(e){onitAlert(e.message)}}
-async function emailStructuredReport(){if(!state.reportLoadedId||!canDeliverReport())return;const recipients=String(await onitPrompt('Email this saved report to (comma-separated addresses):','')||'').trim();if(!recipients)return;try{showToast('Digital Pulse','Sending report email…');const d=await api('PULSE_EMAIL_STRUCTURED_REPORT',{reportId:state.reportLoadedId,recipients});showToast('Digital Pulse',`Report emailed to ${(d.recipients||[]).length||1} recipient(s).`)}catch(e){onitAlert(e.message)}}
-async function saveReportSchedule(scheduleId){if(!state.reportLoadedId||!canDeliverReport())return;const snap=state.reportIntelligence||{},recipients=text('prScheduleRecipients'),sendTime=text('prScheduleTime')||'09:00',timezone=text('prScheduleTimezone')||'Africa/Lagos',dayOfWeek=snap.reportType==='Weekly'?text('prScheduleDay'):'';if(!recipients)return onitAlert('Enter at least one email recipient.');try{await api('PULSE_SAVE_REPORT_SCHEDULE',{scheduleId:scheduleId||'',clientId:snap.clientId,campaign:snap.campaign||'',reportType:snap.reportType,recipients,dayOfWeek,sendTime,timezone,enabled:true});state.reportDelivery=null;state.reportSetupAt=0;await ensureReportSetup(true);await loadReportDelivery(state.reportLoadedId,true);showToast('Digital Pulse','Automatic report delivery saved.');await reports()}catch(e){onitAlert(e.message)}}
-async function disableReportSchedule(scheduleId){if(!scheduleId||!await onitConfirm('Disable this automatic report delivery?'))return;try{await api('PULSE_ARCHIVE_REPORT_SCHEDULE',{scheduleId});state.reportDelivery=null;state.reportSetupAt=0;await ensureReportSetup(true);await loadReportDelivery(state.reportLoadedId,true);showToast('Digital Pulse','Automatic delivery disabled.');await reports()}catch(e){onitAlert(e.message)}}
+async function downloadStructuredReport(){
+  if(!state.reportLoadedId||!canDeliverReport())return showToast('Digital Pulse','Open a saved report first.');if(state.busy)return;const op=reportOperation_();if(!reportBusyStart_(op))return;
+  try{showToast('Digital Pulse','Building saved report PDF…');const d=await ONITAccount.wait(api('PULSE_EXPORT_STRUCTURED_REPORT',{reportId:op.reportId}),op.scope);if(!reportOperationCurrent_(op))return;downloadPdfPayload(d);showToast('Digital Pulse','PDF downloaded.')}
+  catch(e){if(reportOperationError_(e,op))onitAlert(e.message)}finally{reportBusyEnd_(op)}
+}
+async function createReportShare(){
+  if(!state.reportLoadedId||!canDeliverReport())return;const op=reportOperation_();
+  try{const d=await ONITAccount.wait(api('PULSE_CREATE_REPORT_SHARE',{reportId:op.reportId,expiresDays:30}),op.scope);if(!reportOperationCurrent_(op))return;state.reportDelivery=null;await ONITAccount.wait(loadReportDelivery(op.reportId,true),op.scope);if(!reportOperationCurrent_(op))return;let copied=false;try{await ONITAccount.wait(navigator.clipboard.writeText(d.url),op.scope);copied=true}catch(e){if(e&&e.code==='ONIT_STALE_ACCOUNT')return}if(!reportOperationCurrent_(op))return;if(copied)showToast('Digital Pulse','Share link copied. It expires in 30 days.');else await ONITAccount.wait(onitPrompt('Copy this view-only report link:',d.url),op.scope);if(!reportOperationCurrent_(op))return;await ONITAccount.wait(reports(),op.scope)}
+  catch(e){if(reportOperationError_(e,op))onitAlert(e.message)}
+}
+async function revokeReportShare(shareId){
+  const op=reportOperation_();
+  try{const ok=await ONITAccount.wait(onitConfirm('Revoke this report share link?'),op.scope);if(!ok||!reportOperationCurrent_(op))return;await ONITAccount.wait(api('PULSE_REVOKE_REPORT_SHARE',{shareId}),op.scope);if(!reportOperationCurrent_(op))return;state.reportDelivery=null;await ONITAccount.wait(loadReportDelivery(op.reportId,true),op.scope);if(!reportOperationCurrent_(op))return;showToast('Digital Pulse','Share link revoked.');await ONITAccount.wait(reports(),op.scope)}
+  catch(e){if(reportOperationError_(e,op))onitAlert(e.message)}
+}
+async function emailStructuredReport(){
+  if(!state.reportLoadedId||!canDeliverReport())return;const op=reportOperation_();
+  try{const answer=await ONITAccount.wait(onitPrompt('Email this saved report to (comma-separated addresses):',''),op.scope);if(!reportOperationCurrent_(op))return;const recipients=String(answer||'').trim();if(!recipients)return;showToast('Digital Pulse','Sending report email…');const d=await ONITAccount.wait(api('PULSE_EMAIL_STRUCTURED_REPORT',{reportId:op.reportId,recipients}),op.scope);if(!reportOperationCurrent_(op))return;showToast('Digital Pulse',`Report emailed to ${(d.recipients||[]).length||1} recipient(s).`)}
+  catch(e){if(reportOperationError_(e,op))onitAlert(e.message)}
+}
+async function saveReportSchedule(scheduleId){
+  if(!state.reportLoadedId||!canDeliverReport())return;const op=reportOperation_(),snap=state.reportIntelligence||{},recipients=text('prScheduleRecipients'),sendTime=text('prScheduleTime')||'09:00',timezone=text('prScheduleTimezone')||'Africa/Lagos',dayOfWeek=snap.reportType==='Weekly'?text('prScheduleDay'):'';if(!recipients)return onitAlert('Enter at least one email recipient.');
+  try{await ONITAccount.wait(api('PULSE_SAVE_REPORT_SCHEDULE',{scheduleId:scheduleId||'',clientId:snap.clientId,campaign:snap.campaign||'',reportType:snap.reportType,recipients,dayOfWeek,sendTime,timezone,enabled:true}),op.scope);if(!reportOperationCurrent_(op))return;state.reportDelivery=null;state.reportSetupAt=0;await ONITAccount.wait(ensureReportSetup(true),op.scope);if(!reportOperationCurrent_(op))return;await ONITAccount.wait(loadReportDelivery(op.reportId,true),op.scope);if(!reportOperationCurrent_(op))return;showToast('Digital Pulse','Automatic report delivery saved.');await ONITAccount.wait(reports(),op.scope)}
+  catch(e){if(reportOperationError_(e,op))onitAlert(e.message)}
+}
+async function disableReportSchedule(scheduleId){
+  if(!scheduleId)return;const op=reportOperation_();
+  try{const ok=await ONITAccount.wait(onitConfirm('Disable this automatic report delivery?'),op.scope);if(!ok||!reportOperationCurrent_(op))return;await ONITAccount.wait(api('PULSE_ARCHIVE_REPORT_SCHEDULE',{scheduleId}),op.scope);if(!reportOperationCurrent_(op))return;state.reportDelivery=null;state.reportSetupAt=0;await ONITAccount.wait(ensureReportSetup(true),op.scope);if(!reportOperationCurrent_(op))return;await ONITAccount.wait(loadReportDelivery(op.reportId,true),op.scope);if(!reportOperationCurrent_(op))return;showToast('Digital Pulse','Automatic delivery disabled.');await ONITAccount.wait(reports(),op.scope)}
+  catch(e){if(reportOperationError_(e,op))onitAlert(e.message)}
+}
 
 function reportWorkflowHtml(){
  const d=loadReportDraft(),hasClient=d.clientId&&d.clientId!=='ALL',hasDraft=!!(d.metrics&&d.metrics.length),hasSaved=!!state.reportLoadedId;
@@ -294,9 +357,11 @@ function reportOutputPlaceholderHtml(){if(state.reportLoadedId)return'';return `
 function continueReportSetup(){const d=loadReportDraft();if(!d.clientId||d.clientId==='ALL')return onitAlert('Choose a specific client first.');const el=document.getElementById('dpReportMetricEntry');if(el)el.scrollIntoView({behavior:'smooth',block:'start'})}
 function jumpToSavedReports(){document.getElementById('dpSavedReports')?.scrollIntoView({behavior:'smooth',block:'start'})}
 async function reports(){
-  await ensureReportSetup(false);
-  if(state.reportLoadedId&&!state.reportIntelligence)await loadReportIntelligence(state.reportLoadedId);
-  if(state.reportLoadedId)await loadReportDelivery(state.reportLoadedId,false);
+  const scope=ONITAccount.capture();
+  await ONITAccount.wait(ensureReportSetup(false),scope);ONITAccount.assert(scope);
+  if(state.reportLoadedId&&!state.reportIntelligence){await ONITAccount.wait(loadReportIntelligence(state.reportLoadedId),scope);ONITAccount.assert(scope)}
+  if(state.reportLoadedId){await ONITAccount.wait(loadReportDelivery(state.reportLoadedId,false),scope);ONITAccount.assert(scope)}
+  ONITAccount.assert(scope);
   const d=loadReportDraft(),setup=state.reportSetup||{},clients=setup.clients||[],groups=[...new Set((setup.metricCatalog||[]).map(m=>m.group))],history=reportFilterHistory();
   const clientOptions=[`<option value='ALL' ${d.clientId==='ALL'?'selected':''}>All clients</option>`].concat(clients.map(c=>`<option value='${esc(c.clientId)}' ${d.clientId===c.clientId?'selected':''}>${esc(reportClientLabel(c))}</option>`)).join('');
   const campaignOptions=reportCampaigns().map(x=>`<option value='${esc(x)}'></option>`).join('');
@@ -306,7 +371,7 @@ async function reports(){
   const loaded=state.reportLoadedId?`<div class='dpReportNotice'><b>Saved report loaded.</b> The intelligence view below is calculated from this saved snapshot. Editing any field turns it back into a draft; saving creates a new report.</div>`:'';
   const editor=canWrite()&&d.clientId!=='ALL'?`<div class='dpCard' id='dpReportMetricEntry'><div class='dpCardHead'><div><h3>METRIC ENTRY</h3><p>Pick metrics from the controlled library. Units fill automatically and supported calculations update from the rows you enter.</p></div><span class='pill'>${d.metrics.length} ROW${d.metrics.length===1?'':'S'}</span></div><div class='dpReportTools'><select id='prMetricPicker'>${metricPicker}</select><button class='secondary' onclick='DigitalPulse.addReportMetric()'>ADD METRIC</button><select id='prGroupPicker'>${groupPicker}</select><button class='secondary' onclick='DigitalPulse.addReportGroup()'>ADD WHOLE GROUP</button><button class='secondary' onclick='DigitalPulse.reportPasteToggle()'>PASTE FROM SPREADSHEET</button></div><div id='dpReportPaste' class='dpReportPaste hidden'><label>Paste tab-separated spreadsheet rows in this order: Metric | Platform | Value | Source | Source link | Note</label><textarea id='prPasteText' placeholder='Reach	Instagram	245300	Platform analytics	https://…	Campaign picked up'></textarea><div class='actions'><button class='new' onclick='DigitalPulse.parseReportPaste()'>ADD PASTED ROWS</button><button class='secondary' onclick='DigitalPulse.reportPasteToggle()'>CLOSE</button></div></div>${reportMetricRows()}<div class='dpReportSummary'><div class='field'><label>WHAT HAPPENED</label><textarea oninput="DigitalPulse.reportTextField('whatHappened',this.value)" placeholder='Short factual summary of the period.'>${esc(d.whatHappened||'')}</textarea></div><div class='field'><label>WHY</label><textarea oninput="DigitalPulse.reportTextField('why',this.value)" placeholder='What explains the movement?'>${esc(d.why||'')}</textarea></div><div class='field'><label>NEXT STEPS</label><textarea oninput="DigitalPulse.reportTextField('nextSteps',this.value)" placeholder='What should happen next?'>${esc(d.nextSteps||'')}</textarea></div></div><div class='actions dpReportSaveBar'><button class='new' onclick='DigitalPulse.saveStructuredReport()'>SAVE REPORT</button><button class='secondary' onclick='DigitalPulse.clearReportDraft(); DigitalPulse.openTab("reports")'>NEW BLANK REPORT</button></div></div>`:`<div class='dpCard'><div class='empty'>${canWrite()?'Choose a specific client to enter and save report metrics. “All clients” shows combined saved report history.':'Digital Pulse is view-only for your account. You can review saved reports below.'}</div></div>`;
   const historyHtml=history.length?history.map(r=>`<div class='dpRow'><div><b>${esc(r.brand||r.clientName||'Client')} · ${esc(r.reportType||'Report')}</b><small>${esc(r.startDate||'')} → ${esc(r.endDate||'')}${r.campaign?' • '+esc(r.campaign):''} • ${(r.platforms||[]).map(esc).join(', ')} • ${esc(r.createdBy||'')}</small></div><button class='secondary' onclick="DigitalPulse.openSavedReport('${esc(r.reportId)}')">OPEN</button></div>`).join(''):`<div class='empty'>No saved reports match this client/campaign yet.</div>`;
-  root().innerHTML=shell(`${reportWorkflowHtml()}${loaded}<div class='dpCard dpReportSetup'><div class='dpCardHead'><div><h3>REPORT SETUP</h3><p>Everything below follows these selectors.</p></div><span class='pill'>REPORTS M4</span></div><div class='dpReportSetupGrid'><div class='field'><label>CLIENT</label><input class='dpClientSearch' type='search' placeholder='Search clients' oninput='DigitalPulse.filterReportClients(this.value)'><select id='prClientSelect' onchange="DigitalPulse.reportSetField('clientId',this.value)">${clientOptions}</select></div><div class='field'><label>CAMPAIGN <span class='tiny'>optional</span></label><input list='prCampaignList' value='${esc(d.campaign||'')}' placeholder='Choose or type campaign' onchange="DigitalPulse.reportSetField('campaign',this.value)"><datalist id='prCampaignList'>${campaignOptions}</datalist></div><div class='field'><label>REPORT TYPE</label><select onchange="DigitalPulse.reportSetField('reportType',this.value)">${['Daily','Weekly','Monthly','Custom'].map(x=>`<option ${d.reportType===x?'selected':''}>${x}</option>`).join('')}</select></div><div class='field'><label>COMPARE WITH</label><select onchange="DigitalPulse.reportSetField('compareWith',this.value)"><option value='previous_period' ${d.compareWith==='previous_period'?'selected':''}>Previous period</option><option value='same_period_last_month' ${d.compareWith==='same_period_last_month'?'selected':''}>Same period last month</option><option value='none' ${d.compareWith==='none'?'selected':''}>None</option></select></div><div class='field'><label>START DATE</label><input type='date' value='${esc(d.startDate)}' onchange="DigitalPulse.reportSetField('startDate',this.value)"></div><div class='field'><label>END DATE</label><input type='date' value='${esc(d.endDate)}' onchange="DigitalPulse.reportSetField('endDate',this.value)"></div></div><div class='dpDateShortcuts'><button class='secondary' onclick="DigitalPulse.reportShortcut('today')">TODAY</button><button class='secondary' onclick="DigitalPulse.reportShortcut('yesterday')">YESTERDAY</button><button class='secondary' onclick="DigitalPulse.reportShortcut('last7')">LAST 7 DAYS</button><button class='secondary' onclick="DigitalPulse.reportShortcut('last30')">LAST 30 DAYS</button><button class='secondary' onclick="DigitalPulse.reportShortcut('month')">THIS MONTH</button></div><div class='field'><label>PLATFORMS</label><div class='dpPlatformTicks'>${platforms}</div></div><div class='dpReportNext'><div><b>${d.clientId&&d.clientId!=='ALL'?'Ready for metric entry':'Choose a specific client to build a report'}</b><span>${d.clientId&&d.clientId!=='ALL'?'Continue to the numbers, then save the report.':'All clients is for viewing combined history; report entry needs one client.'}</span></div><div class='actions'><button class='new' ${d.clientId&&d.clientId!=='ALL'?'': 'disabled'} onclick='DigitalPulse.continueReportSetup()'>CONTINUE TO METRICS</button><button class='secondary' onclick='DigitalPulse.jumpToSavedReports()'>SAVED REPORTS</button></div></div></div>${reportOutputPlaceholderHtml()}${deliveryHtml()}${reportIntelligenceHtml()}${reportGoalsHtml()}${d.metrics.length&&!state.reportLoadedId?`<div class='dpMetrics dpReportPreview'>${reportPreviewCards()}</div>`:''}${editor}<div class='dpCard' id='dpSavedReports'><div class='dpCardHead'><div><h3>SAVED REPORTS</h3><p>${d.clientId==='ALL'?'Combined view across clients.':'Filtered to the selected client.'}</p></div><span class='pill'>${history.length}</span></div>${historyHtml}</div>`,'Reports','Client reporting workspace — metrics, intelligence, content performance, community activity and Case Signals.');
+  ONITAccount.assert(scope);root().innerHTML=shell(`${reportWorkflowHtml()}${loaded}<div class='dpCard dpReportSetup'><div class='dpCardHead'><div><h3>REPORT SETUP</h3><p>Everything below follows these selectors.</p></div><span class='pill'>REPORTS M4</span></div><div class='dpReportSetupGrid'><div class='field'><label>CLIENT</label><input class='dpClientSearch' type='search' placeholder='Search clients' oninput='DigitalPulse.filterReportClients(this.value)'><select id='prClientSelect' onchange="DigitalPulse.reportSetField('clientId',this.value)">${clientOptions}</select></div><div class='field'><label>CAMPAIGN <span class='tiny'>optional</span></label><input list='prCampaignList' value='${esc(d.campaign||'')}' placeholder='Choose or type campaign' onchange="DigitalPulse.reportSetField('campaign',this.value)"><datalist id='prCampaignList'>${campaignOptions}</datalist></div><div class='field'><label>REPORT TYPE</label><select onchange="DigitalPulse.reportSetField('reportType',this.value)">${['Daily','Weekly','Monthly','Custom'].map(x=>`<option ${d.reportType===x?'selected':''}>${x}</option>`).join('')}</select></div><div class='field'><label>COMPARE WITH</label><select onchange="DigitalPulse.reportSetField('compareWith',this.value)"><option value='previous_period' ${d.compareWith==='previous_period'?'selected':''}>Previous period</option><option value='same_period_last_month' ${d.compareWith==='same_period_last_month'?'selected':''}>Same period last month</option><option value='none' ${d.compareWith==='none'?'selected':''}>None</option></select></div><div class='field'><label>START DATE</label><input type='date' value='${esc(d.startDate)}' onchange="DigitalPulse.reportSetField('startDate',this.value)"></div><div class='field'><label>END DATE</label><input type='date' value='${esc(d.endDate)}' onchange="DigitalPulse.reportSetField('endDate',this.value)"></div></div><div class='dpDateShortcuts'><button class='secondary' onclick="DigitalPulse.reportShortcut('today')">TODAY</button><button class='secondary' onclick="DigitalPulse.reportShortcut('yesterday')">YESTERDAY</button><button class='secondary' onclick="DigitalPulse.reportShortcut('last7')">LAST 7 DAYS</button><button class='secondary' onclick="DigitalPulse.reportShortcut('last30')">LAST 30 DAYS</button><button class='secondary' onclick="DigitalPulse.reportShortcut('month')">THIS MONTH</button></div><div class='field'><label>PLATFORMS</label><div class='dpPlatformTicks'>${platforms}</div></div><div class='dpReportNext'><div><b>${d.clientId&&d.clientId!=='ALL'?'Ready for metric entry':'Choose a specific client to build a report'}</b><span>${d.clientId&&d.clientId!=='ALL'?'Continue to the numbers, then save the report.':'All clients is for viewing combined history; report entry needs one client.'}</span></div><div class='actions'><button class='new' ${d.clientId&&d.clientId!=='ALL'?'': 'disabled'} onclick='DigitalPulse.continueReportSetup()'>CONTINUE TO METRICS</button><button class='secondary' onclick='DigitalPulse.jumpToSavedReports()'>SAVED REPORTS</button></div></div></div>${reportOutputPlaceholderHtml()}${deliveryHtml()}${reportIntelligenceHtml()}${reportGoalsHtml()}${d.metrics.length&&!state.reportLoadedId?`<div class='dpMetrics dpReportPreview'>${reportPreviewCards()}</div>`:''}${editor}<div class='dpCard' id='dpSavedReports'><div class='dpCardHead'><div><h3>SAVED REPORTS</h3><p>${d.clientId==='ALL'?'Combined view across clients.':'Filtered to the selected client.'}</p></div><span class='pill'>${history.length}</span></div>${historyHtml}</div>`,'Reports','Client reporting workspace — metrics, intelligence, content performance, community activity and Case Signals.');
 }
 
 function downloadPdfPayload(d){
@@ -317,16 +382,16 @@ function downloadPdfPayload(d){
    a.href=url;a.download=d.fileName||'ONIT.pdf';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1500);
  }catch(e){onitAlert('Could not download PDF. '+e.message)}
 }
-async function downloadReport(){
+async function downloadReport(){let __onitScope28376=ONITAccount.capture();
  if(!canDownloadReport()){showToast('Digital Pulse','Report download is available to leadership.');return}
  if(state.busy)return;state.busy=true;
- try{showToast('Digital Pulse','Preparing report…');const d=await api('PULSE_EXPORT_REPORT',{date:state.data?.today||''});downloadPdfPayload(d);showToast('Digital Pulse','Report downloaded.');}
- catch(e){onitAlert(e.message)}finally{state.busy=false}
+ try{showToast('Digital Pulse','Preparing report…');const d=await ONITAccount.wait(api('PULSE_EXPORT_REPORT',{date:state.data?.today||''}),__onitScope28376);downloadPdfPayload(d);showToast('Digital Pulse','Report downloaded.');}
+ catch(e){ONITAccount.assert(__onitScope28376);onitAlert(e.message)}finally{if(ONITAccount.isCurrent(__onitScope28376)){state.busy=false}}
 }
 
 function candidateSummary(x){const r=x.row||{},t=x.sourceType;if(t==='metric')return `${val(r,'Name')}: ${val(r,'Value')} ${val(r,'Unit')}`;if(t==='insight')return val(r,'Insight');if(t==='escalation')return val(r,'Summary');if(t==='content')return `${val(r,'Platform')} — ${val(r,'Title')} (${val(r,'Status')})`;return `${val(r,'Platform')} — ${val(r,'Comments Handled')} comments, ${val(r,'DMs Answered')} DMs`}
-async function cases(){
- if(!state.candidates)state.candidates=await api('PULSE_CASE_CANDIDATES');
+async function cases(){let __onitScope29223=ONITAccount.capture();
+ if(!state.candidates)state.candidates=await ONITAccount.wait(api('PULSE_CASE_CANDIDATES'),__onitScope29223);
  const list=state.candidates.candidates||[];
  const rows=list.length?list.map(x=>{
    let action=`<span class='dpCaseFlag'>FLAGGED</span>`;
@@ -335,37 +400,37 @@ async function cases(){
  }).join(''):`<div class='empty'>No items have been flagged for Cases yet.</div>`;
  root().innerHTML=shell(`<div class='dpCard'><div class='dpCardHead'><div><h3>CASE SIGNALS</h3><p>Digital flags strong moments. Leadership decides which signals become a one-page Case draft.</p></div><span class='pill'>${list.length} SIGNAL${list.length===1?'':'S'}</span></div>${rows}</div><div class='dpCard'><h3>HOW THIS CONNECTS</h3><p class='muted'>BUILD 1-PAGE CASE creates a private Case draft, carries the Pulse evidence across, links the brief when available, and downloads a one-page internal PDF. Missing challenge, idea or results stay clearly marked for completion rather than being invented.</p></div>`,'Case Signals','Turn verified Digital evidence into a case draft while the work is still fresh.');
 }
-async function buildOnePageCase(sourceType,sourceId){
+async function buildOnePageCase(sourceType,sourceId){let __onitScope30619=ONITAccount.capture();
  if(!canBuildOnePageCase()){showToast('Digital Pulse','Only leadership or the System Owner can build a one-page Case.');return}
- if(!await onitConfirm('Build a private 1-page Case draft from this Digital Pulse signal?'))return;
+ if(!await ONITAccount.wait(onitConfirm('Build a private 1-page Case draft from this Digital Pulse signal?'),__onitScope30619))return;
  if(state.busy)return;state.busy=true;
  try{
    showToast('Cases','Building 1-page Case draft…');
-   const d=await api('PULSE_BUILD_ONE_PAGE_CASE',{sourceType,sourceId});
-   state.candidates=null;state.lastAt=0;await load(true);downloadPdfPayload(d);
+   const d=await ONITAccount.wait(api('PULSE_BUILD_ONE_PAGE_CASE',{sourceType,sourceId}),__onitScope30619);
+   state.candidates=null;state.lastAt=0;await ONITAccount.wait(load(true),__onitScope30619);downloadPdfPayload(d);
    showToast('Cases',`Case ${d.caseId||''} created and the one-page draft downloaded.`);
-   await cases();
- }catch(e){onitAlert(e.message)}finally{state.busy=false}
+   await ONITAccount.wait(cases(),__onitScope30619);
+ }catch(e){ONITAccount.assert(__onitScope30619);onitAlert(e.message)}finally{if(ONITAccount.isCurrent(__onitScope30619)){state.busy=false}}
 }
-async function render(){const r=root();if(!r)return;await refreshCapabilities(false);restoreLastTab();if(!allowed()){r.innerHTML=shell(`<div class='dpLock'><b>Digital Pulse is not available for this account.</b><div class='muted'>Digital Pulse is available to active ONIT users.</div></div>`);return}try{await load();if(state.tab==='today')today();else if(state.tab==='engagement')engagement();else if(state.tab==='content')content();else if(state.tab==='listening')listening();else if(state.tab==='reports')await reports();else if(state.tab==='cases')await cases();restoreDraft();updateDraftStatus();}catch(e){r.innerHTML=shell(`<div class='dpLock'><b>Pulse could not load.</b><div class='muted'>${esc(e.message)}</div></div>`)} }
-async function openTab(tab){saveDraftNow();state.tab=tab;const d=readDraftStore();d.lastTab=tab;writeDraftStore(d);state.dirtyGroups=new Set((d.tabs&&d.tabs[tab]&&d.tabs[tab].groups)||[]);loading(({today:'Today',engagement:'Engagement',content:'Content',listening:'Listening',reports:'Reports',cases:'Case Signals'})[tab]||'Digital Pulse');await render()}
-async function refresh(){
+async function render(){let __onitScope31319=ONITAccount.capture();const r=root();if(!r)return;await ONITAccount.wait(refreshCapabilities(false),__onitScope31319);restoreLastTab();if(!allowed()){r.innerHTML=shell(`<div class='dpLock'><b>Digital Pulse is not available for this account.</b><div class='muted'>Digital Pulse is available to active ONIT users.</div></div>`);return}try{await ONITAccount.wait(load(),__onitScope31319);if(state.tab==='today')today();else if(state.tab==='engagement')engagement();else if(state.tab==='content')content();else if(state.tab==='listening')listening();else if(state.tab==='reports')await ONITAccount.wait(reports(),__onitScope31319);else if(state.tab==='cases')await ONITAccount.wait(cases(),__onitScope31319);restoreDraft();updateDraftStatus();}catch(e){ONITAccount.assert(__onitScope31319);r.innerHTML=shell(`<div class='dpLock'><b>Pulse could not load.</b><div class='muted'>${esc(e.message)}</div></div>`)} }
+async function openTab(tab){let __onitScope32045=ONITAccount.capture();saveDraftNow();state.tab=tab;const d=readDraftStore();d.lastTab=tab;writeDraftStore(d);state.dirtyGroups=new Set((d.tabs&&d.tabs[tab]&&d.tabs[tab].groups)||[]);loading(({today:'Today',engagement:'Engagement',content:'Content',listening:'Listening',reports:'Reports',cases:'Case Signals'})[tab]||'Digital Pulse');await ONITAccount.wait(render(),__onitScope32045)}
+async function refresh(){let __onitScope32401=ONITAccount.capture();
  saveDraftNow();state.lastAt=0;state.candidates=null;
  if(canWrite()&&state.dirty){showToast('Digital Pulse','Draft protected. Refreshing saved data without discarding what you typed.');}
  if(!state.dirty)loading();
- await load(true);await render();
+ await ONITAccount.wait(load(true),__onitScope32401);await ONITAccount.wait(render(),__onitScope32401);
 }
-async function mutate(action,payload,msg){
+async function mutate(action,payload,msg){let __onitScope32679=ONITAccount.capture();
  if(!canWrite()){showToast('Digital Pulse','View only. Only users in the Digital department can update Pulse.');return}
  if(state.busy)return;state.busy=true;saveDraftNow();
  try{
-   await api(action,payload);
+   await ONITAccount.wait(api(action,payload),__onitScope32679);
    clearDraftGroup(action);state.lastSavedAt=Date.now();state.lastAt=0;state.candidates=null;
-   await load(true);
+   await ONITAccount.wait(load(true),__onitScope32679);
    showToast('Saved to ONIT',`${msg} Leadership live view will update automatically.`);
-   await render();
- }catch(e){saveDraftNow();onitAlert(e.message)}
- finally{state.busy=false;updateDraftStatus()}
+   await ONITAccount.wait(render(),__onitScope32679);
+ }catch(e){ONITAccount.assert(__onitScope32679);saveDraftNow();onitAlert(e.message)}
+ finally{if(ONITAccount.isCurrent(__onitScope32679)){state.busy=false;updateDraftStatus()}}
 }
 function byId(id){return document.getElementById(id)}
 function checked(id){return !!byId(id)?.checked}
@@ -376,13 +441,13 @@ function addContent(){return mutate('PULSE_ADD_CONTENT',{title:text('pcTitle'),b
 function updateContent(contentId,status){return mutate('PULSE_UPDATE_CONTENT',{contentId,status},`Content marked ${status}.`)}
 function addInsight(){return mutate('PULSE_ADD_INSIGHT',{brand:text('piBrand'),campaign:text('piCampaign'),source:text('piSource'),type:text('piType'),sentiment:text('piSentiment'),briefCode:text('piBrief'),insight:text('piInsight'),caseCandidate:checked('piCase')},'Insight saved.')}
 function addEscalation(){return mutate('PULSE_ADD_ESCALATION',{brand:text('pxBrand'),campaign:text('pxCampaign'),source:text('pxSource'),severity:text('pxSeverity'),type:text('pxType'),briefCode:text('pxBrief'),summary:text('pxSummary'),caseCandidate:checked('pxCase')},'Escalation saved.')}
-async function resolveEscalation(escalationId){if(!await onitConfirm('Mark this escalation as resolved?'))return;return mutate('PULSE_RESOLVE_ESCALATION',{escalationId},'Escalation resolved.')}
+async function resolveEscalation(escalationId){let __onitScope35134=ONITAccount.capture();if(!await ONITAccount.wait(onitConfirm('Mark this escalation as resolved?'),__onitScope35134))return;return mutate('PULSE_RESOLVE_ESCALATION',{escalationId},'Escalation resolved.')}
 function addMetric(){return mutate('PULSE_ADD_METRIC',{brand:text('pmBrand'),campaign:text('pmCampaign'),name:text('pmName'),value:text('pmValue'),unit:text('pmUnit'),platform:text('pmPlatform'),period:text('pmPeriod'),briefCode:text('pmBrief'),source:text('pmSource'),caseCandidate:checked('pmCase')},'Performance metric saved.')}
-async function sendToCases(sourceType,sourceId){if(!canPromote()){showToast('Digital Pulse','You do not have permission to send Pulse evidence to Cases.');return}const caseId=(await onitPrompt('Enter the ONIT Case ID to receive this evidence:','')||'').trim();if(!caseId)return;try{await api('PULSE_SEND_TO_CASES',{sourceType,sourceId,caseId});state.candidates=null;state.lastAt=0;showToast('Digital Pulse','Evidence sent to Cases Data Vault.');await render()}catch(e){onitAlert(e.message)}}
-const originalApply=window.applyPermissions;if(typeof originalApply==='function')window.applyPermissions=function(){const r=originalApply.apply(this,arguments);setTimeout(()=>refreshCapabilities(true),0);return r};
+async function sendToCases(sourceType,sourceId){let __onitScope35660=ONITAccount.capture();if(!canPromote()){showToast('Digital Pulse','You do not have permission to send Pulse evidence to Cases.');return}const caseId=(await ONITAccount.wait(onitPrompt('Enter the ONIT Case ID to receive this evidence:',''),__onitScope35660)||'').trim();if(!caseId)return;try{await ONITAccount.wait(api('PULSE_SEND_TO_CASES',{sourceType,sourceId,caseId}),__onitScope35660);state.candidates=null;state.lastAt=0;showToast('Digital Pulse','Evidence sent to Cases Data Vault.');await ONITAccount.wait(render(),__onitScope35660)}catch(e){ONITAccount.assert(__onitScope35660);onitAlert(e.message)}}
+const originalApply=window.applyPermissions;if(typeof originalApply==='function')window.applyPermissions=function(){const r=originalApply.apply(this,arguments);ONITAccount.later(()=>refreshCapabilities(true),0);return r};
 const originalShow=window.show;if(typeof originalShow==='function')window.show=function(id,btn){const r=originalShow.apply(this,arguments);if(id==='pulse'){restoreLastTab();loading();render()}return r};
 // Editors never auto-refresh underneath active work. Leadership uses quiet polling: no spinner, no redraw unless saved Pulse data actually changed.
 setInterval(()=>{if(!document.hidden)quietLeadershipSync(false)},300000);
 window.DigitalPulse={render,refresh,openTab,saveReadiness,logEngagement,addContent,updateContent,addInsight,addEscalation,resolveEscalation,addMetric,sendToCases,downloadReport,buildOnePageCase,refreshCapabilities,quietLeadershipSync,reportSetField,reportTextField,filterReportClients,reportShortcut,toggleReportPlatform,addReportMetric,addReportGroup,removeReportMetric,reportRowChange,reportRowTextChange,reportPasteToggle,parseReportPaste,openSavedReport,saveStructuredReport,clearReportDraft,saveReportGoal,archiveReportGoal,addReportContent,saveReportContent,archiveReportContent,openLinkedCase,continueReportSetup,jumpToSavedReports,downloadStructuredReport,createReportShare,revokeReportShare,emailStructuredReport,saveReportSchedule,disableReportSchedule};
-setTimeout(()=>{refreshCapabilities(true);syncGlobalDirty()},450);
+ONITAccount.later(()=>{refreshCapabilities(true);syncGlobalDirty()},450);
 })();
