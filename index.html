@@ -917,6 +917,7 @@ img,video,canvas,svg{max-width:100%}
 <link rel="stylesheet" href="./ideas-dump.css?v=0.37.6">
 <link rel="stylesheet" href="./pulse-module.css?v=0.39.4">
 <link rel="stylesheet" href="./executive-reports.css?v=1.0.0">
+<link rel="stylesheet" href="./module-studio.css?v=2.2.0-m2-editable">
 
 <style id="onit-mobile-nav-v0212">
 .navLabelMobile{display:none!important}
@@ -1205,6 +1206,8 @@ html.onitReduceMotion *,html.onitReduceMotion *::before,html.onitReduceMotion *:
 <section id="activation" class="hidden"><div id="activationRoot"><div class="activationEmpty">Activation Command is locked until ONIT verifies private access.</div></div></section>
 <section id="ideas" class="hidden"><div id="ideasRoot"><div class="ideasEmpty">Ideas Dump is loading agency intelligence.</div></div></section>
 <section id="rewards" class="hidden"><div id="rewardsRoot"><div class="card"><b>ONIT Rewards is loading…</b><div class="tiny">Your coin progress is private to you.</div></div></div></section>
+<section id="moduleStudio" class="hidden"><div id="moduleStudioRoot"><div class="ms-empty">Module Studio</div></div></section>
+<section id="moduleRuntime" class="hidden"><div id="moduleRuntimeRoot"><div class="ms-empty">Module</div></div></section>
 <section id="more" class="hidden"><h1>Settings</h1><p class="muted">Manage your profile, notifications, access and organisation preferences.</p><div id="moreContent"></div></section>
 
 <section id="newbrief" class="hidden">
@@ -1257,9 +1260,9 @@ html.onitReduceMotion *,html.onitReduceMotion *::before,html.onitReduceMotion *:
 <script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-messaging-compat.js"></script>
 <script src="./account-lifecycle.js?v=batch1-rebase"></script>
-<script>const APP_VERSION='0.39.6';
-const UI_REVISION=39600;
-const DASHBOARD_UI_REVISION=39601;
+<script>const APP_VERSION='0.39.7';
+const UI_REVISION=39700;
+const DASHBOARD_UI_REVISION=39701;
 const DASHBOARD_UI_STORAGE_KEY='onit-dashboard-ui-state-v1';
 window.ONIT_RUNTIME={version:APP_VERSION,uiRevision:UI_REVISION,dashboardUiRevision:DASHBOARD_UI_REVISION};
 const BACKEND_DATASETS=['USERS','CLIENTS','BRIEFS','ASSIGNMENTS','ITERATIONS','ACTIVITY_LOG','NOTIFICATIONS','REPORTS'];
@@ -1718,6 +1721,7 @@ function applyPermissions(){
   const bt=document.getElementById('briefsTitle'),bs=document.getElementById('briefsSub');if(bt&&bs){if(isTrafficManagerUser()){bt.textContent='Traffic Control';bs.textContent='Manage incoming briefs, production order, scheduling and live work.'}else if(canApprove()){bt.textContent='Briefs / Approval';bs.textContent='Your assigned work, briefs you have sent, and work available for leadership review.'}else if(canCreateBrief()){bt.textContent='Briefs';bs.textContent='Work you have sent into the organisation and its current status.'}else{bt.textContent='My Work';bs.textContent='Briefs assigned to you and work waiting for your action.'}}
   applyWorkstationTabAccess();
   renderMore();hydrateProfilePhotos();
+  if(window.ONITModuleStudio&&typeof ONITModuleStudio.refreshRuntime==='function')ONITModuleStudio.refreshRuntime();
 }
 function effectiveDeadline(b){return b?.deadline||b?.trafficInternalDeadline||b?.clientDeadline||b?.originalDeadline||''}
 function isBriefOverdue(b){if(!b||['Closed','Approved','Cancelled'].includes(String(b.status||'')))return false;const due=effectiveDeadline(b),t=new Date(due||0).getTime();return Number.isFinite(t)&&t<(Date.now()+serverOffset)}
@@ -2847,6 +2851,7 @@ function renderMore(){if(!currentUser)return;const names=backendAccess();let htm
   if(names.length||canSeeReports()){html+=`<div class='morecard' style='grid-column:1/-1'><h3>DATA & ACCESS</h3><div class='bigTiny'>Reports, governed exports and authorised backend datasets live in one place.</div><button class='secondary linkbtn' onclick="show('data')">OPEN DATA & ACCESS</button></div>`}
   if(isOwner()||dashboardMode()==='LEADERSHIP'){html+=`<div class='morecard leadershipReportCard' style='grid-column:1/-1'><h3>LEADERSHIP OPERATIONS REPORT</h3><div class='bigTiny'>Download one current PDF covering workload, overdue jobs, review bottlenecks, turnaround time, Traffic pressure and department utilisation.</div><div class='actions'><button class='new' onclick='downloadLeadershipReport(this)'>DOWNLOAD LEADERSHIP REPORT</button></div></div>`}
   if(typeof executiveReportsMoreCardMarkup==='function')html+=executiveReportsMoreCardMarkup();
+  if(typeof moduleStudioMoreCardMarkup==='function')html+=moduleStudioMoreCardMarkup();
   html+=dataExportRequestsMarkup();
   if(typeof autoCareMoreCardMarkup==='function')html+=autoCareMoreCardMarkup();
   html+=isStagingEnvironment()?`<div class='morecard' style='grid-column:1/-1'><h3>STAGING • BROWSER ONLY</h3><div class='bigTiny'>This test environment cannot be installed as ONIT. Use it only in the browser. Install ONIT only from the current production Cloudflare Pages address.</div><div class='actions'><button class='secondary linkbtn' onclick="window.open(productionOnitUrl(),'_blank','noopener')">OPEN PRODUCTION ONIT</button></div></div>`:`<div class='morecard' style='grid-column:1/-1'><h3>INSTALL / UPDATE ONIT</h3><div class='bigTiny'>Install ONIT on this device for quick access. ONIT detects published UI updates automatically and always offers UPDATE NOW. If unsaved work or an active action exists, ONIT warns before reloading; automatic background updating still waits for a safe idle moment.</div><div class='actions'><button class='secondary linkbtn' onclick='installOnit()'>INSTALL ON THIS DEVICE</button><button class='secondary linkbtn' onclick='forceFrontendUpdate()'>CHECK / REPAIR UPDATE</button></div></div>`;
@@ -3174,6 +3179,7 @@ document.addEventListener('DOMContentLoaded',()=>boot(),{once:true});
 <script src="./ideas-dump.js?v=0.37.6"></script>
 <script src="./pulse-module.js?v=0.39.4"></script>
 <script src="./executive-reports.js?v=1.1.0"></script>
+<script src="./module-studio.js?v=2.2.0-m2-editable"></script>
 <script src="./assist-traffic-module.js?v=0.37.6"></script>
 <script src="./core-intelligence.js?v=0.37.6"></script>
 <script src="./ui-system.js?v=0.38.0"></script>
