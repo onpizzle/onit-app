@@ -916,6 +916,7 @@ img,video,canvas,svg{max-width:100%}
 <link rel="stylesheet" href="./activation-command.css?v=0.37.6">
 <link rel="stylesheet" href="./ideas-dump.css?v=0.37.6">
 <link rel="stylesheet" href="./pulse-module.css?v=0.39.4">
+<link rel="stylesheet" href="./executive-reports.css?v=1.0.0">
 
 <style id="onit-mobile-nav-v0212">
 .navLabelMobile{display:none!important}
@@ -1256,9 +1257,9 @@ html.onitReduceMotion *,html.onitReduceMotion *::before,html.onitReduceMotion *:
 <script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-messaging-compat.js"></script>
 <script src="./account-lifecycle.js?v=batch1-rebase"></script>
-<script>const APP_VERSION='0.39.4';
-const UI_REVISION=39400;
-const DASHBOARD_UI_REVISION=39401;
+<script>const APP_VERSION='0.39.6';
+const UI_REVISION=39600;
+const DASHBOARD_UI_REVISION=39601;
 const DASHBOARD_UI_STORAGE_KEY='onit-dashboard-ui-state-v1';
 window.ONIT_RUNTIME={version:APP_VERSION,uiRevision:UI_REVISION,dashboardUiRevision:DASHBOARD_UI_REVISION};
 const BACKEND_DATASETS=['USERS','CLIENTS','BRIEFS','ASSIGNMENTS','ITERATIONS','ACTIVITY_LOG','NOTIFICATIONS','REPORTS'];
@@ -1479,7 +1480,7 @@ async function apiGet(action='bootstrap'){
 async function apiPost(action,payload={},requiresAuth=true){let __onitScope40542=ONITAccount.capture();
   await ONITAccount.wait(ensureBackendResolved(false),__onitScope40542);
   const data={...payload};if(requiresAuth){if(!SESSION_TOKEN)throw new Error('AUTH_REQUIRED');Object.assign(data,onitPresenceMeta());data.sessionToken=SESSION_TOKEN}
-  const safeRead=SAFE_RETRY_POST_ACTIONS.has(action),attempts=safeRead?2:1,timeoutMs=action==='createOwnerBroadcast'?60000:(action==='REWARDS_OWNER_DASHBOARD'?45000:30000);let lastError=null;
+  const safeRead=SAFE_RETRY_POST_ACTIONS.has(action),attempts=safeRead?2:1,timeoutMs=action==='EXEC_REPORT_GENERATE'?120000:(action==='createOwnerBroadcast'?60000:(action==='REWARDS_OWNER_DASHBOARD'?45000:30000));let lastError=null;
   for(let attempt=0;attempt<attempts;attempt++){
     try{const r=await ONITAccount.wait(fetchWithTimeout(API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action,data})},timeoutMs),__onitScope40542);if(!r.ok)throw new Error('API '+r.status);const result=await ONITAccount.wait(r.json(),__onitScope40542);if(!result.success)throw new Error(result.error||result.message||'API request failed');if(Array.isArray(result.rewards)&&result.rewards.length){queueMicrotask(ONITAccount.guard(()=>{try{window.ONITRewards&&ONITRewards.handleApiRewards(result.rewards)}catch(_){ONITAccount.assert(__onitScope40542);}},__onitScope40542))}return result}
     catch(e){ONITAccount.assert(__onitScope40542);lastError=e;if(window.AutoCare)window.AutoCare.signalApiFailure(action,e,safeRead);if(safeRead&&attempt===0&&apiRetryableError(e)){await ONITAccount.wait(sleep(650),__onitScope40542);continue}throw e}
@@ -2845,6 +2846,7 @@ function renderMore(){if(!currentUser)return;const names=backendAccess();let htm
   if(canManagePeople()){html+=`<div class='morecard' style='grid-column:1/-1'><h3>MANAGE</h3><button class='secondary linkbtn' onclick='addMember()'>+ ADD MEMBER PROFILE</button></div>`}
   if(names.length||canSeeReports()){html+=`<div class='morecard' style='grid-column:1/-1'><h3>DATA & ACCESS</h3><div class='bigTiny'>Reports, governed exports and authorised backend datasets live in one place.</div><button class='secondary linkbtn' onclick="show('data')">OPEN DATA & ACCESS</button></div>`}
   if(isOwner()||dashboardMode()==='LEADERSHIP'){html+=`<div class='morecard leadershipReportCard' style='grid-column:1/-1'><h3>LEADERSHIP OPERATIONS REPORT</h3><div class='bigTiny'>Download one current PDF covering workload, overdue jobs, review bottlenecks, turnaround time, Traffic pressure and department utilisation.</div><div class='actions'><button class='new' onclick='downloadLeadershipReport(this)'>DOWNLOAD LEADERSHIP REPORT</button></div></div>`}
+  if(typeof executiveReportsMoreCardMarkup==='function')html+=executiveReportsMoreCardMarkup();
   html+=dataExportRequestsMarkup();
   if(typeof autoCareMoreCardMarkup==='function')html+=autoCareMoreCardMarkup();
   html+=isStagingEnvironment()?`<div class='morecard' style='grid-column:1/-1'><h3>STAGING • BROWSER ONLY</h3><div class='bigTiny'>This test environment cannot be installed as ONIT. Use it only in the browser. Install ONIT only from the current production Cloudflare Pages address.</div><div class='actions'><button class='secondary linkbtn' onclick="window.open(productionOnitUrl(),'_blank','noopener')">OPEN PRODUCTION ONIT</button></div></div>`:`<div class='morecard' style='grid-column:1/-1'><h3>INSTALL / UPDATE ONIT</h3><div class='bigTiny'>Install ONIT on this device for quick access. ONIT detects published UI updates automatically and always offers UPDATE NOW. If unsaved work or an active action exists, ONIT warns before reloading; automatic background updating still waits for a safe idle moment.</div><div class='actions'><button class='secondary linkbtn' onclick='installOnit()'>INSTALL ON THIS DEVICE</button><button class='secondary linkbtn' onclick='forceFrontendUpdate()'>CHECK / REPAIR UPDATE</button></div></div>`;
@@ -3171,6 +3173,7 @@ document.addEventListener('DOMContentLoaded',()=>boot(),{once:true});
 <script src="./activation-command.js?v=0.37.6"></script>
 <script src="./ideas-dump.js?v=0.37.6"></script>
 <script src="./pulse-module.js?v=0.39.4"></script>
+<script src="./executive-reports.js?v=1.1.0"></script>
 <script src="./assist-traffic-module.js?v=0.37.6"></script>
 <script src="./core-intelligence.js?v=0.37.6"></script>
 <script src="./ui-system.js?v=0.38.0"></script>
