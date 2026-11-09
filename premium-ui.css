@@ -658,3 +658,11 @@ img,video,canvas,svg{max-width:100%}
 .person.workingPerson{background:#e3f5e9!important;border-color:#9ed3b0!important;box-shadow:inset 5px 0 0 #20a85a!important}
 .person.workingPerson .pill{background:#cfead9!important;color:#176f3d!important}
 .person.workingPerson .dot{background:#20a85a!important}
+
+
+/* ONIT v0.39.8 — Workstation visibility authority hardening.
+   Must outrank premium/mobile navigation display:flex!important rules. */
+.nav button.hiddenByOwner,
+.nav button.hiddenByRole,
+#mobileMoreBackdrop button.hiddenByOwner,
+#mobileMoreBackdrop button.hiddenByRole{display:none!important}

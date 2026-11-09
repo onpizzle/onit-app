@@ -248,3 +248,11 @@ button{line-height:1.2;white-space:normal}
 @media(prefers-reduced-motion:reduce){.commandMiniSpinner{animation:none}}
 
 .commandAction.running:disabled{opacity:1!important}.commandAction:disabled:not(.running){opacity:.58!important}
+
+
+/* ONIT v0.39.8 — Workstation visibility authority hardening.
+   Must outrank premium/mobile navigation display:flex!important rules. */
+.nav button.hiddenByOwner,
+.nav button.hiddenByRole,
+#mobileMoreBackdrop button.hiddenByOwner,
+#mobileMoreBackdrop button.hiddenByRole{display:none!important}
