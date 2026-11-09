@@ -1267,9 +1267,9 @@ html.onitReduceMotion *,html.onitReduceMotion *::before,html.onitReduceMotion *:
 <script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-messaging-compat.js"></script>
 <script src="./account-lifecycle.js?v=batch1-rebase"></script>
-<script>const APP_VERSION='0.39.8';
-const UI_REVISION=39800;
-const DASHBOARD_UI_REVISION=39801;
+<script>const APP_VERSION='0.39.9';
+const UI_REVISION=39900;
+const DASHBOARD_UI_REVISION=39901;
 const DASHBOARD_UI_STORAGE_KEY='onit-dashboard-ui-state-v1';
 window.ONIT_RUNTIME={version:APP_VERSION,uiRevision:UI_REVISION,dashboardUiRevision:DASHBOARD_UI_REVISION};
 const BACKEND_DATASETS=['USERS','CLIENTS','BRIEFS','ASSIGNMENTS','ITERATIONS','ACTIVITY_LOG','NOTIFICATIONS','REPORTS'];
@@ -1490,7 +1490,7 @@ async function apiGet(action='bootstrap'){
 async function apiPost(action,payload={},requiresAuth=true){let __onitScope40542=ONITAccount.capture();
   await ONITAccount.wait(ensureBackendResolved(false),__onitScope40542);
   const data={...payload};if(requiresAuth){if(!SESSION_TOKEN)throw new Error('AUTH_REQUIRED');Object.assign(data,onitPresenceMeta());data.sessionToken=SESSION_TOKEN}
-  const safeRead=SAFE_RETRY_POST_ACTIONS.has(action),attempts=safeRead?2:1,timeoutMs=action==='EXEC_REPORT_GENERATE'?120000:(action==='createOwnerBroadcast'?60000:(action==='REWARDS_OWNER_DASHBOARD'?45000:30000));let lastError=null;
+  const safeRead=SAFE_RETRY_POST_ACTIONS.has(action),attempts=safeRead?2:1,timeoutMs=(action==='submitIteration'||action==='createBrief')?120000:(action==='EXEC_REPORT_GENERATE'?120000:(action==='createOwnerBroadcast'?60000:(action==='REWARDS_OWNER_DASHBOARD'?45000:30000)));let lastError=null;
   for(let attempt=0;attempt<attempts;attempt++){
     try{const r=await ONITAccount.wait(fetchWithTimeout(API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action,data})},timeoutMs),__onitScope40542);if(!r.ok)throw new Error('API '+r.status);const result=await ONITAccount.wait(r.json(),__onitScope40542);if(!result.success)throw new Error(result.error||result.message||'API request failed');if(Array.isArray(result.rewards)&&result.rewards.length){queueMicrotask(ONITAccount.guard(()=>{try{window.ONITRewards&&ONITRewards.handleApiRewards(result.rewards)}catch(_){ONITAccount.assert(__onitScope40542);}},__onitScope40542))}return result}
     catch(e){ONITAccount.assert(__onitScope40542);lastError=e;if(window.AutoCare)window.AutoCare.signalApiFailure(action,e,safeRead);if(safeRead&&attempt===0&&apiRetryableError(e)){await ONITAccount.wait(sleep(650),__onitScope40542);continue}throw e}

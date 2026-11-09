@@ -1,8 +1,8 @@
 {
-  "version": "0.39.8",
-  "build": "0.39.8",
-  "uiRevision": 39800,
-  "dashboardUiRevision": 39801,
+  "version": "0.39.9",
+  "build": "0.39.9",
+  "uiRevision": 39900,
+  "dashboardUiRevision": 39901,
   "mandatoryUiSync": false,
   "universalDashboardUi": true,
   "authorityEngineVersion": "1.0.0",
