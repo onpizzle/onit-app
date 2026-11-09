@@ -30,4 +30,6 @@ After publishing, hard-refresh once or open `reset.html` if an installed PWA sti
 
 Suggested commit message:
 
+Deployment trigger for ONIT v0.39.8
+
 `ONIT v0.17.1 — premium UI refresh and approved brand system`
