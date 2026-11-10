@@ -1334,26 +1334,25 @@ html.onitReduceMotion *,html.onitReduceMotion *::before,html.onitReduceMotion *:
 <script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-messaging-compat.js"></script>
 <script src="./account-lifecycle.js?v=batch1-rebase"></script>
-<script>const APP_VERSION='0.40.6';
-const UI_REVISION=40600;
-const DASHBOARD_UI_REVISION=40601;
+<script>const APP_VERSION='0.40.7';
+const UI_REVISION=40700;
+const DASHBOARD_UI_REVISION=40701;
 const DASHBOARD_UI_STORAGE_KEY='onit-dashboard-ui-state-v1';
 window.ONIT_RUNTIME={version:APP_VERSION,uiRevision:UI_REVISION,dashboardUiRevision:DASHBOARD_UI_REVISION};
 const BACKEND_DATASETS=['USERS','CLIENTS','BRIEFS','ASSIGNMENTS','ITERATIONS','ACTIVITY_LOG','NOTIFICATIONS','REPORTS'];
 const BACKEND_MIN_VERSION='0.31.26';
 const BACKEND_SELECTION_KEY='onit-backend-selection-v1';
 const BACKEND_URL_CANDIDATES=[
-  {id:'primary',label:'Primary ONIT backend',url:'https://script.google.com/macros/s/AKfycbyLVpsQLFCpQWRIvRndw66sghmu5rtK31cuthS7hXjJ--lf703mJPIbJ2zpLDIlH76b/exec'},
-  {id:'legacy',label:'Alternate ONIT backend',url:'https://script.google.com/macros/s/AKfycbyY98jKIh2ls8jKsB5w2H7YG3Okj61AoIkt3-2x0LBnvRVwDgBhrQnVr1Ghfu04J7YB/exec'}
+  {id:'primary',label:'Primary ONIT backend',url:'https://script.google.com/macros/s/AKfycbyLVpsQLFCpQWRIvRndw66sghmu5rtK31cuthS7hXjJ--lf703mJPIbJ2zpLDIlH76b/exec'}
 ];
 let API_URL=BACKEND_URL_CANDIDATES[0].url;
 let backendResolution=null,backendResolveInFlight=null,backendLastHealthAt=0,backendLastError=null;
 function backendCandidateFor(url){return BACKEND_URL_CANDIDATES.find(x=>x.url===url)||null}
-function backendCandidateOrder(){const saved=localStorage.getItem(BACKEND_SELECTION_KEY)||'';const rows=[];const add=x=>{if(x&&!rows.some(r=>r.url===x.url))rows.push(x)};add(backendCandidateFor(saved));BACKEND_URL_CANDIDATES.forEach(add);return rows}
+function backendCandidateOrder(){const saved=localStorage.getItem(BACKEND_SELECTION_KEY)||'';const rows=[];const add=x=>{if(x&&!rows.some(r=>r.url===x.url))rows.push(x)};const savedCandidate=backendCandidateFor(saved);if(saved&&!savedCandidate){try{localStorage.removeItem(BACKEND_SELECTION_KEY)}catch(e){}}add(savedCandidate);BACKEND_URL_CANDIDATES.forEach(add);return rows}
 function backendStatusText(){if(!backendResolution)return 'Backend not verified';return `${backendResolution.label} • v${backendResolution.version||'unknown'}`}
-async function probeBackendCandidate(candidate){let __onitScope1485=ONITAccount.capture();
+async function probeBackendCandidate(candidate,timeoutMs=18000){let __onitScope1485=ONITAccount.capture();
   const url=candidate.url+'?action=health&t='+Date.now();
-  const r=await ONITAccount.wait(fetchWithTimeout(url,{cache:'no-store',redirect:'follow'},18000),__onitScope1485);
+  const r=await ONITAccount.wait(fetchWithTimeout(url,{cache:'no-store',redirect:'follow'},timeoutMs),__onitScope1485);
   if(!r.ok)throw new Error('HTTP '+r.status);
   const data=await ONITAccount.wait(r.json(),__onitScope1485);
   if(!data||data.success!==true||String(data.app||'').toUpperCase()!=='ONIT')throw new Error('Not an ONIT backend');
@@ -1367,7 +1366,24 @@ function showBackendRecovery(error){const el=backendRecoveryHost();if(!el)return
 async function ensureBackendResolved(force=false){let __onitScope3642=ONITAccount.capture();
   if(!force&&backendResolution&&Date.now()-backendLastHealthAt<5*60*1000)return backendResolution;
   if(backendResolveInFlight&&!force)return backendResolveInFlight;
-  const work=(async()=>{let __onitScope3873=ONITAccount.capture();const errors=[];for(const candidate of backendCandidateOrder()){try{const ok=await ONITAccount.wait(probeBackendCandidate(candidate),__onitScope3873);API_URL=ok.url;backendResolution=ok;backendLastHealthAt=Date.now();backendLastError=null;localStorage.setItem(BACKEND_SELECTION_KEY,ok.url);window.ONIT_BACKEND_STATUS={ok:true,label:ok.label,version:ok.version};hideBackendRecovery();return ok}catch(e){ONITAccount.assert(__onitScope3873);errors.push(`${candidate.label}: ${e.message||e}`)}}const err=new Error(errors.join(' • ')||'No ONIT backend responded.');backendResolution=null;backendLastHealthAt=0;backendLastError=err;window.ONIT_BACKEND_STATUS={ok:false,error:err.message};throw err})();
+  const work=(async()=>{let __onitScope3873=ONITAccount.capture();const errors=[];
+    for(const candidate of backendCandidateOrder()){
+      const timeouts=candidate.id==='primary'?[18000,45000]:[22000];let lastError=null;
+      for(let attempt=0;attempt<timeouts.length;attempt++){
+        try{
+          const ok=await ONITAccount.wait(probeBackendCandidate(candidate,timeouts[attempt]),__onitScope3873);
+          API_URL=ok.url;backendResolution=ok;backendLastHealthAt=Date.now();backendLastError=null;
+          localStorage.setItem(BACKEND_SELECTION_KEY,ok.url);window.ONIT_BACKEND_STATUS={ok:true,label:ok.label,version:ok.version};hideBackendRecovery();return ok;
+        }catch(e){
+          ONITAccount.assert(__onitScope3873);lastError=e;
+          if(attempt+1<timeouts.length&&apiRetryableError(e)){await ONITAccount.wait(sleep(700),__onitScope3873);continue}
+          break;
+        }
+      }
+      errors.push(`${candidate.label}: ${lastError&&lastError.message||lastError||'did not respond'}`);
+    }
+    const err=new Error(errors.join(' • ')||'No ONIT backend responded.');backendResolution=null;backendLastHealthAt=0;backendLastError=err;window.ONIT_BACKEND_STATUS={ok:false,error:err.message};throw err;
+  })();
   backendResolveInFlight=work;try{return await ONITAccount.wait(work,__onitScope3642)}finally{if(ONITAccount.isCurrent(__onitScope3642)){if(backendResolveInFlight===work)backendResolveInFlight=null}}
 }
 async function retryBackendStartup(){let __onitScope4634=ONITAccount.capture();try{setBusy(true);await ONITAccount.wait(ensureBackendResolved(true),__onitScope4634);hideBackendRecovery();if(!SESSION_TOKEN)return;const fast=await ONITAccount.wait(loadFastHome(),__onitScope4634);if(!fast)await ONITAccount.wait(loadFromGoogle(false,false),__onitScope4634)}catch(e){ONITAccount.assert(__onitScope4634);showBackendRecovery(e)}finally{if(ONITAccount.isCurrent(__onitScope4634)){setBusy(false)}}}
@@ -2631,7 +2647,7 @@ async function enablePushNotifications(){let __onitScope235259=ONITAccount.captu
   }catch(e){ONITAccount.assert(__onitScope235259);console.error(e);onitAlert('Could not enable outside-ONIT alerts. '+e.message)}
 }
 function pushNotificationStatus_(){if(typeof Notification==='undefined')return'UNSUPPORTED';if(Notification.permission==='granted'&&pushTokenRegistered)return'ON';if(Notification.permission==='denied')return'BLOCKED';return'OFF'}
-async function ensurePushRegistrationQuietly(){let __onitScope237107=ONITAccount.capture();if(typeof Notification==='undefined'||Notification.permission!=='granted'||!SESSION_TOKEN||typeof firebase==='undefined'||!firebase.messaging)return;try{const configRes=await ONITAccount.wait(apiPost('getPushConfig',{}),__onitScope237107),cfg=configRes.data||configRes;if(!cfg.enabled||!cfg.vapidKey)return;if(!firebase.apps.length)firebaseApp=firebase.initializeApp(FIREBASE_CONFIG);firebaseMessaging=firebase.messaging();bindForegroundPush_();const reg=await ONITAccount.wait(navigator.serviceWorker.ready,__onitScope237107),token=await ONITAccount.wait(firebaseMessaging.getToken({vapidKey:cfg.vapidKey,serviceWorkerRegistration:reg}),__onitScope237107);if(token&&token!==pushTokenRegistered){const uid=firebase.auth().currentUser?.uid||'';await ONITAccount.wait(apiPost('registerPushToken',{fcmToken:token,firebaseUid:uid,deviceLabel:navigator.userAgent}),__onitScope237107);pushTokenRegistered=token;try{localStorage.setItem('onit_push_token_v1',token)}catch(e){ONITAccount.assert(__onitScope237107);}if(!document.getElementById('more')?.classList.contains('hidden'))renderMore();}}catch(e){ONITAccount.assert(__onitScope237107);console.warn('ONIT push registration:',e)}}
+async function ensurePushRegistrationQuietly(){let __onitScope237107=ONITAccount.capture();if(typeof Notification==='undefined'||Notification.permission!=='granted'||!SESSION_TOKEN||typeof firebase==='undefined'||!firebase.messaging)return;try{const configRes=await ONITAccount.wait(apiPost('getPushConfig',{}),__onitScope237107),cfg=configRes.data||configRes;if(!cfg.enabled||!cfg.vapidKey)return;if(!firebase.apps.length)firebaseApp=firebase.initializeApp(FIREBASE_CONFIG);firebaseMessaging=firebase.messaging();bindForegroundPush_();const reg=await ONITAccount.wait(navigator.serviceWorker.ready,__onitScope237107),token=await ONITAccount.wait(firebaseMessaging.getToken({vapidKey:cfg.vapidKey,serviceWorkerRegistration:reg}),__onitScope237107);if(token){const repairKey='onit_push_reconfirm_v2',lastRepair=Number(localStorage.getItem(repairKey)||0),needsRegister=token!==pushTokenRegistered||Date.now()-lastRepair>6*60*60*1000;if(needsRegister){const uid=firebase.auth().currentUser?.uid||'';await ONITAccount.wait(apiPost('registerPushToken',{fcmToken:token,firebaseUid:uid,deviceLabel:navigator.userAgent}),__onitScope237107);pushTokenRegistered=token;try{localStorage.setItem('onit_push_token_v1',token);localStorage.setItem(repairKey,String(Date.now()))}catch(e){ONITAccount.assert(__onitScope237107);}if(!document.getElementById('more')?.classList.contains('hidden'))renderMore();}}}catch(e){ONITAccount.assert(__onitScope237107);console.warn('ONIT push registration:',e)}}
 function notificationRouteTarget_(n){const code=String(rowVal(n,'Brief Code')||''),type=String(rowVal(n,'Type')||'').toUpperCase();if(code){const b=briefs.find(x=>String(x.code)===code);if(b)return()=>detail(code);return()=>{show('memory');memorySetExample(code);showToast('Brief not in live workspace',`${code} is not loaded in the current workspace. Memory has been searched for it.`)}}if(/DATA_EXPORT|BACKEND_DATA/.test(type))return()=>show('data');if(/PULSE|DIGITAL/.test(type))return()=>show('pulse');if(/CASE/.test(type))return()=>show('cases');if(/ACTIVATION/.test(type))return()=>show('activation');if(/IDEA|SIGNAL|PROACTIVE/.test(type))return()=>show('ideas');if(type==='OWNER_BROADCAST')return()=>openBroadcastNotificationById(rowVal(n,'Notification ID'));return()=>showToast(rowVal(n,'Title')||'ONIT update',rowVal(n,'Message')||'')}
 async function openNotificationTarget(id){let __onitScope238978=ONITAccount.capture();const n=notifications.find(x=>String(rowVal(x,'Notification ID'))===String(id));if(!n)return;const nid=rowVal(n,'Notification ID');document.getElementById('notifPanel')?.classList.add('hidden');if(!truthy(rowVal(n,'Read'))){n['Read']=true;n['Read At']=new Date().toISOString();renderNotifications();if(nid)apiPost('markNotificationsRead',{notificationIds:[nid]}).catch(ONITAccount.guard(e=>console.warn('Notification read receipt:',e)))}const go=notificationRouteTarget_(n);ONITAccount.later(()=>{try{go()}catch(e){ONITAccount.assert(__onitScope238978);console.warn('Notification route:',e);show('home')}},0)}
 window.openNotificationTarget=openNotificationTarget;
@@ -3256,10 +3272,17 @@ setInterval(()=>{if(SESSION_TOKEN&&!document.hidden&&navigator.onLine!==false&&!
 setInterval(()=>{const now=Date.now(),gap=firebaseRealtimeHealthy?180000:60000;if(now-lastFallbackPulseAt>=gap){lastFallbackPulseAt=now;checkForUpdates()}},5000);
 async function boot(){let __onitScope340754=ONITAccount.capture();
   if(SESSION_TOKEN){
-    document.getElementById('authGate').classList.add('hidden');document.getElementById('appShell').classList.add('hidden');
-    try{await ONITAccount.wait(ensureBackendResolved(true),__onitScope340754)}catch(e){ONITAccount.assert(__onitScope340754);showBackendRecovery(e);return}
+    document.getElementById('authGate').classList.add('hidden');
+    const cached=await ONITAccount.wait(readStartupSnapshot(),__onitScope340754),restored=!!(cached&&restoreStartupState(cached));
+    if(!restored)document.getElementById('appShell').classList.add('hidden');
     const hydrateLater=()=>ONITAccount.later(()=>{if(SESSION_TOKEN&&!document.hidden&&!refreshInFlight){checkWorkstationAuthority_(true);loadFromGoogle(false,true)}},3000,__onitScope340754);
-    const cached=await ONITAccount.wait(readStartupSnapshot(),__onitScope340754);if(cached&&restoreStartupState(cached)){hydrateLater();return}
+    try{await ONITAccount.wait(ensureBackendResolved(true),__onitScope340754)}catch(e){
+      ONITAccount.assert(__onitScope340754);
+      if(restored){connectionNotice(staleConnectionMessage());scheduleFullRefreshRetry();return}
+      showBackendRecovery(e);return;
+    }
+    hideBackendRecovery();
+    if(restored){connectionNotice('');hydrateLater();return}
     const fast=await ONITAccount.wait(loadFastHome(),__onitScope340754);if(fast){hydrateLater();return}
     const full=await ONITAccount.wait(loadFromGoogle(false,false),__onitScope340754);if(full||currentUser)return;
     showBackendRecovery(lastStartupError||backendLastError||new Error('The verified backend responded, but ONIT could not load your workspace.'));
@@ -3374,53 +3397,5 @@ html body .bsLiveCard.urgent .bsLiveFooter b *{
   -webkit-text-fill-color:#171717!important;
 }
 </style>
-<script id="onit-v0406-control-contrast-guard">
-(function(){
-  'use strict';
-  const CANDIDATES='button,[role="button"],a.new,.new,.broadcastDeliveryCta,.bsLiveFooter b,.primaryBuzzResponse,.buzzerBtn,.morningStartBtn,.casesOwnerAccessQuick';
-  let queued=false;
-  function rgba(value){
-    const m=String(value||'').match(/rgba?\(([^)]+)\)/i);if(!m)return null;
-    const p=m[1].split(',').map(v=>parseFloat(v.trim()));
-    if(p.length<3||p.slice(0,3).some(v=>!Number.isFinite(v)))return null;
-    return {r:p[0],g:p[1],b:p[2],a:Number.isFinite(p[3])?p[3]:1};
-  }
-  function darkBackground(el){
-    const cs=getComputedStyle(el),c=rgba(cs.backgroundColor);if(!c||c.a<.25)return false;
-    const lum=.2126*c.r+.7152*c.g+.0722*c.b;
-    return lum<105;
-  }
-  function audit(root){
-    const list=[];
-    if(root&&root.nodeType===1&&root.matches&&root.matches(CANDIDATES))list.push(root);
-    if(root&&root.querySelectorAll)list.push(...root.querySelectorAll(CANDIDATES));
-    for(const el of list){
-      if(!el||!el.classList)continue;
-      const should=darkBackground(el);
-      if(should&&!el.classList.contains('onitAutoDarkControl'))el.classList.add('onitAutoDarkControl');
-      else if(!should&&el.classList.contains('onitAutoDarkControl'))el.classList.remove('onitAutoDarkControl');
-    }
-  }
-  function schedule(root=document){
-    if(queued)return;queued=true;
-    requestAnimationFrame(()=>{queued=false;try{audit(root&&root.isConnected===false?document:root)}catch(e){try{audit(document)}catch(_){}}});
-  }
-  window.ONITControlContrast={audit:schedule};
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>schedule(document),{once:true});else schedule(document);
-  const start=()=>{
-    if(!document.body)return;
-    const mo=new MutationObserver(muts=>{
-      let root=document;
-      for(const m of muts){
-        if(m.type==='childList'&&m.target){root=m.target;break}
-        if(m.type==='attributes'&&m.target){root=m.target;break}
-      }
-      schedule(root);
-    });
-    mo.observe(document.body,{subtree:true,childList:true,attributes:true,attributeFilter:['class','style','disabled']});
-    document.addEventListener('click',e=>schedule(e.target&&e.target.closest?e.target.closest(CANDIDATES)||document:document),true);
-  };
-  if(document.body)start();else document.addEventListener('DOMContentLoaded',start,{once:true});
-})();
-</script>
+
 
