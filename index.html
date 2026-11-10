@@ -1334,9 +1334,9 @@ html.onitReduceMotion *,html.onitReduceMotion *::before,html.onitReduceMotion *:
 <script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-messaging-compat.js"></script>
 <script src="./account-lifecycle.js?v=batch1-rebase"></script>
-<script>const APP_VERSION='0.40.5';
-const UI_REVISION=40500;
-const DASHBOARD_UI_REVISION=40501;
+<script>const APP_VERSION='0.40.6';
+const UI_REVISION=40600;
+const DASHBOARD_UI_REVISION=40601;
 const DASHBOARD_UI_STORAGE_KEY='onit-dashboard-ui-state-v1';
 window.ONIT_RUNTIME={version:APP_VERSION,uiRevision:UI_REVISION,dashboardUiRevision:DASHBOARD_UI_REVISION};
 const BACKEND_DATASETS=['USERS','CLIENTS','BRIEFS','ASSIGNMENTS','ITERATIONS','ACTIVITY_LOG','NOTIFICATIONS','REPORTS'];
@@ -3338,3 +3338,89 @@ button,[role="button"]{touch-action:manipulation;-webkit-tap-highlight-color:tra
 </style>
 
 <link rel="stylesheet" href="./ui-system.css?v=0.38.2">
+
+<style id="onit-v0406-control-contrast-fix">
+/* ONIT v0.40.6 — global dark-control label repair.
+   Keeps light/outlined controls unchanged; dark controls must always carry readable labels. */
+html body .onitAutoDarkControl,
+html body .onitAutoDarkControl *{
+  color:#fff!important;
+  -webkit-text-fill-color:#fff!important;
+}
+/* Known strong controls that are intentionally dark. */
+html body .new,
+html body .new *,
+html body .buzzerBtn,
+html body .buzzerBtn *,
+html body .primaryBuzzResponse,
+html body .primaryBuzzResponse *,
+html body .onitDialogBtn.primary,
+html body .onitDialogBtn.primary *,
+html body .casesOwnerAccessQuick,
+html body .casesOwnerAccessQuick *,
+html body .broadcastDeliveryCard:not(.urgent) .broadcastDeliveryCta,
+html body .broadcastDeliveryCard:not(.urgent) .broadcastDeliveryCta *,
+html body .bsLiveCard:not(.urgent) .bsLiveFooter b,
+html body .bsLiveCard:not(.urgent) .bsLiveFooter b *{
+  color:#fff!important;
+  -webkit-text-fill-color:#fff!important;
+}
+/* Urgent uses the inverse white CTA by design. */
+html body .broadcastDeliveryCard.urgent .broadcastDeliveryCta,
+html body .broadcastDeliveryCard.urgent .broadcastDeliveryCta *,
+html body .bsLiveCard.urgent .bsLiveFooter b,
+html body .bsLiveCard.urgent .bsLiveFooter b *{
+  color:#171717!important;
+  -webkit-text-fill-color:#171717!important;
+}
+</style>
+<script id="onit-v0406-control-contrast-guard">
+(function(){
+  'use strict';
+  const CANDIDATES='button,[role="button"],a.new,.new,.broadcastDeliveryCta,.bsLiveFooter b,.primaryBuzzResponse,.buzzerBtn,.morningStartBtn,.casesOwnerAccessQuick';
+  let queued=false;
+  function rgba(value){
+    const m=String(value||'').match(/rgba?\(([^)]+)\)/i);if(!m)return null;
+    const p=m[1].split(',').map(v=>parseFloat(v.trim()));
+    if(p.length<3||p.slice(0,3).some(v=>!Number.isFinite(v)))return null;
+    return {r:p[0],g:p[1],b:p[2],a:Number.isFinite(p[3])?p[3]:1};
+  }
+  function darkBackground(el){
+    const cs=getComputedStyle(el),c=rgba(cs.backgroundColor);if(!c||c.a<.25)return false;
+    const lum=.2126*c.r+.7152*c.g+.0722*c.b;
+    return lum<105;
+  }
+  function audit(root){
+    const list=[];
+    if(root&&root.nodeType===1&&root.matches&&root.matches(CANDIDATES))list.push(root);
+    if(root&&root.querySelectorAll)list.push(...root.querySelectorAll(CANDIDATES));
+    for(const el of list){
+      if(!el||!el.classList)continue;
+      const should=darkBackground(el);
+      if(should&&!el.classList.contains('onitAutoDarkControl'))el.classList.add('onitAutoDarkControl');
+      else if(!should&&el.classList.contains('onitAutoDarkControl'))el.classList.remove('onitAutoDarkControl');
+    }
+  }
+  function schedule(root=document){
+    if(queued)return;queued=true;
+    requestAnimationFrame(()=>{queued=false;try{audit(root&&root.isConnected===false?document:root)}catch(e){try{audit(document)}catch(_){}}});
+  }
+  window.ONITControlContrast={audit:schedule};
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>schedule(document),{once:true});else schedule(document);
+  const start=()=>{
+    if(!document.body)return;
+    const mo=new MutationObserver(muts=>{
+      let root=document;
+      for(const m of muts){
+        if(m.type==='childList'&&m.target){root=m.target;break}
+        if(m.type==='attributes'&&m.target){root=m.target;break}
+      }
+      schedule(root);
+    });
+    mo.observe(document.body,{subtree:true,childList:true,attributes:true,attributeFilter:['class','style','disabled']});
+    document.addEventListener('click',e=>schedule(e.target&&e.target.closest?e.target.closest(CANDIDATES)||document:document),true);
+  };
+  if(document.body)start();else document.addEventListener('DOMContentLoaded',start,{once:true});
+})();
+</script>
+
