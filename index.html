@@ -1329,11 +1329,10 @@ html.onitReduceMotion *,html.onitReduceMotion *::before,html.onitReduceMotion *:
     </div>
   </div>
 </div>
-<script src="https://www.gstatic.com/firebasejs/13.3.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/13.3.0/firebase-app-check-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/13.3.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/13.3.0/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/13.3.0/firebase-messaging-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/13.0.0/firebase-messaging-compat.js"></script>
 <script src="./account-lifecycle.js?v=batch1-rebase"></script>
 <script>
 (function(){
@@ -1345,7 +1344,7 @@ html.onitReduceMotion *,html.onitReduceMotion *::before,html.onitReduceMotion *:
   window.addEventListener('touchstart',keyboardOff,true);
 })();
 </script>
-<script>const APP_VERSION='0.40.10';
+<script>const APP_VERSION='0.40.8';
 const UI_REVISION=40800;
 const DASHBOARD_UI_REVISION=40801;
 const DASHBOARD_UI_STORAGE_KEY='onit-dashboard-ui-state-v1';
@@ -1410,41 +1409,6 @@ let selectedAccessEmail='',activeBackendDataset='',currentBroadcast=null;const d
 const profilePhotoCache=new Map();
 let current=null,currentUser=null,apiOnline=false,mutationBusy=false,backendVersion='',serverOffset=0,loadGeneration=0,lastListSection='home',briefFilter='ALL',refreshInFlight=false,lastStateVersion='',refreshRetryTimer=null,refreshRetryAttempt=0,refreshRecoveryPending=false,lastSuccessfulSyncAt=Number(localStorage.getItem('onit-last-sync')||0);
 const FIREBASE_CONFIG={apiKey:'AIzaSyAmpqFDMfo6zAorD-f14hTQnSNFDFU6VHM',authDomain:'onit-backend-api.firebaseapp.com',projectId:'onit-backend-api',storageBucket:'onit-backend-api.firebasestorage.app',messagingSenderId:'1052909191157',appId:'1:1052909191157:web:392c4a50b453deb5ebeabc'};
-const FIREBASE_APPCHECK_SITE_KEY='6LdeoSYuAAAAAHaVQ07KIkdBaTb9rc2CYs9Qe0jF';
-const FIREBASE_APPCHECK_MODE='MONITOR_ONLY';
-let firebaseAppCheck=null,firebaseAppCheckReady=false,firebaseAppCheckInitError='';
-function ensureFirebaseAppCheck_(){
-  if(firebaseAppCheckReady)return firebaseAppCheck;
-  if(typeof firebase==='undefined'||!firebase.appCheck){firebaseAppCheckInitError='Firebase App Check SDK unavailable';return null;}
-  try{
-    if(!firebase.apps.length)firebaseApp=firebase.initializeApp(FIREBASE_CONFIG);else firebaseApp=firebase.app();
-    firebaseAppCheck=firebase.appCheck();
-    firebaseAppCheck.activate(new firebase.appCheck.ReCaptchaEnterpriseProvider(FIREBASE_APPCHECK_SITE_KEY),true);
-    firebaseAppCheckReady=true;firebaseAppCheckInitError='';
-    window.ONIT_APP_CHECK_STATUS={mode:FIREBASE_APPCHECK_MODE,provider:'recaptcha-enterprise',initialized:true,enforcement:false,appId:FIREBASE_CONFIG.appId};
-    console.info('ONIT App Check monitor initialized',{provider:'recaptcha-enterprise',enforcement:false});
-    return firebaseAppCheck;
-  }catch(e){
-    firebaseAppCheckInitError=String(e&&e.message||e);
-    window.ONIT_APP_CHECK_STATUS={mode:FIREBASE_APPCHECK_MODE,provider:'recaptcha-enterprise',initialized:false,enforcement:false,error:firebaseAppCheckInitError,appId:FIREBASE_CONFIG.appId};
-    console.warn('ONIT App Check monitor initialization:',e);
-    return null;
-  }
-}
-async function onitAppCheckSelfTest_(){
-  const appCheck=ensureFirebaseAppCheck_();
-  if(!appCheck||typeof appCheck.getToken!=='function')return{ok:false,initialized:firebaseAppCheckReady,enforcement:false,error:firebaseAppCheckInitError||'App Check unavailable'};
-  try{
-    const result=await appCheck.getToken(false);
-    return{ok:!!(result&&result.token),initialized:true,provider:'recaptcha-enterprise',enforcement:false};
-  }catch(e){
-    return{ok:false,initialized:true,provider:'recaptcha-enterprise',enforcement:false,error:String(e&&e.message||e)};
-  }
-}
-window.ONITAppCheck={
-  status:function(){return Object.assign({},window.ONIT_APP_CHECK_STATUS||{mode:FIREBASE_APPCHECK_MODE,provider:'recaptcha-enterprise',initialized:firebaseAppCheckReady,enforcement:false,error:firebaseAppCheckInitError});},
-  selfTest:onitAppCheckSelfTest_
-};
 let firebaseApp=null,firebaseDb=null,firebaseRealtimeHealthy=false,firebaseStarting=false,firebaseUnsubs=[],firebaseActivityRows=new Map(),firebaseBuzzerRows=new Map(),lastFallbackPulseAt=0,firebaseMessaging=null,pushTokenRegistered='',foregroundPushBound=false,pendingPushRouteConsumed=false;
 try{if(typeof Notification!=='undefined'&&Notification.permission==='granted')pushTokenRegistered=localStorage.getItem('onit_push_token_v1')||''}catch(e){}
 let currentBuzzer=null,buzzerQueue=[];
@@ -1753,7 +1717,6 @@ function applyFirebaseBuzzerSnapshot_(snap){
 function queuePendingBuzzers_(){
   const now=Date.now();buzzerQueue=buzzers.filter(b=>String(b.status||rowVal(b,'Status')||'')==='Pending'&&new Date(b.expiresAt||rowVal(b,'Expires At')||0).getTime()>now).sort((a,z)=>new Date(a.sentAt||rowVal(a,'Sent At')||0)-new Date(z.sentAt||rowVal(z,'Sent At')||0));showNextBuzzer();
 }
-try{ensureFirebaseAppCheck_();}catch(e){console.warn('ONIT App Check monitor startup:',e)}
 async function startFirebaseRealtime(){let __onitScope46972=ONITAccount.capture();
   if(firebaseStarting||firebaseUnsubs.length||!SESSION_TOKEN||!CURRENT_USER_ID||!ORG_ID||typeof firebase==='undefined')return;firebaseStarting=true;
   try{
