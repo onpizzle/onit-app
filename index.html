@@ -1111,8 +1111,8 @@ html.onitReduceMotion *,html.onitReduceMotion *::before,html.onitReduceMotion *:
   .broadcastComposerActions{position:fixed;left:0;right:0;bottom:0;z-index:30;margin:0;padding:10px 12px calc(10px + env(safe-area-inset-bottom));background:rgba(255,255,255,.96);backdrop-filter:blur(12px);border-top:1px solid #ddd8d1;display:grid;grid-template-columns:1fr 1.35fr;gap:8px}.broadcastComposerActions button{width:100%;min-height:50px}
 }
 </style>
-<link rel="stylesheet" href="./christmas.css?v=0.40.18">
-<script src="./christmas.js?v=0.40.18" defer></script>
+<link rel="stylesheet" href="./christmas.css?v=0.40.19">
+<script src="./christmas.js?v=0.40.19" defer></script>
 </head>
 <body>
 <a class="onitSkipLink" href="#mainContent">Skip to main content</a>
@@ -1425,8 +1425,9 @@ html.onitReduceMotion *,html.onitReduceMotion *::before,html.onitReduceMotion *:
 @media(max-width:1000px){.platformMetrics{grid-template-columns:repeat(2,minmax(0,1fr))}.platformGrid{grid-template-columns:1fr}}
 @media(max-width:560px){.platformMetrics{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.platformMetric,.platformPanel{padding:13px}.platformMetric b{font-size:25px}.platformSettingsGrid{grid-template-columns:1fr}.platformIntro{align-items:flex-start}}
 </style>
-<script>const APP_VERSION='0.40.16';
-const UI_REVISION=41016;
+<!-- Release consistency: keep APP_VERSION, UI_REVISION, version.json and service-worker.js synchronized. -->
+<script>const APP_VERSION='0.40.19';
+const UI_REVISION=41019;
 const DASHBOARD_UI_REVISION=41001;
 const DASHBOARD_UI_STORAGE_KEY='onit-dashboard-ui-state-v1';
 window.ONIT_RUNTIME={version:APP_VERSION,uiRevision:UI_REVISION,dashboardUiRevision:DASHBOARD_UI_REVISION};

@@ -1,7 +1,7 @@
 {
-  "version": "0.40.18",
-  "build": "0.40.18",
-  "uiRevision": 41018,
+  "version": "0.40.19",
+  "build": "0.40.19",
+  "uiRevision": 41019,
   "dashboardUiRevision": 41001,
   "mandatoryUiSync": false,
   "universalDashboardUi": true,
@@ -13,7 +13,7 @@
   "workflowControlVersion": "1.0.0",
   "activationCommandVersion": "0.2.0",
   "label": "ONIT Update Anytime",
-  "releasedAt": "2026-11-23T00:15:00+01:00",
+  "releasedAt": "2026-11-23T00:18:33+01:00",
   "ideasDumpVersion": "0.2.0",
   "visualContrastVersion": "1.0.5",
   "attentionLoopVersion": "0.1.2",
@@ -28,7 +28,7 @@
   "securityPreviewVersion": "1.0.0",
   "rewardsVersion": "1.0.2",
   "securityClickjackingVersion": "1.0.0",
-  "notes": "Refine Christmas visuals: remove large banner, add small Santa hats and restrained pine ornaments, gentle snowflakes, compact opt-out; frontend decorative only; no backend or workflow change.",
+  "notes": "Repair release prompt loop (sync HTML runtime with version.json), strengthen visible snow on dark/light across all ONIT tabs. Existing workflows unchanged.",
   "staffSearchVersion": "1.0.0",
   "workstationTabControlVersion": "1.4.0",
   "commandCenterVersion": "1.2.0",
@@ -45,5 +45,5 @@
   "broadcastStudioVersion": "1.0.3",
   "briefLifecycleVersion": "1.0.0",
   "platformOwnerConsoleVersion": "1.0.0",
-  "christmasEditionVersion": "1.1.0"
+  "christmasEditionVersion": "1.2.0"
 }
