@@ -1,7 +1,7 @@
 {
-  "version": "0.40.15",
-  "build": "0.40.15",
-  "uiRevision": 41015,
+  "version": "0.40.16",
+  "build": "0.40.16",
+  "uiRevision": 41016,
   "dashboardUiRevision": 41001,
   "mandatoryUiSync": false,
   "universalDashboardUi": true,
@@ -28,7 +28,7 @@
   "securityPreviewVersion": "1.0.0",
   "rewardsVersion": "1.0.2",
   "securityClickjackingVersion": "1.0.0",
-  "notes": "Team dropdown reliability fix: card-scoped toggle, safe handler and unique panel IDs; no backend changes or additional requests.",
+  "notes": "Platform Owner console: organisation metadata, staff account administration, server-denied agency operational actions; existing staff workspace unchanged.",
   "staffSearchVersion": "1.0.0",
   "workstationTabControlVersion": "1.4.0",
   "commandCenterVersion": "1.2.0",
@@ -43,5 +43,6 @@
   "moduleStudioVersion": "2.2.0-m2",
   "accountHandoffVersion": "1.0.0",
   "broadcastStudioVersion": "1.0.3",
-  "briefLifecycleVersion": "1.0.0"
+  "briefLifecycleVersion": "1.0.0",
+  "platformOwnerConsoleVersion": "1.0.0"
 }

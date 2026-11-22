@@ -5,7 +5,7 @@ const VERSION='1.0.0';let overlay,input,results,items=[],active=0;
 function esc(v){return typeof escapeHTML==='function'?escapeHTML(v):String(v||'')}
 function authority(name,fallback=false){try{return window.ONITAuthority?ONITAuthority.allowed(name,fallback):!!fallback}catch(e){return !!fallback}}
 function close(){if(overlay)overlay.classList.add('hidden')}
-function open(seed=''){if(!overlay)mount();overlay.classList.remove('hidden');input.value=seed;active=0;render();ONITAccount.later(()=>input.focus(),20)}
+function open(seed=''){if(document.getElementById('appShell')?.classList.contains('platformOwnerMode'))return;if(!overlay)mount();overlay.classList.remove('hidden');input.value=seed;active=0;render();ONITAccount.later(()=>input.focus(),20)}
 function run(item){close();try{item.run()}catch(e){console.warn('ONIT command',e)}}
 function commands(){
  const out=[
