@@ -1,4 +1,4 @@
-/* ONIT festive accents v0.40.20. Purely decorative frontend layer; no changes to workflows. */
+/* ONIT festive accents v0.40.21. Purely decorative frontend layer; no changes to workflows. */
 html.onitChristmas{--onit-festive-green:#1f624a;--onit-festive-red:#b53b46;--onit-festive-gold:#d2af65}
 /* Seasonal switch: unobtrusive, always user-controlled. */
 .onitXmasToggle{display:inline-flex;align-items:center;justify-content:center;gap:6px;flex:0 0 auto;min-height:32px;padding:5px 10px;margin-right:auto;border:1px solid #e6e7e2;border-radius:999px;background:#fff;color:#52625a;box-shadow:none;cursor:pointer;font:700 10px/1.2 Arial,Helvetica,sans-serif;letter-spacing:.025em;white-space:nowrap;transition:background .15s,border-color .15s}
@@ -7,7 +7,8 @@ html.onitChristmas{--onit-festive-green:#1f624a;--onit-festive-red:#b53b46;--oni
 .onitXmasToggle svg{width:15px;height:15px;display:block;flex:0 0 auto}
 html.onitChristmas .onitXmasToggle{border-color:#cddfd2;background:#f7faf7;color:#275a43}
 html.onitChristmas .onitXmasToggle .onitXmasToggleText::after{content:' ON';color:#19734d;font-weight:900}
-.onitXmasToggle[aria-pressed="false"]{color:#777;background:#fafafa}
+ .onitXmasToggle[aria-pressed="false"]{color:#777;background:#fafafa}
+.onitXmasToggle[aria-pressed="false"] .onitXmasToggleText::after{content:' OFF';color:#a13c42;font-weight:900}
 /* The Santa hat sits on the first O of ONIT rather than replacing the brand. */
 .onitXmasHat{position:absolute;display:block;width:42px;height:37px;left:9px;top:2px;z-index:2;pointer-events:none;transform:rotate(-8deg);filter:drop-shadow(0 1px 1px rgba(26,22,19,.10))}
 .onitXmasHat svg{display:block;width:100%;height:100%}

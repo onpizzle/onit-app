@@ -1,7 +1,7 @@
 {
-  "version": "0.40.20",
-  "build": "0.40.20",
-  "uiRevision": 41020,
+  "version": "0.40.21",
+  "build": "0.40.21",
+  "uiRevision": 41021,
   "dashboardUiRevision": 41001,
   "mandatoryUiSync": false,
   "universalDashboardUi": true,
@@ -28,7 +28,7 @@
   "securityPreviewVersion": "1.0.0",
   "rewardsVersion": "1.0.2",
   "securityClickjackingVersion": "1.0.0",
-  "notes": "Performance mitigation for Page Unresponsive: eliminate animated SVG filters, reduce decorative flakes, update brief countdowns without full list redraw, skip hidden tick. No backend, permissions or workflow changes.",
+  "notes": "Restore original ONIT Command Center and owner administration controls in the existing ONIT design. Preserve tenant-work isolation with backend filtering; make Christmas Mode state explicit and reset legacy seasonal toggle on this release. Requires backend v0.31.54.",
   "staffSearchVersion": "1.0.0",
   "workstationTabControlVersion": "1.4.0",
   "commandCenterVersion": "1.2.0",
@@ -44,6 +44,6 @@
   "accountHandoffVersion": "1.0.0",
   "broadcastStudioVersion": "1.0.3",
   "briefLifecycleVersion": "1.0.0",
-  "platformOwnerConsoleVersion": "1.0.0",
-  "christmasEditionVersion": "1.2.1"
+  "platformOwnerConsoleVersion": "1.1.0",
+  "christmasEditionVersion": "1.3.0"
 }

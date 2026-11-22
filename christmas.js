@@ -1,11 +1,11 @@
-/* ONIT festive detail v0.40.20: UI decoration only, no account or operational data. */
+/* ONIT festive detail v0.40.21: UI decoration only, no account or operational data. */
 (() => {
   'use strict';
   const now = new Date();
   const m = now.getMonth(), d = now.getDate();
   const seasonal = (m === 10 && d >= 20) || m === 11 || (m === 0 && d <= 6);
   if (!seasonal) return;
-  const storageKey='onit.christmas.mode.v1'; // Keep the existing user's v0.40.17 preference.
+  const storageKey='onit.christmas.mode.2026.v2'; // Reset legacy season flag once; subsequent ON/OFF choices persist.
   let choice;
   try{choice=localStorage.getItem(storageKey)}catch(_){choice=null}
   let enabled = choice!=='off';
@@ -16,7 +16,7 @@
   function decoration(parent,klass,svg){if(!parent)return;const e=document.createElement('span');e.className=klass;e.setAttribute('aria-hidden','true');if(svg)e.innerHTML=svg;parent.appendChild(e);return e}
   function update(){
     document.documentElement.classList.toggle('onitChristmas',enabled);
-    if(button){button.setAttribute('aria-pressed',String(enabled));button.setAttribute('aria-label',enabled?'Turn Christmas decorations off':'Turn Christmas decorations on');button.title=enabled?'Turn Christmas decorations off':'Turn Christmas decorations on'}
+    if(button){button.setAttribute('aria-pressed',String(enabled));button.setAttribute('aria-label',enabled?'Turn Christmas decorations off':'Turn Christmas decorations on');button.title=enabled?'Festive Mode ON — click to turn decorations off':'Festive Mode OFF — click to show Christmas decorations and snowflakes'}
     if(snow)snow.hidden=!enabled;
   }
   function init(){
