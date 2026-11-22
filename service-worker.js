@@ -23,10 +23,10 @@ const FIREBASE_CONFIG={apiKey:'AIzaSyAmpqFDMfo6zAorD-f14hTQnSNFDFU6VHM',authDoma
 let messaging=null;
 try{firebase.initializeApp(FIREBASE_CONFIG);messaging=firebase.messaging();}catch(e){}
 
-const UI_VERSION='0.40.12';
-const UI_REVISION=41012;
+const UI_VERSION='0.40.13';
+const UI_REVISION=41013;
 const DASHBOARD_UI_REVISION=41001;
-const CACHE='onit-v0.40.12-file-review';
+const CACHE='onit-v0.40.13-performance';
 const STATIC=['./account-lifecycle.js','./creative-work.js','./creative-work.css','./offline.html','./manifest.webmanifest','./icons/icon-192.png','./icons/icon-512.png','./icons/apple-touch-icon.png','./assets/onit-logo-horizontal.png','./cases-module.css','./cases-module.js','./activation-command.css','./activation-command.js','./ideas-dump.css','./ideas-dump.js','./visual-contrast.css','./pulse-module.css','./pulse-module.js','./executive-reports.css','./executive-reports.js','./module-studio.css','./module-studio.js','./assist-traffic-module.css','./assist-traffic-module.js','./core-intelligence.css','./core-intelligence.js','./autocare-module.css','./autocare-module.js','./authority-engine.js','./sync-engine.js','./release-guard.js','./command-palette.css','./command-palette.js','./dialog-system.css','./dialog-system.js','./attention-loop.css','./attention-loop.js','./rewards-module.css','./rewards-module.js','./ui-system.css','./ui-system.js'];
 
 // Notification+data messages are displayed automatically by FCM in the background.
@@ -43,9 +43,10 @@ try{
 
 async function cacheFreshStatic(){
   const c=await caches.open(CACHE);
-  for(const path of STATIC){
-    try{const u=new URL(path,self.location.href);u.searchParams.set('_ui',UI_VERSION);const r=await fetch(u.toString(),{cache:'reload'});if(r.ok){await c.put(new Request(new URL(path,self.location.href).toString()),r.clone());await c.put(u.toString(),r.clone())}}catch(e){}
-  }
+  // Fetch a bounded number of independent assets concurrently rather than serialising ~40 network requests.
+  let next=0;
+  async function worker(){while(next<STATIC.length){const path=STATIC[next++];try{const u=new URL(path,self.location.href);u.searchParams.set('_ui',UI_VERSION);const r=await fetch(u.toString(),{cache:'reload'});if(r.ok){await c.put(new Request(new URL(path,self.location.href).toString()),r.clone());await c.put(u.toString(),r.clone())}}catch(e){}}}
+  await Promise.all(Array.from({length:Math.min(4,STATIC.length)},()=>worker()));
 }
 self.addEventListener('install',event=>{event.waitUntil(cacheFreshStatic())});
 self.addEventListener('activate',event=>{event.waitUntil((async()=>{const keys=await caches.keys();await Promise.all(keys.filter(k=>k.startsWith('onit-')&&k!==CACHE).map(k=>caches.delete(k)));try{if(self.registration.navigationPreload)await self.registration.navigationPreload.disable()}catch(e){}try{await clients.claim()}catch(e){}})())});

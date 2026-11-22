@@ -24,7 +24,7 @@
 <link rel="preconnect" href="https://script.google.com">
 <link rel="dns-prefetch" href="//www.gstatic.com">
 <link rel="dns-prefetch" href="//script.google.com">
-<link rel="stylesheet" href="./dialog-system.css?v=0.40.12">
+<link rel="stylesheet" href="./dialog-system.css?v=0.40.13">
 <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
@@ -1395,8 +1395,8 @@ html.onitReduceMotion *,html.onitReduceMotion *::before,html.onitReduceMotion *:
   window.addEventListener('touchstart',keyboardOff,true);
 })();
 </script>
-<script>const APP_VERSION='0.40.12';
-const UI_REVISION=41012;
+<script>const APP_VERSION='0.40.13';
+const UI_REVISION=41013;
 const DASHBOARD_UI_REVISION=41001;
 const DASHBOARD_UI_STORAGE_KEY='onit-dashboard-ui-state-v1';
 window.ONIT_RUNTIME={version:APP_VERSION,uiRevision:UI_REVISION,dashboardUiRevision:DASHBOARD_UI_REVISION};
@@ -1425,7 +1425,9 @@ function backendRecoveryHost(){let el=document.getElementById('backendRecoveryCa
 function hideBackendRecovery(){const el=document.getElementById('backendRecoveryCard');if(el)el.style.display='none'}
 function showBackendRecovery(error){const el=backendRecoveryHost();if(!el)return;const detail=String(error&&error.message||error||'ONIT could not verify the backend.');el.innerHTML=`<div style="font-size:12px;font-weight:900;letter-spacing:.08em">ONIT CONNECTION CHECK</div><h2 style="margin:7px 0 6px;font-size:22px">The app is open, but the backend is not verified.</h2><p style="margin:0 0 12px;line-height:1.45">ONIT will not keep showing an empty dashboard or repeatedly reboot. ${escapeHTML(detail)}</p><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="new" type="button" onclick="retryBackendStartup()">RETRY BACKEND</button><button class="secondary" type="button" onclick="handleSignOut()">SIGN OUT</button></div><div class="tiny" style="margin-top:10px">Expected backend: ONIT v${BACKEND_MIN_VERSION}+ • ${escapeHTML(location.hostname)}</div>`;el.style.display='block';connectionNotice('')}
 async function ensureBackendResolved(force=false){let __onitScope3642=ONITAccount.capture();
-  if(!force&&backendResolution&&Date.now()-backendLastHealthAt<5*60*1000)return backendResolution;
+  // A verified backend does not require a separate health GET before every normal request.
+  // The authenticated API request itself remains authoritative; failures still trigger forced recovery.
+  if(!force&&backendResolution)return backendResolution;
   if(backendResolveInFlight&&!force)return backendResolveInFlight;
   const work=(async()=>{let __onitScope3873=ONITAccount.capture();const errors=[];
     for(const candidate of backendCandidateOrder()){
@@ -1660,6 +1662,7 @@ async function apiGet(action='bootstrap'){
         const payload=envelope.data!==undefined?envelope.data:envelope;
         if(!payload||typeof payload!=='object')throw new Error('Invalid ONIT read response.');
         if(payload.success===false)throw new Error(payload.error||'Could not load ONIT backend.');
+        backendLastHealthAt=Date.now();
         return payload;
       }
 
@@ -1688,7 +1691,7 @@ async function apiPost(action,payload={},requiresAuth=true){let __onitScope40542
   const data={...payload};if(requiresAuth){if(!SESSION_TOKEN)throw new Error('AUTH_REQUIRED');Object.assign(data,onitPresenceMeta());data.sessionToken=SESSION_TOKEN}
   const safeRead=SAFE_RETRY_POST_ACTIONS.has(action),attempts=safeRead?2:1,timeoutMs=(action==='submitIteration'||action==='createBrief'||action==='BRIEF_LIFECYCLE_SAVE')?120000:(action==='EXEC_REPORT_GENERATE'?120000:(action==='createOwnerBroadcast'?60000:(action==='REWARDS_OWNER_DASHBOARD'?45000:30000)));let lastError=null;
   for(let attempt=0;attempt<attempts;attempt++){
-    try{const r=await ONITAccount.wait(fetchWithTimeout(API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action,data})},timeoutMs),__onitScope40542);if(!r.ok)throw new Error('API '+r.status);const result=await ONITAccount.wait(r.json(),__onitScope40542);if(!result.success)throw new Error(result.error||result.message||'API request failed');if(Array.isArray(result.rewards)&&result.rewards.length){queueMicrotask(ONITAccount.guard(()=>{try{window.ONITRewards&&ONITRewards.handleApiRewards(result.rewards)}catch(_){ONITAccount.assert(__onitScope40542);}},__onitScope40542))}return result}
+    try{const r=await ONITAccount.wait(fetchWithTimeout(API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action,data})},timeoutMs),__onitScope40542);if(!r.ok)throw new Error('API '+r.status);const result=await ONITAccount.wait(r.json(),__onitScope40542);if(!result.success)throw new Error(result.error||result.message||'API request failed');backendLastHealthAt=Date.now();if(Array.isArray(result.rewards)&&result.rewards.length){queueMicrotask(ONITAccount.guard(()=>{try{window.ONITRewards&&ONITRewards.handleApiRewards(result.rewards)}catch(_){ONITAccount.assert(__onitScope40542);}},__onitScope40542))}return result}
     catch(e){ONITAccount.assert(__onitScope40542);lastError=e;if(window.AutoCare)window.AutoCare.signalApiFailure(action,e,safeRead);if(safeRead&&attempt===0&&apiRetryableError(e)){await ONITAccount.wait(sleep(650),__onitScope40542);continue}throw e}
   }
   throw lastError||new Error('API request failed');
@@ -1844,12 +1847,17 @@ async function loadFromGoogle(strict=false,silent=false){let __onitScope59997=ON
         if(!versionAtLeast(backendVersion,'0.15.7'))throw new Error('Backend '+backendVersion+' is older than the ONIT V0.15.7 shared-account backend required by this frontend. Deploy backend V0.15.7 first.');
         lastStateVersion=String(data.stateVersion||lastStateVersion||'');organisations=data.organisations||[];users=table(data,'USERS');pendingUsers=data.pendingUsers||[];accessDirectory=data.accessDirectory||[];securityInfo=data.security||null;systemControl=data.systemControl||{};permissions=data.permissions||{};authority=data.authority||data.permissions||{};if(window.ONITAuthority)ONITAuthority.set(authority);clients=table(data,'CLIENTS');allAssignments=table(data,'ASSIGNMENTS');notifications=table(data,'NOTIFICATIONS').filter(n=>!isWorkstationAccessSignal_(n));buzzers=data.buzzers||[];reports=table(data,'REPORTS');dataExports=data.dataExports||[];teamWorkload=data.teamWorkload||[];reportSummary=data.reportSummary||null;homeAnalytics=data.homeAnalytics||null;currentUser=data.currentUser||users.find(u=>rowVal(u,'User ID','userId')===CURRENT_USER_ID)||null;
         if(!currentUser)throw new Error('Your signed-in profile is not available.');CURRENT_USER_ID=rowVal(currentUser,'User ID');ORG_ID=rowVal(currentUser,'Organisation ID');localStorage.setItem('onit-user',CURRENT_USER_ID);localStorage.setItem('onit-org',ORG_ID);
-        const rows=table(data,'BRIEFS'),iterations=table(data,'ITERATIONS'),activities=table(data,'ACTIVITY_LOG');briefs=rows.map(sheetBriefToUI);briefs.forEach(b=>{const as=allAssignments.filter(r=>sameBrief(r,b.code)&&String(rowVal(r,'Assignment Type','assignmentType')).toUpperCase()==='TO'&&String(rowVal(r,'Active','active')).toLowerCase()!=='false');if(as.length){b.assignee=as.map(r=>rowVal(r,'Full Name','fullName')||'Assigned team').join(' + ');b.assigneeUserId=rowVal(as[0],'User ID','userId');b.assigneeFullName=rowVal(as[0],'Full Name','fullName')||b.assignee}b.iterations=iterations.filter(r=>sameBrief(r,b.code)).sort((a,z)=>Number(rowVal(a,'Version Number','versionNumber')||0)-Number(rowVal(z,'Version Number','versionNumber')||0)).map(r=>{
+        const rows=table(data,'BRIEFS'),iterations=table(data,'ITERATIONS'),activities=table(data,'ACTIVITY_LOG');
+        // One-pass indexes avoid repeatedly scanning every assignment, iteration and log row for every brief.
+        // Matching uses exactly the same Brief Code coercion as sameBrief(), including legacy fields.
+        const groupByBrief=(entries)=>{const groups=new Map();for(const entry of entries){const code=String(rowVal(entry,'Brief Code','briefCode','code'));if(!groups.has(code))groups.set(code,[]);groups.get(code).push(entry);}return groups;};
+        const assignmentsByBrief=groupByBrief(allAssignments),iterationsByBrief=groupByBrief(iterations),activityByBrief=groupByBrief(activities);
+        briefs=rows.map(sheetBriefToUI);briefs.forEach(b=>{const as=(assignmentsByBrief.get(String(b.code))||[]).filter(r=>String(rowVal(r,'Assignment Type','assignmentType')).toUpperCase()==='TO'&&String(rowVal(r,'Active','active')).toLowerCase()!=='false');if(as.length){b.assignee=as.map(r=>rowVal(r,'Full Name','fullName')||'Assigned team').join(' + ');b.assigneeUserId=rowVal(as[0],'User ID','userId');b.assigneeFullName=rowVal(as[0],'Full Name','fullName')||b.assignee}b.iterations=(iterationsByBrief.get(String(b.code))||[]).slice().sort((a,z)=>Number(rowVal(a,'Version Number','versionNumber')||0)-Number(rowVal(z,'Version Number','versionNumber')||0)).map(r=>{
           let fileIds=parseJsonArray(rowVal(r,'Work File IDs')),fileNames=parseJsonArray(rowVal(r,'Work File Names')),fileTypes=parseJsonArray(rowVal(r,'Work File Types')),fileUrls=parseJsonArray(rowVal(r,'Work File URLs'));
           const legacyId=rowVal(r,'Drive File ID','driveFileId')||'',legacyName=rowVal(r,'File Name','fileName')||'',legacyType=rowVal(r,'File Type','fileType')||'',legacyUrl=rowVal(r,'Drive File URL','driveFileUrl')||'';
           if(!fileIds.length&&legacyId)fileIds=[legacyId];if(!fileNames.length&&legacyName)fileNames=[legacyName];if(!fileTypes.length&&legacyType)fileTypes=[legacyType];if(!fileUrls.length&&legacyUrl)fileUrls=[legacyUrl];
           return {v:Number(rowVal(r,'Version Number','versionNumber')||0),file:fileNames[0]||legacyName||'Submission',fileType:fileTypes[0]||legacyType,driveFileId:fileIds[0]||legacyId,driveFileUrl:fileUrls[0]||legacyUrl,files:fileIds.map((id,index)=>({id,name:fileNames[index]||`File ${index+1}`,type:fileTypes[index]||'',url:fileUrls[index]||''})),links:parseJsonArray(rowVal(r,'Work Links')),texts:parseJsonArray(rowVal(r,'Work Text Blocks')),contentSummary:rowVal(r,'Submission Content Summary')||'',note:rowVal(r,'Submission Note')||'',clientSent:truthy(rowVal(r,'Client Sent')),clientSentAt:rowVal(r,'Client Sent At'),state:rowVal(r,'Status','status')||'Submitted',id:rowVal(r,'Iteration ID','iterationId'),feedback:rowVal(r,'Feedback'),submittedAt:rowVal(r,'Submitted At'),approvedBy:rowVal(r,'Approved By User ID'),approvedAt:rowVal(r,'Approved At'),teamLeadRequired:truthy(rowVal(r,'Team Lead Required')),teamLeadApproved:truthy(rowVal(r,'Team Lead Approved')),teamLeadApprovedBy:rowVal(r,'Team Lead Approved By User ID'),teamLeadApprovedAt:rowVal(r,'Team Lead Approved At')};
-        });b.activityRows=activities.filter(r=>sameBrief(r,b.code)).sort((a,z)=>new Date(rowVal(a,'Timestamp','timestamp')||0)-new Date(rowVal(z,'Timestamp','timestamp')||0));b.activity=b.activityRows.map(r=>`${formatTime(rowVal(r,'Timestamp','timestamp'))} — ${rowVal(r,'Action','action')}${rowVal(r,'Reason','reason')?' — '+rowVal(r,'Reason','reason'):''}`)});
+        });b.activityRows=(activityByBrief.get(String(b.code))||[]).slice().sort((a,z)=>new Date(rowVal(a,'Timestamp','timestamp')||0)-new Date(rowVal(z,'Timestamp','timestamp')||0));b.activity=b.activityRows.map(r=>`${formatTime(rowVal(r,'Timestamp','timestamp'))} — ${rowVal(r,'Action','action')}${rowVal(r,'Reason','reason')?' — '+rowVal(r,'Reason','reason'):''}`)});
         apiOnline=true;markFullSyncSuccess();applyPermissions();applySystemControlState();
         const preserve=silent?new Set(uiDirtySections):new Set();
         if(!preserve.has('newbrief')){populateClients();populateAssignees();}
@@ -3443,7 +3451,7 @@ async function boot(){let __onitScope340754=ONITAccount.capture();
 }
 document.addEventListener('DOMContentLoaded',()=>boot(),{once:true});
 </script>
-<script src="./dialog-system.js?v=0.40.12"></script>
+<script src="./dialog-system.js?v=0.40.13"></script>
 <script src="./authority-engine.js?v=0.37.6"></script>
 <script src="./sync-engine.js?v=0.37.6"></script>
 <script src="./release-guard.js?v=0.37.6"></script>
@@ -3451,8 +3459,8 @@ document.addEventListener('DOMContentLoaded',()=>boot(),{once:true});
 <script src="./autocare-module.js?v=0.37.6"></script>
 <script src="./cases-module.js?v=0.37.6"></script>
 <script src="./activation-command.js?v=0.37.6"></script>
-<script src="./ideas-dump.js?v=0.40.12"></script>
-<script src="./pulse-module.js?v=0.40.12"></script>
+<script src="./ideas-dump.js?v=0.40.13"></script>
+<script src="./pulse-module.js?v=0.40.13"></script>
 <script src="./executive-reports.js?v=1.1.0"></script>
 <script src="./module-studio.js?v=2.2.0-m2-editable"></script>
 <script src="./assist-traffic-module.js?v=0.37.6"></script>
@@ -3460,7 +3468,7 @@ document.addEventListener('DOMContentLoaded',()=>boot(),{once:true});
 <script src="./ui-system.js?v=0.38.0"></script>
 <script src="./rewards-module.js?v=0.38.0"></script>
 <script src="./attention-loop.js?v=0.37.6"></script>
-<script src="./creative-work.js?v=0.40.12"></script>
+<script src="./creative-work.js?v=0.40.13"></script>
 <script>
 /* ================== ONIT BRIEF LIFECYCLE v1.0.0 ================== */
 let onitLifecycleDraft=null;

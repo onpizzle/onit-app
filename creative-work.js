@@ -142,7 +142,21 @@ function buildPdf(pages){const enc=new TextEncoder(),parts=[],offsets=[0];let le
  let next=3;const pageIds=[],imgIds=[],contentIds=[],annIds=[];for(const page of pages){pageIds.push(next++);imgIds.push(next++);contentIds.push(next++);annIds.push(page.annotations.map(()=>next++))}push('%PDF-1.4\n');obj(1,'<< /Type /Catalog /Pages 2 0 R >>');obj(2,`<< /Type /Pages /Kids [${pageIds.map(n=>n+' 0 R').join(' ')}] /Count ${pages.length} >>`);
  pages.forEach((page,i)=>{const jpeg=bytes64(page.data),draw='q 960 0 0 540 0 0 cm /Im Do Q';obj(pageIds[i],`<< /Type /Page /Parent 2 0 R /MediaBox [0 0 960 540] /Resources << /XObject << /Im ${imgIds[i]} 0 R >> >> /Contents ${contentIds[i]} 0 R /Annots [${annIds[i].map(n=>n+' 0 R').join(' ')}] >>`);obj(imgIds[i],[`<< /Type /XObject /Subtype /Image /Width 1600 /Height 900 /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${jpeg.length} >>\nstream\n`,jpeg,'\nendstream']);obj(contentIds[i],`<< /Length ${draw.length} >>\nstream\n${draw}\nendstream`);page.annotations.forEach((a,k)=>{const x=a.x*.6,y=(900-a.y-a.h)*.6,w=a.w*.6,h=a.h*.6,url=a.url.replace(/[\\()]/g,c=>'\\'+c);obj(annIds[i][k],`<< /Type /Annot /Subtype /Link /Rect [${x} ${y} ${x+w} ${y+h}] /Border [0 0 0] /A << /S /URI /URI (${url}) >> >>`)})});const start=length;push(`xref\n0 ${next}\n0000000000 65535 f \n`);for(let i=1;i<next;i++)push(String(offsets[i]).padStart(10,'0')+' 00000 n \n');push(`trailer\n<< /Size ${next} /Root 1 0 R >>\nstartxref\n${start}\n%%EOF`);return new Blob(parts,{type:'application/pdf'})}
 async function exportPdf(btn){const scope=window.ONITAccount?.capture(),month=S.month;busyButton(btn,true);const old=btn.textContent;btn.textContent='Preparing PDF…';try{const slides=E('#cwPresentation .cw-present')?S.slides:buildSlides(false),pages=[];for(const s of slides){if(month!==S.month)throw Error('Review month changed. Start the PDF download again.');if(scope)window.ONITAccount.assert(scope);pages.push(await pdfSlide(s))}if(month!==S.month)throw Error('Review month changed. Start the PDF download again.');if(scope)window.ONITAccount.assert(scope);downloadBlob(buildPdf(pages),'ONIT_Monthly_Review_'+S.month+'.pdf');notify('Monthly Review PDF downloaded.')}finally{busyButton(btn,false);btn.textContent=old}}
-async function open(tab,loaded){S.tab=tab;try{if(!can(tab==='archive'?'creativearchive':'monthlyreview'))throw Error('Tab access has not been granted by the System Owner.');if(!loaded)await load();if(tab==='archive')archive();else{await loadReview();monthly()}}catch(e){setBody(tab,`<div class="cw-hero"><h3>Creative workspace unavailable</h3><p class="cw-note">${safe(e.message)}</p><button class="cw-btn" onclick="window.ONITCreative.open('${tab}')">Retry</button></div>`);}}
+let creativeOpenSequence=0;
+async function open(tab,loaded){const sequence=++creativeOpenSequence;S.tab=tab;try{
+  if(!can(tab==='archive'?'creativearchive':'monthlyreview'))throw Error('Tab access has not been granted by the System Owner.');
+  if(!loaded)setBody(tab,'<div class="cw-hero" role="status"><p class="cw-note">Loading creative workspace…</p></div>');
+  if(tab==='archive'){
+    if(!loaded)await load();
+    if(sequence!==creativeOpenSequence)return;
+    archive();
+  }else{
+    // Independent read-only calls may run together. Keep auth/owner checks on the backend.
+    if(!loaded)await Promise.all([load(),loadReview()]);else await loadReview();
+    if(sequence!==creativeOpenSequence)return;
+    monthly();
+  }
+}catch(e){if(sequence===creativeOpenSequence)setBody(tab,`<div class="cw-hero"><h3>Creative workspace unavailable</h3><p class="cw-note">${safe(e.message)}</p><button class="cw-btn" onclick="window.ONITCreative.open('${tab}')">Retry</button></div>`);}}
 window.ONITAccount?.onRetire(()=>{
  for(const src of S.media.values())URL.revokeObjectURL(src);
  S.media.clear();mediaErrors.clear();mediaPending.clear();
