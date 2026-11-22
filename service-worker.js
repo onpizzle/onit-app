@@ -23,11 +23,11 @@ const FIREBASE_CONFIG={apiKey:'AIzaSyAmpqFDMfo6zAorD-f14hTQnSNFDFU6VHM',authDoma
 let messaging=null;
 try{firebase.initializeApp(FIREBASE_CONFIG);messaging=firebase.messaging();}catch(e){}
 
-const UI_VERSION='0.40.11';
-const UI_REVISION=41010;
+const UI_VERSION='0.40.12';
+const UI_REVISION=41012;
 const DASHBOARD_UI_REVISION=41001;
-const CACHE='onit-v0.40.11-creative-preview';
-const STATIC=['./account-lifecycle.js','./creative-work.js','./creative-work.css','./offline.html','./manifest.webmanifest','./icons/icon-192.png','./icons/icon-512.png','./icons/apple-touch-icon.png','./assets/onit-logo-horizontal.png','./assets/onit-logo-full.png','./icons/favicon-32.png','./cases-module.css','./cases-module.js','./activation-command.css','./activation-command.js','./ideas-dump.css','./ideas-dump.js','./visual-contrast.css','./pulse-module.css','./pulse-module.js','./executive-reports.css','./executive-reports.js','./module-studio.css','./module-studio.js','./assist-traffic-module.css','./assist-traffic-module.js','./core-intelligence.css','./core-intelligence.js','./autocare-module.css','./autocare-module.js','./authority-engine.js','./sync-engine.js','./release-guard.js','./command-palette.css','./command-palette.js','./dialog-system.css','./dialog-system.js','./attention-loop.css','./attention-loop.js','./rewards-module.css','./rewards-module.js','./ui-system.css','./ui-system.js'];
+const CACHE='onit-v0.40.12-file-review';
+const STATIC=['./account-lifecycle.js','./creative-work.js','./creative-work.css','./offline.html','./manifest.webmanifest','./icons/icon-192.png','./icons/icon-512.png','./icons/apple-touch-icon.png','./assets/onit-logo-horizontal.png','./cases-module.css','./cases-module.js','./activation-command.css','./activation-command.js','./ideas-dump.css','./ideas-dump.js','./visual-contrast.css','./pulse-module.css','./pulse-module.js','./executive-reports.css','./executive-reports.js','./module-studio.css','./module-studio.js','./assist-traffic-module.css','./assist-traffic-module.js','./core-intelligence.css','./core-intelligence.js','./autocare-module.css','./autocare-module.js','./authority-engine.js','./sync-engine.js','./release-guard.js','./command-palette.css','./command-palette.js','./dialog-system.css','./dialog-system.js','./attention-loop.css','./attention-loop.js','./rewards-module.css','./rewards-module.js','./ui-system.css','./ui-system.js'];
 
 // Notification+data messages are displayed automatically by FCM in the background.
 // Keep this callback only as a fallback for any legacy data-only message.
@@ -37,7 +37,7 @@ try{
     const d=(payload&&payload.data)||{},title=d.title||(d.type==='BUZZER'?'ONIT BUZZER':'ONIT');
     const urgent=d.type==='BUZZER'||d.type==='BRIEF_ALERT'||String(d.actionRequired||'')==='true'||['OWNER_BROADCAST','APPROVAL_REQUIRED','TEAM_LEAD_APPROVAL_REQUIRED','REVISION','HANDOVER_RECEIVED','DATA_EXPORT_APPROVAL','AUTO_ESCALATION_TRAFFIC','AUTO_ESCALATION_APPROVAL','AUTO_ESCALATION_TEAM_LEAD'].includes(String(d.notificationType||''));
     const tag=d.notificationId?'onit-'+d.notificationId:d.buzzerId?'onit-buzzer-'+d.buzzerId:d.briefCode?'onit-'+(d.type||'update')+'-'+d.briefCode:'onit-update';
-    return self.registration.showNotification(title,{body:d.body||d.message||'You have a new ONIT update.',icon:'./icons/icon-192.png',badge:'./icons/favicon-32.png',tag,renotify:urgent,requireInteraction:urgent,silent:false,data:{url:d.url||'./',type:d.type||'',notificationType:d.notificationType||'',notificationId:d.notificationId||'',briefCode:d.briefCode||'',buzzerId:d.buzzerId||''}});
+    return self.registration.showNotification(title,{body:d.body||d.message||'You have a new ONIT update.',icon:'./icons/icon-192.png',badge:'./icons/icon-192.png',tag,renotify:urgent,requireInteraction:urgent,silent:false,data:{url:d.url||'./',type:d.type||'',notificationType:d.notificationType||'',notificationId:d.notificationId||'',briefCode:d.briefCode||'',buzzerId:d.buzzerId||''}});
   });
 }catch(e){}
 

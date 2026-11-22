@@ -4,7 +4,7 @@
 const state={cap:null,tab:'intelligence',dashboard:null,signals:null,signalsPromise:null,detail:null,opportunity:null,compose:false,filters:{query:'',brand:'',signalType:'',route:''},lastLoad:0};
 ONITAccount.onRetire(()=>{Object.keys(state).forEach(k=>delete state[k]);Object.assign(state,{cap:null,tab:'intelligence',dashboard:null,signals:null,signalsPromise:null,detail:null,opportunity:null,compose:false,filters:{query:'',brand:'',signalType:'',route:''},lastLoad:0});});
 const esc=v=>typeof escapeHTML==='function'?escapeHTML(String(v==null?'':v)):String(v==null?'':v).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
-const safeUrl=v=>{try{const u=new URL(String(v||''),location.href);return (u.protocol==='http:'||u.protocol==='https:')?u.href:''}catch(e){return''}};
+const safeUrl=v=>{if(!String(v||'').trim())return '';try{const u=new URL(String(v||''),location.href);return (u.protocol==='http:'||u.protocol==='https:')?u.href:''}catch(e){return''}};
 const val=(o,...ks)=>{for(const k of ks){if(o&&o[k]!==undefined&&o[k]!==null&&o[k]!=='')return o[k]}return ''};
 const num=v=>Number(v||0)||0;
 const api=(action,data={})=>apiPost(action,data,true).then(ONITAccount.guard(r=>r.data||r));
@@ -47,11 +47,91 @@ async function renderOpportunities(){let __onitScope14401=ONITAccount.capture();
 function renderCompose(){root().innerHTML=shell(`<div class='ideasCompose'><h3>DROP SOMETHING</h3><div class='ideasQuickNote'><b>Drop it even if it is not for a client.</b> ONIT will scan every completed Brand Portfolio profile and surface possible opportunities automatically.</div><div class='field'><label>WHAT DID YOU SEE / THINK?</label><textarea id='ideaObservation' placeholder='Write it the way you would tell a colleague…'></textarea></div><div class='row'><div class='field'><label>BRAND (OPTIONAL)</label><select id='ideaBrand'>${brandOptions('General / Agency')}</select><div class='tiny'>Choose General / Agency when the thought is not tied to a brand. ONIT still scans the whole portfolio.</div></div><div class='field'><label>TYPE</label><select id='ideaType'>${typeOptions()}</select></div></div><div class='row'><div class='field'><label>WHERE DID YOU SEE / HEAR THIS?</label><input id='ideaWhere' placeholder='e.g. School gate, Lekki; TikTok; supermarket'></div><div class='field'><label>WHO DOES IT INVOLVE? (OPTIONAL)</label><input id='ideaAudience' placeholder='e.g. Working parents, students, retailers'></div></div><div class='field'><label>WHY MIGHT THIS MATTER? (OPTIONAL)</label><textarea id='ideaWhy' placeholder='One or two lines are enough.'></textarea></div><div class='row'><div class='field'><label>ROUTE (OPTIONAL)</label><select id='ideaRoute'>${routeOptions('')}</select></div><div class='field'><label>TAGS (OPTIONAL)</label><input id='ideaTags' placeholder='e.g. breakfast, school, convenience'></div></div><div class='field'><label>LINK / SOURCE (OPTIONAL)</label><input id='ideaSourceUrl' placeholder='https://…'></div><div class='field'><label>PHOTO / VIDEO / AUDIO / SCREENSHOT (OPTIONAL • 20 MB MAX)</label><input class='ideasFileInput' id='ideaEvidenceFile' type='file' accept='image/*,video/*,audio/*,.pdf'></div><div class='ideasActionLine'><button class='new' onclick='IdeasDump.submitSignal(this)'>DROP SIGNAL</button><button class='secondary' onclick='IdeasDump.cancelDrop()'>CANCEL</button></div></div>`,'Drop a Signal','Fast enough to use when something catches your attention.')}
 function openDrop(){state.compose=true;state.detail=null;state.opportunity=null;render()}
 function cancelDrop(){state.compose=false;render()}
-function filePayload(file){return new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(String(r.result||'').split(',').pop());r.onerror=reject;r.readAsDataURL(file)})}
-async function submitSignal(button){let __onitScope17901=ONITAccount.capture();const observation=document.getElementById('ideaObservation')?.value.trim();if(!observation)return onitAlert('Write what you saw or thought first.');const payload={brand:document.getElementById('ideaBrand')?.value,signalType:document.getElementById('ideaType')?.value,observation,whereSeen:document.getElementById('ideaWhere')?.value,audience:document.getElementById('ideaAudience')?.value,whyItMatters:document.getElementById('ideaWhy')?.value,route:document.getElementById('ideaRoute')?.value,tags:document.getElementById('ideaTags')?.value,sourceUrl:document.getElementById('ideaSourceUrl')?.value};const file=document.getElementById('ideaEvidenceFile')?.files?.[0];if(file&&file.size>20*1024*1024)return onitAlert('Evidence files must be 20 MB or smaller.');const old=button.textContent;try{button.disabled=true;button.textContent='SAVING…';const d=await ONITAccount.wait(api('IDEAS_CREATE',payload),__onitScope17901);if(file){button.textContent='UPLOADING EVIDENCE…';await ONITAccount.wait(api('IDEAS_UPLOAD_EVIDENCE',{signalId:d.signalId,fileName:file.name,fileType:file.type,fileSize:file.size,fileBase64:await ONITAccount.wait(filePayload(file),__onitScope17901),evidenceType:file.type||'File'}),__onitScope17901)}state.compose=false;state.dashboard=null;state.signals=null;const matchText=(d.brandMatches||[]).slice(0,2).map(m=>`${m.brand} ${m.score}%`).join(' • ');showToast('Ideas Dump',matchText?`Signal captured. Possible brand fit: ${matchText}`:'Signal captured. ONIT added it to the intelligence base and scanned the Brand Portfolio.');state.tab='signals';await ONITAccount.wait(render(),__onitScope17901)}catch(e){ONITAccount.assert(__onitScope17901);onitAlert(e.message)}finally{if(ONITAccount.isCurrent(__onitScope17901)){button.disabled=false;button.textContent=old}}}
+function filePayload(file){
+  return new Promise((resolve,reject)=>{
+    const reader=new FileReader();
+    reader.onload=()=>resolve(String(reader.result).split(',')[1]);
+    reader.onerror=()=>reject(new Error('Could not read '+file.name+'. Choose the file again.'));
+    reader.onabort=()=>reject(new Error('Reading '+file.name+' was interrupted.'));
+    reader.readAsDataURL(file);
+  });
+}
+function uploadEvidence(signalId,file,encoded){
+  return api('IDEAS_UPLOAD_EVIDENCE',{signalId,fileName:file.name,fileType:file.type,fileSize:file.size,fileBase64:encoded,evidenceType:file.type||'File'});
+}
+async function submitSignal(button){
+  if(button.disabled)return;
+  const scope=ONITAccount.capture();
+  const observation=document.getElementById('ideaObservation')?.value.trim();
+  if(!observation)return onitAlert('Write what you saw or thought first.');
+  const payload={brand:document.getElementById('ideaBrand')?.value,signalType:document.getElementById('ideaType')?.value,observation,whereSeen:document.getElementById('ideaWhere')?.value,audience:document.getElementById('ideaAudience')?.value,whyItMatters:document.getElementById('ideaWhy')?.value,route:document.getElementById('ideaRoute')?.value,tags:document.getElementById('ideaTags')?.value,sourceUrl:document.getElementById('ideaSourceUrl')?.value};
+  const file=document.getElementById('ideaEvidenceFile')?.files?.[0];
+  if(file&&file.size>20*1024*1024)return onitAlert('Evidence files must be 20 MB or smaller.');
+  const old=button.textContent;
+  let createdId='';
+  try{
+    button.disabled=true;
+    button.textContent=file?'READING EVIDENCE…':'SAVING…';
+    const encoded=file?await ONITAccount.wait(filePayload(file),scope):null;
+    button.textContent='SAVING…';
+    const d=await ONITAccount.wait(api('IDEAS_CREATE',payload),scope);
+    createdId=d.signalId;
+    state.dashboard=null;
+    state.signals=null;
+    state.compose=false;
+    state.tab='signals';
+    if(file){
+      button.textContent='UPLOADING EVIDENCE…';
+      await ONITAccount.wait(uploadEvidence(createdId,file,encoded),scope);
+    }
+    const matchText=(d.brandMatches||[]).slice(0,2).map(m=>`${m.brand} ${m.score}%`).join(' • ');
+    showToast('Ideas Dump',matchText?`Signal captured. Possible brand fit: ${matchText}`:'Signal captured. ONIT added it to the intelligence base and scanned the Brand Portfolio.');
+    await ONITAccount.wait(render(),scope);
+  }catch(e){
+    ONITAccount.assert(scope);
+    if(!createdId){onitAlert(e.message);return}
+    // Replace the create form even if refreshing the signal fails offline.
+    const el=root();
+    if(el)el.innerHTML=shell(`<div class='ideasEmpty'>Signal ${esc(createdId)} was saved. Refresh to check its evidence.</div>`);
+    try{await ONITAccount.wait(openSignal(createdId),scope)}catch(loadError){ONITAccount.assert(scope)}
+    onitAlert('Signal '+createdId+' was saved. Check its evidence before uploading again. '+e.message);
+  }finally{
+    if(ONITAccount.isCurrent(scope)){button.disabled=false;button.textContent=old}
+  }
+}
 async function openSignal(id){let __onitScope19503=ONITAccount.capture();state.detail=await ONITAccount.wait(api('IDEAS_GET',{signalId:id}),__onitScope19503);state.opportunity=null;state.compose=false;await ONITAccount.wait(renderDetail(),__onitScope19503)}
-async function renderDetail(){let __onitScope19648=ONITAccount.capture();const d=state.detail,s=d.signal||{},ev=s.evidence||[];root().innerHTML=shell(`<div class='ideasPanel'><div class='ideasDetailHead'><div><span class='ideasSignalType'>${esc(val(s,'Signal Type'))}</span><h3 style='font-size:21px;margin:5px 0'>${esc(val(s,'Brand'))}</h3></div><span class='ideasStage'>${esc(val(s,'Theme'))}</span></div><div class='ideasObservation'>${esc(val(s,'Observation'))}</div>${val(s,'Why It Matters')?`<p><b>Why it may matter</b><br>${esc(val(s,'Why It Matters'))}</p>`:''}<div class='ideasMeta'><span class='ideasChip'>${esc(val(s,'Route'))}</span>${val(s,'Where Seen')?`<span class='ideasChip'>${esc(val(s,'Where Seen'))}</span>`:''}${val(s,'Audience')?`<span class='ideasChip'>${esc(val(s,'Audience'))}</span>`:''}${val(s,'Tags')?`<span class='ideasChip'>${esc(val(s,'Tags'))}</span>`:''}</div><div class='ideasSource'>Captured ${dateText(val(s,'Created At'))} • ${esc(sourceDept(s))}${val(s,'Contributor Name')?` • ${esc(val(s,'Contributor Name'))}`:''}</div></div><div class='ideasPanel'><h3>EVIDENCE</h3>${ev.length?`<div class='ideasEvidence'>${ev.map(e=>`<div class='ideasEvidenceItem'><b>${esc(val(e,'File Name','Evidence Type'))}</b><div class='tiny'>${esc(val(e,'Note'))}</div>${safeUrl(val(e,'Source URL'))?`<a href='${esc(safeUrl(val(e,'Source URL')))}' target='_blank' rel='noopener'>OPEN SOURCE</a>`:''}</div>`).join('')}</div>`:`<div class='ideasEmpty'>No evidence attached yet.</div>`}<div class='field'><label>ADD EVIDENCE</label><input class='ideasFileInput' id='ideaDetailEvidence' type='file' accept='image/*,video/*,audio/*,.pdf'></div><button class='secondary' onclick='IdeasDump.addEvidence()'>UPLOAD EVIDENCE</button></div>${d.opportunity?`<div class='ideasPanel'><h3>DEVELOPED OPPORTUNITY</h3>${opportunityCard(d.opportunity)}</div>`:''}${curate()&&!d.opportunity?`<div class='ideasPanel'><h3>DEVELOP THIS</h3><p>Turn this signal into a proactive opportunity when it deserves structured investigation—not because it is popular.</p><div class='ideasActionLine'><button class='secondary' onclick="IdeasDump.developSignals(['${esc(val(s,'Signal ID'))}'])">CREATE OPPORTUNITY</button>${state.cap?.canUseCases?`<button class='secondary' onclick="IdeasDump.sendSignalToCases('${esc(val(s,'Signal ID'))}')">SEND ORIGIN TO CASES</button>`:''}<button class='secondary' onclick="IdeasDump.linkSignal('${esc(val(s,'Signal ID'))}')">LINK TO WORK</button></div></div>`:''}<button class='back' onclick='IdeasDump.closeDetail()'>← BACK TO SIGNALS</button>`,'Signal Detail','One observation in the agency intelligence trail.')}
-async function addEvidence(){let __onitScope22239=ONITAccount.capture();const file=document.getElementById('ideaDetailEvidence')?.files?.[0];if(!file)return onitAlert('Choose a file first.');if(file.size>20*1024*1024)return onitAlert('Evidence files must be 20 MB or smaller.');try{await ONITAccount.wait(api('IDEAS_UPLOAD_EVIDENCE',{signalId:val(state.detail?.signal,'Signal ID'),fileName:file.name,fileType:file.type,fileSize:file.size,fileBase64:await ONITAccount.wait(filePayload(file),__onitScope22239),evidenceType:file.type||'File'}),__onitScope22239);state.detail=await ONITAccount.wait(api('IDEAS_GET',{signalId:val(state.detail?.signal,'Signal ID')}),__onitScope22239);state.dashboard=null;showToast('Ideas Dump','Evidence added to this signal.');await ONITAccount.wait(renderDetail(),__onitScope22239)}catch(e){ONITAccount.assert(__onitScope22239);onitAlert(e.message)}}
+async function renderDetail(){let __onitScope19648=ONITAccount.capture();const d=state.detail,s=d.signal||{},ev=s.evidence||[];root().innerHTML=shell(`<div class='ideasPanel'><div class='ideasDetailHead'><div><span class='ideasSignalType'>${esc(val(s,'Signal Type'))}</span><h3 style='font-size:21px;margin:5px 0'>${esc(val(s,'Brand'))}</h3></div><span class='ideasStage'>${esc(val(s,'Theme'))}</span></div><div class='ideasObservation'>${esc(val(s,'Observation'))}</div>${val(s,'Why It Matters')?`<p><b>Why it may matter</b><br>${esc(val(s,'Why It Matters'))}</p>`:''}<div class='ideasMeta'><span class='ideasChip'>${esc(val(s,'Route'))}</span>${val(s,'Where Seen')?`<span class='ideasChip'>${esc(val(s,'Where Seen'))}</span>`:''}${val(s,'Audience')?`<span class='ideasChip'>${esc(val(s,'Audience'))}</span>`:''}${val(s,'Tags')?`<span class='ideasChip'>${esc(val(s,'Tags'))}</span>`:''}</div><div class='ideasSource'>Captured ${dateText(val(s,'Created At'))} • ${esc(sourceDept(s))}${val(s,'Contributor Name')?` • ${esc(val(s,'Contributor Name'))}`:''}</div></div><div class='ideasPanel'><h3>EVIDENCE</h3>${ev.length?`<div class='ideasEvidence'>${ev.map(e=>`<div class='ideasEvidenceItem'><b>${esc(val(e,'File Name','Evidence Type'))}</b><div class='tiny'>${esc(val(e,'Note'))}</div>${safeUrl(val(e,'Source URL'))?`<a href='${esc(safeUrl(val(e,'Source URL')))}' target='_blank' rel='noopener'>OPEN SOURCE</a>`:''}</div>`).join('')}</div>`:`<div class='ideasEmpty'>No evidence attached yet.</div>`}<div class='field'><label>ADD EVIDENCE</label><input class='ideasFileInput' id='ideaDetailEvidence' type='file' accept='image/*,video/*,audio/*,.pdf'></div><button class='secondary' onclick='IdeasDump.addEvidence(this)'>UPLOAD EVIDENCE</button></div>${d.opportunity?`<div class='ideasPanel'><h3>DEVELOPED OPPORTUNITY</h3>${opportunityCard(d.opportunity)}</div>`:''}${curate()&&!d.opportunity?`<div class='ideasPanel'><h3>DEVELOP THIS</h3><p>Turn this signal into a proactive opportunity when it deserves structured investigation—not because it is popular.</p><div class='ideasActionLine'><button class='secondary' onclick="IdeasDump.developSignals(['${esc(val(s,'Signal ID'))}'])">CREATE OPPORTUNITY</button>${state.cap?.canUseCases?`<button class='secondary' onclick="IdeasDump.sendSignalToCases('${esc(val(s,'Signal ID'))}')">SEND ORIGIN TO CASES</button>`:''}<button class='secondary' onclick="IdeasDump.linkSignal('${esc(val(s,'Signal ID'))}')">LINK TO WORK</button></div></div>`:''}<button class='back' onclick='IdeasDump.closeDetail()'>← BACK TO SIGNALS</button>`,'Signal Detail','One observation in the agency intelligence trail.')}
+async function addEvidence(button){
+  if(button?.disabled)return;
+  const scope=ONITAccount.capture(),detail=state.detail;
+  const file=document.getElementById('ideaDetailEvidence')?.files?.[0];
+  if(!file)return onitAlert('Choose a file first.');
+  if(file.size>20*1024*1024)return onitAlert('Evidence files must be 20 MB or smaller.');
+  const signalId=val(detail?.signal,'Signal ID');
+  if(!signalId)return;
+  const old=button?.textContent;
+  let uploaded=false;
+  try{
+    if(button){button.disabled=true;button.textContent='UPLOADING EVIDENCE…'}
+    const encoded=await ONITAccount.wait(filePayload(file),scope);
+    await ONITAccount.wait(uploadEvidence(signalId,file,encoded),scope);
+    uploaded=true;
+    state.dashboard=null;
+    state.signals=null;
+    if(state.detail!==detail)return;
+    document.getElementById('ideaDetailEvidence').value='';
+    const updated=await ONITAccount.wait(api('IDEAS_GET',{signalId}),scope);
+    if(state.detail!==detail)return;
+    state.detail=updated;
+    showToast('Ideas Dump','Evidence added to this signal.');
+    await ONITAccount.wait(renderDetail(),scope);
+  }catch(e){
+    ONITAccount.assert(scope);
+    onitAlert((uploaded?'Evidence was saved. Refresh to see it. ':'Check the signal before retrying. ')+e.message);
+  }finally{
+    if(button&&ONITAccount.isCurrent(scope)){button.disabled=false;button.textContent=old}
+  }
+}
 function closeDetail(){state.detail=null;state.tab='signals';render()}
 async function developMatch(i){let __onitScope22972=ONITAccount.capture();const d=await ONITAccount.wait(loadDashboard(),__onitScope22972),m=d.brandRadar?.[i];if(!m)return;return developSignals([m.signalId],{brand:m.brand,theme:m.theme||'Opportunity fit',suggestion:`${m.reason} Explore how this observation could create value for ${m.brand}.`})}
 async function developPattern(i){let __onitScope23241=ONITAccount.capture();const d=await ONITAccount.wait(loadDashboard(),__onitScope23241),p=d.patterns?.[i];if(!p)return;return developSignals(p.signalIds,p)}

@@ -221,7 +221,7 @@ function reportDeltaLabel(k){
 }
 function reportTrendClass(k){const d=Number(k.delta);return !Number.isFinite(d)||d===0?'flat':d>0?'up':'down'}
 function reportDomKey(v){return String(v||'').replace(/[^A-Za-z0-9_-]/g,'_')}
-function reportSafeUrl(v){try{const u=new URL(String(v||''),location.href);return /^https?:$/.test(u.protocol)?u.href:''}catch(e){return''}}
+function reportSafeUrl(v){if(!String(v||'').trim())return '';try{const u=new URL(String(v||''),location.href);return /^https?:$/.test(u.protocol)?u.href:''}catch(e){return''}}
 function reportContentMetricValue(v,unit='count'){if(v===null||v===undefined||v==='')return '—';return reportFormatValue(v,unit)}
 function reportContentCard(item,label){if(!item)return `<div class='empty'>Add performance for at least two posts to calculate ${esc(label.toLowerCase())} content.</div>`;const url=reportSafeUrl(item.postUrl);return `<div class='dpContentRankCard'><span>${esc(label)}</span><b>${esc(item.title||'Untitled content')}</b><small>${esc(item.platform||'')} • ${esc(item.contentType||'')}</small>${url?`<a href='${esc(url)}' target='_blank' rel='noopener'>OPEN POST</a>`:''}</div>`}
 function reportM3Html(x){
@@ -375,12 +375,13 @@ async function reports(){
 }
 
 function downloadPdfPayload(d){
- if(!d||!d.base64)return onitAlert('ONIT could not prepare this PDF.');
- try{
-   const raw=atob(d.base64),bytes=new Uint8Array(raw.length);for(let i=0;i<raw.length;i++)bytes[i]=raw.charCodeAt(i);
-   const blob=new Blob([bytes],{type:d.mimeType||'application/pdf'}),url=URL.createObjectURL(blob),a=document.createElement('a');
-   a.href=url;a.download=d.fileName||'ONIT.pdf';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1500);
- }catch(e){onitAlert('Could not download PDF. '+e.message)}
+ if(!d||!d.base64)throw new Error('ONIT could not prepare this PDF.');
+ const raw=atob(d.base64);
+ if(!raw.slice(0,1024).includes('%PDF-'))throw new Error('ONIT received an invalid PDF. Refresh and try again.');
+ const bytes=new Uint8Array(raw.length);
+ for(let i=0;i<raw.length;i++)bytes[i]=raw.charCodeAt(i);
+ const blob=new Blob([bytes],{type:'application/pdf'}),url=URL.createObjectURL(blob),a=document.createElement('a');
+ a.href=url;a.download=d.fileName||'ONIT.pdf';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1500);
 }
 async function downloadReport(){let __onitScope28376=ONITAccount.capture();
  if(!canDownloadReport()){showToast('Digital Pulse','Report download is available to leadership.');return}
@@ -407,7 +408,9 @@ async function buildOnePageCase(sourceType,sourceId){let __onitScope30619=ONITAc
  try{
    showToast('Cases','Building 1-page Case draft…');
    const d=await ONITAccount.wait(api('PULSE_BUILD_ONE_PAGE_CASE',{sourceType,sourceId}),__onitScope30619);
-   state.candidates=null;state.lastAt=0;await ONITAccount.wait(load(true),__onitScope30619);downloadPdfPayload(d);
+   state.candidates=null;state.lastAt=0;
+   try{downloadPdfPayload(d)}catch(e){throw new Error('Case '+(d.caseId||'')+' was created. The PDF download failed. '+e.message)}
+   await ONITAccount.wait(load(true),__onitScope30619);
    showToast('Cases',`Case ${d.caseId||''} created and the one-page draft downloaded.`);
    await ONITAccount.wait(cases(),__onitScope30619);
  }catch(e){ONITAccount.assert(__onitScope30619);onitAlert(e.message)}finally{if(ONITAccount.isCurrent(__onitScope30619)){state.busy=false}}
