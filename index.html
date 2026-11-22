@@ -1111,8 +1111,8 @@ html.onitReduceMotion *,html.onitReduceMotion *::before,html.onitReduceMotion *:
   .broadcastComposerActions{position:fixed;left:0;right:0;bottom:0;z-index:30;margin:0;padding:10px 12px calc(10px + env(safe-area-inset-bottom));background:rgba(255,255,255,.96);backdrop-filter:blur(12px);border-top:1px solid #ddd8d1;display:grid;grid-template-columns:1fr 1.35fr;gap:8px}.broadcastComposerActions button{width:100%;min-height:50px}
 }
 </style>
-<link rel="stylesheet" href="./christmas.css?v=0.40.19">
-<script src="./christmas.js?v=0.40.19" defer></script>
+<link rel="stylesheet" href="./christmas.css?v=0.40.20">
+<script src="./christmas.js?v=0.40.20" defer></script>
 </head>
 <body>
 <a class="onitSkipLink" href="#mainContent">Skip to main content</a>
@@ -1426,8 +1426,8 @@ html.onitReduceMotion *,html.onitReduceMotion *::before,html.onitReduceMotion *:
 @media(max-width:560px){.platformMetrics{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.platformMetric,.platformPanel{padding:13px}.platformMetric b{font-size:25px}.platformSettingsGrid{grid-template-columns:1fr}.platformIntro{align-items:flex-start}}
 </style>
 <!-- Release consistency: keep APP_VERSION, UI_REVISION, version.json and service-worker.js synchronized. -->
-<script>const APP_VERSION='0.40.19';
-const UI_REVISION=41019;
+<script>const APP_VERSION='0.40.20';
+const UI_REVISION=41020;
 const DASHBOARD_UI_REVISION=41001;
 const DASHBOARD_UI_STORAGE_KEY='onit-dashboard-ui-state-v1';
 window.ONIT_RUNTIME={version:APP_VERSION,uiRevision:UI_REVISION,dashboardUiRevision:DASHBOARD_UI_REVISION};
@@ -2073,7 +2073,7 @@ function renderDashboardDeadlines(scope){
   }).join(''):`<div class='empty compactEmpty'>No upcoming deadlines.</div>`;
 }
 function approvalClockInfo(b){if(!b||b.status!=='In Review'||b.finalApproved||!b.approvalDueAt)return null;const due=new Date(b.approvalDueAt).getTime(),ms=due-(Date.now()+serverOffset);if(!Number.isFinite(due))return null;return{ms,text:ms>=0?'APPROVE '+duration(ms):'APPROVAL OVERDUE '+duration(ms),cls:ms<0?'overdue':''}}
-function renderApprovalClocks(){document.querySelectorAll('[data-approval-due]').forEach(el=>{const due=new Date(el.dataset.approvalDue).getTime(),ms=due-(Date.now()+serverOffset);if(!Number.isFinite(due))return;el.textContent=ms>=0?'APPROVE '+duration(ms):'APPROVAL OVERDUE '+duration(ms);el.classList.toggle('overdue',ms<0)})}
+function renderApprovalClocks(){document.querySelectorAll('[data-approval-due]').forEach(el=>{if(el.getClientRects().length===0)return;const due=new Date(el.dataset.approvalDue).getTime(),ms=due-(Date.now()+serverOffset);if(!Number.isFinite(due))return;const next=ms>=0?'APPROVE '+duration(ms):'APPROVAL OVERDUE '+duration(ms);if(el.textContent!==next)el.textContent=next;el.classList.toggle('overdue',ms<0)})}
 function accountBriefMarkup(b){const code=encodeURIComponent(b.code).replace(/'/g,'%27'),clock=approvalClockInfo(b),t=timeInfo(b);return `<button class='accountBrief' onclick="detail(decodeURIComponent('${code}'))"><b>${escapeHTML(b.project)}</b><div class='accountBriefMeta'><span>${escapeHTML(b.assignee||'Unassigned')}</span><span>${escapeHTML(b.status)}</span></div><div class='accountBriefMeta' style='margin-top:7px'><span>${escapeHTML(b.code)}</span><span class='${t.cls}'>${escapeHTML(t.text)}</span></div>${clock?`<div style='margin-top:7px'><span class='approvalClock ${clock.cls}' data-approval-due='${escapeHTML(b.approvalDueAt)}'>${escapeHTML(clock.text)}</span></div>`:''}</button>`}
 function brandProfileComplete(c){const fields=['Target Audience','Brand Summary','Brand Proposition','Core Pillars','Product Range'],done=fields.filter(k=>String(rowVal(c,k)||'').trim()).length;return{done,total:fields.length,pct:Math.round(done/fields.length*100)}}
 function brandLine(v,max=120){const t=String(v||'').trim();return t.length>max?t.slice(0,max-1)+'…':t}
@@ -2279,7 +2279,24 @@ function renderBriefFilters(){const filters=['ALL','ACTIVE','PAUSED','REVIEW','O
 function setBriefFilter(f){briefFilter=f;renderBriefFilters();renderBriefs()}
 function filteredBriefs(){const q=(document.getElementById('briefSearch')?.value||'').trim().toLowerCase();return briefs.filter(b=>{let ok=true;if(briefFilter==='ACTIVE')ok=!['Closed','Approved','Cancelled'].includes(b.status);else if(briefFilter==='PAUSED')ok=b.status==='Paused';else if(briefFilter==='REVIEW')ok=['Team Lead Review','In Review','Revision'].includes(b.status);else if(briefFilter==='OVERDUE')ok=timeInfo(b).cls==='red'&&!['Closed','Approved','Cancelled'].includes(b.status);else if(briefFilter==='CLOSED')ok=['Closed','Cancelled'].includes(b.status);if(q)ok=ok&&[b.code,b.client,b.project,b.assignee,b.status].join(' ').toLowerCase().includes(q);return ok})}
 function renderBriefs(){const list=filteredBriefs();document.getElementById('briefList').innerHTML=list.length?list.map(briefMarkup).join(''):`<div class='empty'>No matching briefs.</div>`}
-function briefMarkup(b){const t=timeInfo(b),r=riskForBrief(b),clock=approvalClockInfo(b),code=encodeURIComponent(b.code).replace(/'/g,'%27'),s=String(b.status||''),statusClass=/Cancelled/i.test(s)?'warn':/Approved|Closed/i.test(s)?'ok':/Review/i.test(s)?'review':/Revision|Paused/i.test(s)?'warn':'active',cancel=canCancelBriefRecord(b)?`<button class='secondary' style='min-height:32px;padding:6px 9px;font-size:9px' onclick="event.stopPropagation();cancelBriefByCode('${code}',this)">CANCEL BRIEF</button>`:'';return `<div class='brief' onclick="detail(decodeURIComponent('${code}'))"><div class='briefIdentity'><span class='briefThumb'>${escapeHTML((b.client||'O').charAt(0).toUpperCase())}</span><span class='briefCopy'><b>${escapeHTML(b.client)} — ${escapeHTML(b.project)}</b><small>${escapeHTML(b.code)} • ${escapeHTML(b.assignee||'Unassigned')}</small></span></div><div class='briefTags'><span class='statusChip ${statusClass}'>${escapeHTML(b.status)}</span>${b.iteration?`<span class='miniChip'>V${b.iteration}</span>`:`<span class='miniChip'>NEW</span>`}${clock?`<span class='approvalClock ${clock.cls}' data-approval-due='${escapeHTML(b.approvalDueAt)}'>${escapeHTML(clock.text)}</span>`:''}${r.score>=35?`<span class='miniChip risk ${r.level==='HIGH'?'high':''}'>Risk ${r.score}</span>`:''}${cancel}</div><div class='timer ${t.cls}'>${escapeHTML(t.text)}</div><span class='rowArrow'>›</span></div>`}
+// ONIT v0.40.20: keep the live countdown, but update text nodes rather than rebuilding the list every second.
+let onitLastOverdueRebuildAt=0;
+function refreshVisibleBriefTimers(){
+  const section=document.getElementById('briefs'),host=document.getElementById('briefList');
+  if(!section||section.classList.contains('hidden')||!host)return;
+  // When viewing the OVERDUE filter, periodically add newly-overdue jobs without a per-second DOM rebuild.
+  if(briefFilter==='OVERDUE'&&Date.now()-onitLastOverdueRebuildAt>=60000){
+    onitLastOverdueRebuildAt=Date.now();renderBriefs();
+  }
+  const byCode=new Map(briefs.map(b=>[String(b.code),b]));
+  host.querySelectorAll('.brief[data-brief-code]').forEach(row=>{
+    const b=byCode.get(row.dataset.briefCode),timer=row.querySelector('.timer');if(!b||!timer)return;
+    const t=timeInfo(b);
+    if(timer.textContent!==t.text)timer.textContent=t.text;
+    const klass='timer '+t.cls;if(timer.className!==klass)timer.className=klass;
+  });
+}
+function briefMarkup(b){const t=timeInfo(b),r=riskForBrief(b),clock=approvalClockInfo(b),code=encodeURIComponent(b.code).replace(/'/g,'%27'),s=String(b.status||''),statusClass=/Cancelled/i.test(s)?'warn':/Approved|Closed/i.test(s)?'ok':/Review/i.test(s)?'review':/Revision|Paused/i.test(s)?'warn':'active',cancel=canCancelBriefRecord(b)?`<button class='secondary' style='min-height:32px;padding:6px 9px;font-size:9px' onclick="event.stopPropagation();cancelBriefByCode('${code}',this)">CANCEL BRIEF</button>`:'';return `<div class='brief' data-brief-code="${escapeHTML(b.code)}" onclick="detail(decodeURIComponent('${code}'))"><div class='briefIdentity'><span class='briefThumb'>${escapeHTML((b.client||'O').charAt(0).toUpperCase())}</span><span class='briefCopy'><b>${escapeHTML(b.client)} — ${escapeHTML(b.project)}</b><small>${escapeHTML(b.code)} • ${escapeHTML(b.assignee||'Unassigned')}</small></span></div><div class='briefTags'><span class='statusChip ${statusClass}'>${escapeHTML(b.status)}</span>${b.iteration?`<span class='miniChip'>V${b.iteration}</span>`:`<span class='miniChip'>NEW</span>`}${clock?`<span class='approvalClock ${clock.cls}' data-approval-due='${escapeHTML(b.approvalDueAt)}'>${escapeHTML(clock.text)}</span>`:''}${r.score>=35?`<span class='miniChip risk ${r.level==='HIGH'?'high':''}'>Risk ${r.score}</span>`:''}${cancel}</div><div class='timer ${t.cls}'>${escapeHTML(t.text)}</div><span class='rowArrow'>›</span></div>`}
 
 // ===== ONIT Experience Streamline v0.28.1 =====
 const memoryState={filter:'all',query:'',cases:[],pulse:null,ideas:[],externalLoaded:false,loading:false,lastExternalAt:0,errors:[]};
@@ -3515,7 +3532,7 @@ if('serviceWorker' in navigator && isHttpsApp() && !isStagingEnvironment()){
 }
 refreshInstallButton();
 
-setInterval(()=>{if(!document.getElementById('briefs').classList.contains('hidden'))renderBriefs();if(current&&!document.getElementById('detail').classList.contains('hidden')){const t=timeInfo(current),el=document.getElementById('dtimer');el.textContent=t.text;el.className='num '+t.cls}renderApprovalClocks()},1000);
+setInterval(()=>{if(document.hidden||!SESSION_TOKEN)return;refreshVisibleBriefTimers();if(current&&!document.getElementById('detail').classList.contains('hidden')){const t=timeInfo(current),el=document.getElementById('dtimer');if(el){if(el.textContent!==t.text)el.textContent=t.text;const cls='num '+t.cls;if(el.className!==cls)el.className=cls}}renderApprovalClocks()},1000);
 // Targeted workstation authority refresh is lightweight and independent of Firebase delivery.
 setInterval(()=>{if(SESSION_TOKEN&&!document.hidden&&navigator.onLine!==false&&!mutationBusy)checkWorkstationAuthority_(false)},5000);
 // Lightweight fallback pulse only. Full workspace hydration is owned by ONITSync.

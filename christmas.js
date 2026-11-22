@@ -1,4 +1,4 @@
-/* ONIT festive detail v0.40.19: UI decoration only, no account or operational data. */
+/* ONIT festive detail v0.40.20: UI decoration only, no account or operational data. */
 (() => {
   'use strict';
   const now = new Date();
@@ -41,15 +41,13 @@
     const reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if(!reduce){
       snow=document.createElement('div');snow.className='onitXmasSnow';snow.setAttribute('aria-hidden','true');
-      // Twenty-two low-cost, slow snowflakes distributed over light and dark content.
+      // Sixteen low-cost, slow snowflakes distributed over light and dark content.
       // Negative delays avoid empty intervals after navigation and at startup.
       [[3,12,24,-7,12],[8,11,27,-19,-14],[13,14,30,-11,21],[18,12,23,-18,-18],
        [23,15,29,-24,16],[29,11,25,-6,-13],[34,13,31,-22,15],[39,15,28,-14,-19],
        [44,12,24,-21,20],[49,14,32,-9,-22],[54,13,26,-18,18],[59,16,29,-7,-15],
-       [64,11,25,-23,20],[69,14,30,-15,-14],[74,12,28,-3,17],[79,15,27,-19,-19],
-       [83,12,23,-8,15],[87,14,31,-27,-22],[91,13,26,-13,16],[95,11,25,-21,-15],
-       [26,13,27,-15,19],[57,12,24,-20,-20]].forEach(([x,size,time,delay,drift])=>{
-        const f=document.createElement('span');f.innerHTML='<svg viewBox="0 0 24 24" focusable="false" aria-hidden="true"><path d="M12 2v20M2 12h20M4.93 4.93l14.14 14.14M19.07 4.93 4.93 19.07M8.5 5.5 12 8.5l3.5-3M18.5 8.5 15.5 12l3 3.5M15.5 18.5 12 15.5l-3.5 3M5.5 15.5 8.5 12l-3-3.5"/></svg>';f.style.cssText=`--x:${x}%;--s:${size}px;--t:${time}s;--delay:${delay}s;--dx:${drift}px`;snow.appendChild(f);
+       [64,11,25,-23,20],[69,14,30,-15,-14],[74,12,28,-3,17],[79,15,27,-19,-19]].forEach(([x,size,time,delay,drift])=>{
+        const f=document.createElement('span');f.innerHTML='<svg viewBox="0 0 24 24" focusable="false" aria-hidden="true"><path class="onitSnowOutline" d="M12 2v20M2 12h20M4.93 4.93l14.14 14.14M19.07 4.93 4.93 19.07M8.5 5.5 12 8.5l3.5-3M18.5 8.5 15.5 12l3 3.5M15.5 18.5 12 15.5l-3.5 3M5.5 15.5 8.5 12l-3-3.5"/><path class="onitSnowCore" d="M12 2v20M2 12h20M4.93 4.93l14.14 14.14M19.07 4.93 4.93 19.07M8.5 5.5 12 8.5l3.5-3M18.5 8.5 15.5 12l3 3.5M15.5 18.5 12 15.5l-3.5 3M5.5 15.5 8.5 12l-3-3.5"/></svg>';f.style.cssText=`--x:${x}%;--s:${size}px;--t:${time}s;--delay:${delay}s;--dx:${drift}px`;snow.appendChild(f);
       });
       document.body.appendChild(snow);
     }

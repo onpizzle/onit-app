@@ -1,4 +1,4 @@
-/* ONIT festive accents v0.40.19. Purely decorative frontend layer; no changes to workflows. */
+/* ONIT festive accents v0.40.20. Purely decorative frontend layer; no changes to workflows. */
 html.onitChristmas{--onit-festive-green:#1f624a;--onit-festive-red:#b53b46;--onit-festive-gold:#d2af65}
 /* Seasonal switch: unobtrusive, always user-controlled. */
 .onitXmasToggle{display:inline-flex;align-items:center;justify-content:center;gap:6px;flex:0 0 auto;min-height:32px;padding:5px 10px;margin-right:auto;border:1px solid #e6e7e2;border-radius:999px;background:#fff;color:#52625a;box-shadow:none;cursor:pointer;font:700 10px/1.2 Arial,Helvetica,sans-serif;letter-spacing:.025em;white-space:nowrap;transition:background .15s,border-color .15s}
@@ -32,10 +32,13 @@ html.onitChristmas .top{box-shadow:inset 0 -1px 0 rgba(192,77,77,.24)!important}
 .onitXmasSnow{position:fixed;inset:0;z-index:42;pointer-events:none!important;overflow:hidden;contain:strict;user-select:none;isolation:isolate}
 /* SVG stroke stays white on charcoal cards; dark edge keeps flakes defined on white cards. */
 .onitXmasSnow span{position:absolute;left:var(--x);top:-28px;width:var(--s);height:var(--s);opacity:0;animation:onitSnowDrift var(--t) linear var(--delay) infinite;pointer-events:none!important}
-.onitXmasSnow span svg{width:100%;height:100%;display:block;overflow:visible;stroke:#fff;fill:none;stroke-width:1.65;stroke-linecap:round;stroke-linejoin:round;filter:drop-shadow(0 0 1px rgba(15,38,51,.95)) drop-shadow(0 0 2px rgba(13,47,60,.60))}
-.onitXmasSnow span:nth-child(3n) svg{stroke:#e5f5ff}
-.onitXmasSnow span:nth-child(5n) svg{stroke-width:2.1}
-@keyframes onitSnowDrift{0%{transform:translate3d(0,-28px,0) rotate(-12deg);opacity:0}9%{opacity:.75}78%{opacity:.8}94%{opacity:.67}100%{transform:translate3d(var(--dx),105vh,0) rotate(70deg);opacity:0}}
+.onitXmasSnow span svg{width:100%;height:100%;display:block;overflow:visible;fill:none;stroke-linecap:round;stroke-linejoin:round;filter:none!important}
+/* Two native SVG strokes keep flakes bright on charcoal AND defined on white without GPU-costly drop-shadow filters. */
+.onitXmasSnow .onitSnowOutline{stroke:rgba(29,49,61,.76);stroke-width:3.5}
+.onitXmasSnow .onitSnowCore{stroke:#fff;stroke-width:1.7}
+.onitXmasSnow span:nth-child(3n) .onitSnowCore{stroke:#eefaff}
+.onitXmasSnow span:nth-child(5n) .onitSnowCore{stroke-width:2}
+@keyframes onitSnowDrift{0%{transform:translate3d(0,-28px,0) rotate(-12deg);opacity:0}9%{opacity:.87}78%{opacity:.91}94%{opacity:.78}100%{transform:translate3d(var(--dx),105vh,0) rotate(70deg);opacity:0}}
 html.onitChristmas.onitXmasPaused .onitXmasSnow span{animation-play-state:paused}
 /* Default-off when decorative mode is disabled. */
 .onitXmasHat,.onitXmasPine,.onitXmasBauble,.onitXmasSnow{display:none}
