@@ -96,13 +96,22 @@ function v0365RenderTeamControls(){
   host.innerHTML=[['all','All',c.all],['available','Available',c.available],['working','Working',c.working]].map(([id,label,n])=>`<button class='teamFilterPill ${v0365TeamFilter===id?'active':''}' onclick="v0365SetTeamFilter('${id}')"><span>${label}</span><b>${n}</b></button>`).join('');
   if(sort&&sort.value!==v0365TeamSort)sort.value=v0365TeamSort;
 }
-function v0365ToggleTeamActions(event,encoded){
-  event?.stopPropagation();
-  const panel=v030ById('teamActions-'+encoded);if(!panel)return;
-  const id=decodeURIComponent(encoded),open=panel.classList.contains('hidden');
+// Resolve the panel from the clicked card. A global ID lookup can target the wrong
+// person when legacy user rows share/miss an ID; it also fails on special characters.
+// This action is synchronous, local and view-only: no Google/API request.
+function v0365ToggleTeamActions(event){
+  const btn=event?.currentTarget;
+  const card=btn?.closest('.teamProCard');
+  const panel=card?.querySelector('.teamProActionTray');
+  if(!btn||!panel)return;
+  event.stopPropagation();
+  const key=card.dataset.teamKey||'';
+  const open=panel.classList.contains('hidden');
   panel.classList.toggle('hidden',!open);
-  if(open)v0365ExpandedTeamIds.add(id);else v0365ExpandedTeamIds.delete(id);
-  const btn=event?.currentTarget;if(btn){btn.classList.toggle('open',open);btn.setAttribute('aria-expanded',String(open));}
+  if(open)v0365ExpandedTeamIds.add(key);else v0365ExpandedTeamIds.delete(key);
+  btn.classList.toggle('open',open);
+  btn.setAttribute('aria-expanded',String(open));
+  btn.setAttribute('aria-label',`${open?'Hide':'View'} current work for ${card.dataset.teamName||'team member'}`);
 }
 function v0365StatIcon(kind){return kind==='late'?`<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 7.5v5l3 1.8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>`:`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3.8h7l3 3V20H7z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M14 3.8V7h3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>`}
 function v0365TeamCurrentWorkMarkup(w){
@@ -116,14 +125,17 @@ function v0365TeamCurrentWorkMarkup(w){
     :`<p class='teamProWorkEmpty'>No work currently in progress.</p>`;
   return `<div class='teamProWork'><div class='teamProWorkHeading'><strong>WHAT THEY'RE WORKING ON</strong><span>VIEW ONLY</span></div>${body}</div>`;
 }
-function v030TeamCard(w){
+function v030TeamCard(w,rowIndex){
   const u=v030UserById(w.userId),open=teamOpenCount(w),busy=Number(w.activeCount||0)>0,status=busy?'Working':'Available',
-    rawId=String(w.userId||''),encoded=encodeURIComponent(rawId),expanded=v0365ExpandedTeamIds.has(rawId),
+    rawId=String(w.userId||''),encoded=safeInlineArg(rawId),
+    // Original data position survives sorting/filtering and separates duplicate IDs.
+    key=rawId+':'+(teamWorkload||[]).indexOf(w),expanded=v0365ExpandedTeamIds.has(key),
+    panelId='teamActions-'+rowIndex,
     assist=isOwner()&&u&&permissionProfile(u)!=='ORG_OWNER'?`<button class='secondary v030AssistButton' onclick="event.stopPropagation();v030StartAssist('${encoded}')">ASSIST USER</button>`:'',
     traffic=isTrafficManagerUser()&&open?`<button class='secondary' onclick="event.stopPropagation();v030OpenPersonWork('${encoded}')">MANAGE WORK</button>`:'',
     meta=(assist||traffic||w.nextDeadline)?`<div class='teamProWorkAdmin'>${w.nextDeadline?`<div class='teamProDeadline'><span>Next deadline</span><b>${escapeHTML(formatDateTime(w.nextDeadline))}</b></div>`:''}${assist||traffic?`<div class='teamProActionButtons'>${assist}${traffic}</div>`:''}</div>`:'';
-  const extra=`<div class='teamProActionTray ${expanded?'':'hidden'}' id='teamActions-${escapeHTML(encoded)}'>${v0365TeamCurrentWorkMarkup(w)}${meta}</div>`;
-  return `<article class='teamProCard ${busy?'isWorking':'isAvailable'}'><div class='teamProTop'><div class='teamProIdentity'><div class='avatar teamProAvatar' data-avatar-user='${escapeHTML(rawId)}'>${escapeHTML(initials(w.fullName||''))}</div><div class='teamProName'><b>${escapeHTML(w.fullName||'Team member')}</b><span>${escapeHTML(w.position||w.department||'')}</span></div></div><div class='teamProStatusWrap'><span class='teamProStatus ${busy?'working':'available'}'><i></i>${status}</span><button type='button' class='teamProChevron ${expanded?'open':''}' aria-label='${expanded?'Hide':'View'} current work for ${escapeHTML(w.fullName||'team member')}' aria-controls='teamActions-${escapeHTML(encoded)}' aria-expanded='${expanded?'true':'false'}' onclick="v0365ToggleTeamActions(event,'${encoded}')">›</button></div></div><div class='teamProDivider'></div><div class='teamProStats'><div class='teamProMetric'><span class='teamProMetricIcon'>${v0365StatIcon('open')}</span><div><b>${open}</b><span>Open tasks</span></div></div><div class='teamProMetric teamProMetricLate'><span class='teamProMetricIcon'>${v0365StatIcon('late')}</span><div><b>${Number(w.overdueCount||0)}</b><span>Overdue</span></div></div></div>${extra}</article>`;
+  const extra=`<div class='teamProActionTray ${expanded?'':'hidden'}' id='${panelId}'>${v0365TeamCurrentWorkMarkup(w)}${meta}</div>`;
+  return `<article class='teamProCard ${busy?'isWorking':'isAvailable'}' data-team-key='${escapeHTML(key)}' data-team-name='${escapeHTML(w.fullName||'team member')}'><div class='teamProTop'><div class='teamProIdentity'><div class='avatar teamProAvatar' data-avatar-user='${escapeHTML(rawId)}'>${escapeHTML(initials(w.fullName||''))}</div><div class='teamProName'><b>${escapeHTML(w.fullName||'Team member')}</b><span>${escapeHTML(w.position||w.department||'')}</span></div></div><div class='teamProStatusWrap'><span class='teamProStatus ${busy?'working':'available'}'><i></i>${status}</span><button type='button' class='teamProChevron ${expanded?'open':''}' aria-label='${expanded?'Hide':'View'} current work for ${escapeHTML(w.fullName||'team member')}' aria-controls='${panelId}' aria-expanded='${expanded?'true':'false'}' onclick="v0365ToggleTeamActions(event)">›</button></div></div><div class='teamProDivider'></div><div class='teamProStats'><div class='teamProMetric'><span class='teamProMetricIcon'>${v0365StatIcon('open')}</span><div><b>${open}</b><span>Open tasks</span></div></div><div class='teamProMetric teamProMetricLate'><span class='teamProMetricIcon'>${v0365StatIcon('late')}</span><div><b>${Number(w.overdueCount||0)}</b><span>Overdue</span></div></div></div>${extra}</article>`;
 }
 function v030RenderTeam(){const host=v030ById('teamGrid');if(!host)return;v0365RenderTeamControls();const rows=v0365TeamRows();host.innerHTML=rows.length?rows.map(v030TeamCard).join(''):`<div class='empty'>No team members match this view.</div>`;hydrateProfilePhotos()}
 renderTeam=v030RenderTeam;
