@@ -1,0 +1,47 @@
+/* ONIT festive accents v0.40.18. Purely decorative frontend layer; no changes to workflows. */
+html.onitChristmas{--onit-festive-green:#1f624a;--onit-festive-red:#b53b46;--onit-festive-gold:#d2af65}
+/* Seasonal switch: unobtrusive, always user-controlled. */
+.onitXmasToggle{display:inline-flex;align-items:center;justify-content:center;gap:6px;flex:0 0 auto;min-height:32px;padding:5px 10px;margin-right:auto;border:1px solid #e6e7e2;border-radius:999px;background:#fff;color:#52625a;box-shadow:none;cursor:pointer;font:700 10px/1.2 Arial,Helvetica,sans-serif;letter-spacing:.025em;white-space:nowrap;transition:background .15s,border-color .15s}
+.onitXmasToggle:hover{background:#f3f8f3;border-color:#a9c6b6}
+.onitXmasToggle:focus-visible{outline:3px solid #24694c;outline-offset:3px}
+.onitXmasToggle svg{width:15px;height:15px;display:block;flex:0 0 auto}
+html.onitChristmas .onitXmasToggle{border-color:#cddfd2;background:#f7faf7;color:#275a43}
+html.onitChristmas .onitXmasToggle .onitXmasToggleText::after{content:' ON';color:#19734d;font-weight:900}
+.onitXmasToggle[aria-pressed="false"]{color:#777;background:#fafafa}
+/* The Santa hat sits on the first O of ONIT rather than replacing the brand. */
+.onitXmasHat{position:absolute;display:block;width:42px;height:37px;left:9px;top:2px;z-index:2;pointer-events:none;transform:rotate(-8deg);filter:drop-shadow(0 1px 1px rgba(26,22,19,.10))}
+.onitXmasHat svg{display:block;width:100%;height:100%}
+html.onitChristmas .sideBrand{position:relative;isolation:isolate}
+html.onitChristmas .authLogo{position:relative;overflow:visible!important}
+.authLogo .onitXmasHat{width:48px;height:42px;left:-2px;top:9px;transform:rotate(-10deg)}
+/* Tiny botanical accents, not overlays on dashboard cards or data. */
+.onitXmasPine{position:absolute;display:block;pointer-events:none;z-index:2;overflow:visible}
+.onitXmasPine svg{width:100%;height:100%;display:block;overflow:visible}
+.sideBrand .onitXmasPine{right:-1px;top:-6px;width:72px;height:49px;transform:rotate(3deg)}
+.top .onitXmasPine{left:57%;top:-8px;width:84px;height:45px;transform:rotate(8deg);opacity:.86}
+.authCard .onitXmasPine{right:9px;top:0;width:92px;height:60px;transform:rotate(9deg)}
+html.onitChristmas .authCard{position:relative}
+/* A pair of gentle hanging gold and red baubles next to the pine, no continuous motion. */
+.onitXmasBauble{position:absolute;display:block;pointer-events:none;z-index:2;height:19px;width:13px;top:26px;right:20px;border-radius:49% 49% 52% 52%;background:radial-gradient(circle at 29% 28%,#ffeac6 0 11%,#e3b75d 28%,#b98936 77%);box-shadow:inset -2px -2px 3px rgba(90,49,0,.1),0 2px 5px rgba(22,21,18,.1)}
+.onitXmasBauble::before{content:'';position:absolute;left:5px;bottom:100%;width:1px;height:21px;background:#b49e77}
+.onitXmasBauble::after{content:'';position:absolute;left:4px;top:-3px;width:5px;height:3px;border-radius:2px 2px 0 0;background:#9d7439}
+.authCard .onitXmasBauble{right:38px;top:30px;transform:scale(.87);background:radial-gradient(circle at 29% 25%,#f8dfe0,#c44856 55%,#8d2a39)}
+/* Subtle seasonal micro-accent; do not recolour functional buttons or status indicators. */
+html.onitChristmas .top{box-shadow:inset 0 -1px 0 rgba(192,77,77,.24)!important}
+/* Sparse drifting snowflake glyphs (CSS transform only; zero hit testing). */
+.onitXmasSnow{position:fixed;inset:0;z-index:29;pointer-events:none!important;overflow:hidden;contain:strict;user-select:none}
+.onitXmasSnow span{position:absolute;left:var(--x);top:-24px;color:#79939f;opacity:0;font:400 var(--s)/1 Georgia,'Times New Roman',serif;text-shadow:0 0 1px rgba(255,255,255,.6);animation:onitSnowDrift var(--t) linear var(--delay) infinite;will-change:transform;pointer-events:none!important}
+.onitXmasSnow span:nth-child(3n){color:#a6b8ba}
+@keyframes onitSnowDrift{0%{transform:translate3d(0,-24px,0) rotate(0deg);opacity:0}12%{opacity:.32}83%{opacity:.28}100%{transform:translate3d(var(--dx),105vh,0) rotate(65deg);opacity:0}}
+html.onitChristmas.onitXmasPaused .onitXmasSnow span{animation-play-state:paused}
+/* Default-off when decorative mode is disabled. */
+.onitXmasHat,.onitXmasPine,.onitXmasBauble,.onitXmasSnow{display:none}
+html.onitChristmas .onitXmasHat{display:block}
+html.onitChristmas .onitXmasPine{display:block}
+html.onitChristmas .onitXmasBauble{display:block}
+html.onitChristmas .onitXmasSnow{display:block}
+/* Keep decorative details out of narrow workspaces; keep the Santa hat visible. */
+@media(max-width:950px){.top .onitXmasPine{display:none!important}}
+@media(max-width:820px){.onitXmasToggle{min-width:34px;min-height:34px;padding:5px 8px}.onitXmasToggleText{display:none}.sideBrand .onitXmasPine{width:54px;height:38px;right:0;top:-4px}.sideBrand .onitXmasHat{width:38px;height:34px;left:10px;top:3px}.sideBrand .onitXmasBauble{transform:scale(.8);right:15px;top:21px}.onitXmasSnow span:nth-child(n+5){display:none}}
+@media(max-width:420px){.onitXmasSnow span{animation-duration:34s!important}}
+@media(prefers-reduced-motion:reduce){.onitXmasSnow{display:none!important}.onitXmasToggle{transition:none!important}}
