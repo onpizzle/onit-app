@@ -1111,8 +1111,9 @@ html.onitReduceMotion *,html.onitReduceMotion *::before,html.onitReduceMotion *:
   .broadcastComposerActions{position:fixed;left:0;right:0;bottom:0;z-index:30;margin:0;padding:10px 12px calc(10px + env(safe-area-inset-bottom));background:rgba(255,255,255,.96);backdrop-filter:blur(12px);border-top:1px solid #ddd8d1;display:grid;grid-template-columns:1fr 1.35fr;gap:8px}.broadcastComposerActions button{width:100%;min-height:50px}
 }
 </style>
-<link rel="stylesheet" href="./christmas.css?v=0.40.21">
-<script src="./christmas.js?v=0.40.21" defer></script>
+<link rel="stylesheet" href="./christmas.css?v=0.40.24">
+<script src="./christmas.js?v=0.40.24" defer></script>
+<style id="onitPlatformHealthV1">.phPanel{background:#19262c;color:#f6f8fa;border:1px solid #35464f;border-radius:14px;padding:24px;margin:16px 0;overflow-wrap:anywhere}.phHead{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}.phHead h2{font-size:20px;margin:0;color:#fff}.phHead p,.phNote,.phDetails p{font-size:12px;color:#b7c3ca;margin:8px 0}.phMetrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:22px 0 14px}.phMetrics>div{padding:0 10px;border-right:1px solid #42515a}.phMetrics>div:last-child{border-right:0}.phMetrics small,.phName small{display:block;color:#bac6cc;font-size:12px}.phMetrics strong{display:block;font-size:30px;line-height:1.2;margin-top:7px}.phGreen{color:#72d7aa}.phRed{color:#ff9d9d}.phOrg{border-top:1px solid #42515a}.phOrg summary{cursor:pointer;display:flex;align-items:center;gap:12px;padding:14px 0;list-style:none}.phOrg summary:after{content:'›';font-size:20px;color:#bac6cc}.phOrg[open] summary:after{content:'⌄'}.phName{flex:1;min-width:0}.phName b{color:#fff}.phDot{width:10px;height:10px;flex:none;border-radius:50%;background:#8d9ba5}.phGood{background:#72d7aa}.phBad{background:#ff9d9d}.phStatus{font-size:12px;color:#dbe5eb}.phDetails{padding:10px 12px 14px;background:#22323b;border-radius:8px;margin:0 0 12px}.phDetails>div{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid #42515a;font-size:12px}.phDetails b{text-align:right;color:#e0e9ef}.phPanel button.secondary{color:#fff;background:#30434c;border:1px solid #657984}.phPanel summary:focus-visible,.phPanel button:focus-visible{outline:2px solid #a7eacb;outline-offset:3px}@media(max-width:500px){.phPanel{padding:14px}.phMetrics strong{font-size:24px}.phMetrics>div{padding:0 5px}.phMetrics small{font-size:10px}.phStatus{font-size:10px}.phDetails>div{flex-wrap:wrap}}</style>
 </head>
 <body>
 <a class="onitSkipLink" href="#mainContent">Skip to main content</a>
@@ -1216,7 +1217,7 @@ html.onitReduceMotion *,html.onitReduceMotion *::before,html.onitReduceMotion *:
 </header>
 <main class="main" id="mainContent" tabindex="-1">
 <section id="platform" class="hidden platformConsoleSection" aria-label="ONIT Platform Administration"><div class="platformIntro"><div><span class="platformKicker">ONIT / PLATFORM ADMINISTRATION</span><h1>System Console</h1><p class="muted">Organisations, people, access, system health and recovery. Agency briefs and projects stay private.</p></div><div class="platformIntroActions"><button class="secondary" onclick="openCommandCenter()">OPEN CONSOLE</button><button class="secondary" onclick="loadPlatformOverview(true)">REFRESH STATUS</button></div></div>
-<div class="platformQuickNav" aria-label="System Owner tools"><button onclick="openCommandCenter()"><b>ONIT Command</b><small>Health, recovery &amp; workstation sync</small></button><button onclick="jumpPlatformSection('platformStaff')"><b>Staff Accounts</b><small>Accounts, recovery &amp; approvals</small></button><button onclick="jumpPlatformSection('platformAccess')"><b>Access &amp; Security</b><small>Workstation, data and Team Lead grants</small></button><button onclick="show('broadcast',document.getElementById('navBroadcast'))"><b>Broadcast Studio</b><small>Staff-wide announcements</small></button></div>
+<div class="platformQuickNav" aria-label="System Owner tools"><button onclick="jumpPlatformSection('platformHealth')"><b>Platform Health</b><small>Organisation registry and diagnostics</small></button><button onclick="openCommandCenter()"><b>ONIT Command</b><small>Health, recovery &amp; workstation sync</small></button><button onclick="jumpPlatformSection('platformStaff')"><b>Staff Accounts</b><small>Accounts, recovery &amp; approvals</small></button><button onclick="jumpPlatformSection('platformAccess')"><b>Access &amp; Security</b><small>Workstation, data and Team Lead grants</small></button><button onclick="show('broadcast',document.getElementById('navBroadcast'))"><b>Broadcast Studio</b><small>Staff-wide announcements</small></button></div>
 <div id="platformContent" aria-live="polite"></div></section>
 <section id="home">
   <div class="dashboardHeading">
@@ -1452,8 +1453,8 @@ html.onitReduceMotion *,html.onitReduceMotion *::before,html.onitReduceMotion *:
 @media(max-width:560px){.platformIntro{padding:17px!important;border-radius:14px}.platformIntro h1{font-size:28px}.platformQuickNav{gap:7px}.platformQuickNav button{padding:12px;min-height:65px}.platformIntroActions{width:100%}.platformIntroActions button{flex:1}.platformMetrics{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.platformMetric,.platformPanel{padding:13px}.platformMetric b{font-size:25px}.platformSettingsGrid{grid-template-columns:1fr}.platformIntro{align-items:flex-start}}
 </style>
 <!-- Release consistency: keep APP_VERSION, UI_REVISION, version.json and service-worker.js synchronized. -->
-<script>const APP_VERSION='0.40.21';
-const UI_REVISION=41021;
+<script>const APP_VERSION='0.40.24';
+const UI_REVISION=41024;
 const DASHBOARD_UI_REVISION=41001;
 const DASHBOARD_UI_STORAGE_KEY='onit-dashboard-ui-state-v1';
 window.ONIT_RUNTIME={version:APP_VERSION,uiRevision:UI_REVISION,dashboardUiRevision:DASHBOARD_UI_REVISION};
@@ -1974,14 +1975,24 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&document.getElement
 /* System Owner console: deliberately limited to organisational account metadata and platform health.
    This code never renders tenant briefs, client jobs, creative files or reports. */
 let platformOverview=null,platformOverviewAt=0,platformOverviewBusy=false;
+let platformHealthError=false;
+ONITAccount.onRetire(function(){platformOverview=null;platformOverviewAt=0;platformOverviewBusy=false;platformHealthError=false;const host=document.getElementById('platformContent');if(host)host.replaceChildren();});
+function platformHealthMarkup_(overview){
+  const h=platformOverview?.health, fresh=!!h&&h.coverage==='SHARED_DATABASE_REGISTRY_ONLY'&&!platformHealthError&&Date.now()-platformOverviewAt<=300000;
+  const verified=fresh?overview.filter(o=>o.health?.registry==='VERIFIED').length:0;
+  const attention=fresh?overview.filter(o=>o.health?.registry==='NEEDS_ATTENTION').length:0;
+  const checked=fresh&&h.checkedAt?escapeHTML(new Date(h.checkedAt).toLocaleString()):'Not verified';
+  const rows=overview.map(o=>{const status=fresh?o.health?.registry:'UNAVAILABLE', ok=status==='VERIFIED',bad=status==='NEEDS_ATTENTION';return `<details class="phOrg"><summary><span class="phDot ${bad?'phBad':ok?'phGood':''}"></span><span class="phName"><b>${escapeHTML(o.name||'Organisation')}</b><small>${escapeHTML(o.organisationId||'No ID')}</small></span><span class="phStatus">${bad?'Registry issue':ok?'Registry verified':'Not verified'}</span></summary><div class="phDetails"><div>Organisation registry <b>${bad?'Needs attention':ok?'Verified':'Unavailable'}</b></div><div>Shared account directory <b>${fresh&&h.sharedAccounts==='READ_OK'?'Read OK':'Unavailable'}</b></div><div>Tenant API, Drive, Firebase, email and incidents <b>Not connected</b></div><p>${fresh?escapeHTML(o.health?.reason||'No registry result.'):'Refresh health to obtain a current result.'}</p><p>Organisation-specific service monitoring and remote repairs are not enabled.</p></div></details>`;}).join('');
+  return `<section id="platformHealth" class="phPanel"><div class="phHead"><div><h2>ONIT Platform Health</h2><p>Live organisation registry · Read-only production monitoring</p></div><button class="secondary" onclick="loadPlatformOverview(true)">Refresh health</button></div><div class="phMetrics"><div><small>Organisations in scope</small><strong>${platformOverview&&!platformHealthError?overview.length:'—'}</strong></div><div><small>Registry verified</small><strong class="phGreen">${fresh?verified:'—'}</strong></div><div><small>Registry issues</small><strong class="phRed">${fresh?attention:'—'}</strong></div></div><p class="phNote">${platformHealthError?'Refresh failed. Previous results are not current.':fresh?'Shared registry and account directory read successfully. This is not a full system-health check.':'Awaiting current health data. Refresh health after the backend update.'} · Last check: ${checked}</p>${rows||'<p class="phNote">No organisation records loaded.</p>'}</section>`;
+}
 async function loadPlatformOverview(manual=false){
   if(!isOwner()||platformOverviewBusy)return;
   const scope=ONITAccount.capture();platformOverviewBusy=true;
   try{const response=await ONITAccount.wait(apiPost('PLATFORM_OVERVIEW',{}),scope);ONITAccount.assert(scope);
-    platformOverview=response.data||response;platformOverviewAt=Date.now();renderPlatformConsole();
+    platformOverview=response.data||response;platformOverviewAt=Date.now();platformHealthError=false;renderPlatformConsole();
     if(manual)showToast('System status','Platform directory refreshed.');
   }catch(e){if(!ONITAccount.isCurrent(scope))return;
-    const host=document.getElementById('platformOverviewStatus');if(host)host.textContent='Cannot load platform status: '+String(e.message||e);
+    platformHealthError=true;renderPlatformConsole();const host=document.getElementById('platformOverviewStatus');if(host)host.textContent='Cannot load platform status. Refresh to retry.';
   }finally{if(ONITAccount.isCurrent(scope))platformOverviewBusy=false;}
 }
 function renderPlatformConsole(){
@@ -1992,7 +2003,8 @@ function renderPlatformConsole(){
   const scopeLabel=platformOverview?(platformOverview.scope==='PLATFORM'?'All registered organisations':'Current organisation only'):'Checking platform status…';
   const orgMarkup=overview.length?overview.map(o=>`<div class='platformOrgRow'><span class='platformOrgDot'></span><div><b>${escapeHTML(o.name||'Organisation')}</b><small>${escapeHTML(o.organisationId||'')} • ${escapeHTML(o.status||'Registered')}</small></div><span>${Number(o.activeAccounts||0)} active accounts<br><small>${Number(o.pendingAccounts||0)} pending</small></span><span>${o.signupsEnabled?'Signups enabled':'Signups disabled'}</span></div>`).join(''):
     `<div class='empty'>Organisation status will appear here after the secure platform read completes.</div>`;
-  host.innerHTML=`<div class='platformMetrics'><div class='platformMetric'><span>REGISTERED ORGANISATIONS</span><b>${overview.length||'—'}</b><small>${escapeHTML(scopeLabel)}</small></div><div class='platformMetric'><span>ACTIVE ACCOUNTS</span><b>${overview.length?totalActive:'—'}</b><small>Users with active profiles</small></div><div class='platformMetric'><span>PENDING SIGNUPS</span><b>${overview.length?totalPending:'—'}</b><small>Awaiting approval</small></div><div class='platformMetric'><span>APPLICATION</span><b>ONLINE</b><small>Backend ${escapeHTML(backendVersion||'checking')} • Authenticated session</small></div></div>
+  host.innerHTML=`<div class='platformMetrics'><div class='platformMetric'><span>REGISTERED ORGANISATIONS</span><b>${overview.length||'—'}</b><small>${escapeHTML(scopeLabel)}</small></div><div class='platformMetric'><span>ACTIVE ACCOUNTS</span><b>${overview.length?totalActive:'—'}</b><small>Users with active profiles</small></div><div class='platformMetric'><span>PENDING SIGNUPS</span><b>${overview.length?totalPending:'—'}</b><small>Awaiting approval</small></div><div class='platformMetric'><span>APPLICATION</span><b>${platformOverview&&!platformHealthError&&Date.now()-platformOverviewAt<=300000?'RESPONDING':'UNVERIFIED'}</b><small>Backend ${escapeHTML(backendVersion||'checking')} • Authenticated session</small></div></div>
+  ${platformHealthMarkup_(overview)}
   <div class='platformGrid'><section class='platformPanel'><h2>Organisation directory</h2><p class='muted'>Registration, account counts and access status only. No briefs, brands or client data.</p><div id='platformOverviewStatus' class='bigTiny'>${escapeHTML(scopeLabel)}</div><div class='platformOrgList'>${orgMarkup}</div></section>
   <section class='platformPanel'><h2>Access and staff security</h2><p class='muted'>Administer the organisation attached to this account. Cross-organisation support actions require separately verified platform permissions.</p><div class='platformSmallStats'><span><b>${accessDirectory.length}</b> registered member profiles</span><span><b>${pendingUsers.length}</b> pending approvals</span></div><button class='secondary linkbtn' onclick="document.getElementById('platformStaff')?.scrollIntoView({behavior:'smooth'})">MANAGE STAFF ACCOUNTS</button></section></div>
   <section class='platformPanel' id='platformStaff'><h2>Account administration</h2><p class='muted'>Edit recovery email, reset access, deactivate or reactivate an account. Existing job and file history remains intact.</p><div class='field'><label>FIND A STAFF MEMBER</label><input id='ownerStaffSearch' class='staffFinderInput' type='search' autocomplete='off' placeholder='Name, initials or email' oninput='renderOwnerStaffMatches(this.value)'><input id='ownerRecoveryUser' type='hidden'><div id='ownerStaffSearchResults' class='staffSearchResults'></div></div><div id='ownerStaffAccountPanel' class='empty'>Select a staff member to administer their account.</div><button class='secondary' onclick='addMember()'>+ ADD MEMBER PROFILE</button></section>
@@ -2312,7 +2324,7 @@ function renderBriefFilters(){const filters=['ALL','ACTIVE','PAUSED','REVIEW','O
 function setBriefFilter(f){briefFilter=f;renderBriefFilters();renderBriefs()}
 function filteredBriefs(){const q=(document.getElementById('briefSearch')?.value||'').trim().toLowerCase();return briefs.filter(b=>{let ok=true;if(briefFilter==='ACTIVE')ok=!['Closed','Approved','Cancelled'].includes(b.status);else if(briefFilter==='PAUSED')ok=b.status==='Paused';else if(briefFilter==='REVIEW')ok=['Team Lead Review','In Review','Revision'].includes(b.status);else if(briefFilter==='OVERDUE')ok=timeInfo(b).cls==='red'&&!['Closed','Approved','Cancelled'].includes(b.status);else if(briefFilter==='CLOSED')ok=['Closed','Cancelled'].includes(b.status);if(q)ok=ok&&[b.code,b.client,b.project,b.assignee,b.status].join(' ').toLowerCase().includes(q);return ok})}
 function renderBriefs(){const list=filteredBriefs();document.getElementById('briefList').innerHTML=list.length?list.map(briefMarkup).join(''):`<div class='empty'>No matching briefs.</div>`}
-// ONIT v0.40.21: keep the live countdown, but update text nodes rather than rebuilding the list every second.
+// ONIT v0.40.24: keep the live countdown, but update text nodes rather than rebuilding the list every second.
 let onitLastOverdueRebuildAt=0;
 function refreshVisibleBriefTimers(){
   const section=document.getElementById('briefs'),host=document.getElementById('briefList');

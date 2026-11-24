@@ -23,10 +23,10 @@ const FIREBASE_CONFIG={apiKey:'AIzaSyAmpqFDMfo6zAorD-f14hTQnSNFDFU6VHM',authDoma
 let messaging=null;
 try{firebase.initializeApp(FIREBASE_CONFIG);messaging=firebase.messaging();}catch(e){}
 
-const UI_VERSION='0.40.21';
-const UI_REVISION=41021;
+const UI_VERSION='0.40.24';
+const UI_REVISION=41024;
 const DASHBOARD_UI_REVISION=41001;
-const CACHE='onit-v0.40.21-owner-restore';
+const CACHE='onit-v0.40.24-platform-health-readonly';
 const STATIC=['./christmas.css','./christmas.js','./account-lifecycle.js','./creative-work.js','./creative-work.css','./offline.html','./manifest.webmanifest','./icons/icon-192.png','./icons/icon-512.png','./icons/apple-touch-icon.png','./assets/onit-logo-horizontal.png','./cases-module.css','./cases-module.js','./activation-command.css','./activation-command.js','./ideas-dump.css','./ideas-dump.js','./visual-contrast.css','./pulse-module.css','./pulse-module.js','./executive-reports.css','./executive-reports.js','./module-studio.css','./module-studio.js','./assist-traffic-module.css','./assist-traffic-module.js','./core-intelligence.css','./core-intelligence.js','./autocare-module.css','./autocare-module.js','./authority-engine.js','./sync-engine.js','./release-guard.js','./command-palette.css','./command-palette.js','./dialog-system.css','./dialog-system.js','./attention-loop.css','./attention-loop.js','./rewards-module.css','./rewards-module.js','./ui-system.css','./ui-system.js'];
 
 // Notification+data messages are displayed automatically by FCM in the background.
