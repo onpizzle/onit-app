@@ -1111,8 +1111,8 @@ html.onitReduceMotion *,html.onitReduceMotion *::before,html.onitReduceMotion *:
   .broadcastComposerActions{position:fixed;left:0;right:0;bottom:0;z-index:30;margin:0;padding:10px 12px calc(10px + env(safe-area-inset-bottom));background:rgba(255,255,255,.96);backdrop-filter:blur(12px);border-top:1px solid #ddd8d1;display:grid;grid-template-columns:1fr 1.35fr;gap:8px}.broadcastComposerActions button{width:100%;min-height:50px}
 }
 </style>
-<link rel="stylesheet" href="./christmas.css?v=0.40.24">
-<script src="./christmas.js?v=0.40.24" defer></script>
+<link rel="stylesheet" href="./christmas.css?v=0.40.29">
+<script src="./christmas.js?v=0.40.29" defer></script>
 <style id="onitPlatformHealthV1">.phPanel{background:#19262c;color:#f6f8fa;border:1px solid #35464f;border-radius:14px;padding:24px;margin:16px 0;overflow-wrap:anywhere}.phHead{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}.phHead h2{font-size:20px;margin:0;color:#fff}.phHead p,.phNote,.phDetails p{font-size:12px;color:#b7c3ca;margin:8px 0}.phMetrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:22px 0 14px}.phMetrics>div{padding:0 10px;border-right:1px solid #42515a}.phMetrics>div:last-child{border-right:0}.phMetrics small,.phName small{display:block;color:#bac6cc;font-size:12px}.phMetrics strong{display:block;font-size:30px;line-height:1.2;margin-top:7px}.phGreen{color:#72d7aa}.phRed{color:#ff9d9d}.phOrg{border-top:1px solid #42515a}.phOrg summary{cursor:pointer;display:flex;align-items:center;gap:12px;padding:14px 0;list-style:none}.phOrg summary:after{content:'›';font-size:20px;color:#bac6cc}.phOrg[open] summary:after{content:'⌄'}.phName{flex:1;min-width:0}.phName b{color:#fff}.phDot{width:10px;height:10px;flex:none;border-radius:50%;background:#8d9ba5}.phGood{background:#72d7aa}.phBad{background:#ff9d9d}.phStatus{font-size:12px;color:#dbe5eb}.phDetails{padding:10px 12px 14px;background:#22323b;border-radius:8px;margin:0 0 12px}.phDetails>div{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid #42515a;font-size:12px}.phDetails b{text-align:right;color:#e0e9ef}.phPanel button.secondary{color:#fff;background:#30434c;border:1px solid #657984}.phPanel summary:focus-visible,.phPanel button:focus-visible{outline:2px solid #a7eacb;outline-offset:3px}@media(max-width:500px){.phPanel{padding:14px}.phMetrics strong{font-size:24px}.phMetrics>div{padding:0 5px}.phMetrics small{font-size:10px}.phStatus{font-size:10px}.phDetails>div{flex-wrap:wrap}}</style>
 </head>
 <body>
@@ -1453,8 +1453,8 @@ html.onitReduceMotion *,html.onitReduceMotion *::before,html.onitReduceMotion *:
 @media(max-width:560px){.platformIntro{padding:17px!important;border-radius:14px}.platformIntro h1{font-size:28px}.platformQuickNav{gap:7px}.platformQuickNav button{padding:12px;min-height:65px}.platformIntroActions{width:100%}.platformIntroActions button{flex:1}.platformMetrics{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.platformMetric,.platformPanel{padding:13px}.platformMetric b{font-size:25px}.platformSettingsGrid{grid-template-columns:1fr}.platformIntro{align-items:flex-start}}
 </style>
 <!-- Release consistency: keep APP_VERSION, UI_REVISION, version.json and service-worker.js synchronized. -->
-<script>const APP_VERSION='0.40.24';
-const UI_REVISION=41024;
+<script>const APP_VERSION='0.40.29';
+const UI_REVISION=41029;
 const DASHBOARD_UI_REVISION=41001;
 const DASHBOARD_UI_STORAGE_KEY='onit-dashboard-ui-state-v1';
 window.ONIT_RUNTIME={version:APP_VERSION,uiRevision:UI_REVISION,dashboardUiRevision:DASHBOARD_UI_REVISION};
@@ -2324,7 +2324,7 @@ function renderBriefFilters(){const filters=['ALL','ACTIVE','PAUSED','REVIEW','O
 function setBriefFilter(f){briefFilter=f;renderBriefFilters();renderBriefs()}
 function filteredBriefs(){const q=(document.getElementById('briefSearch')?.value||'').trim().toLowerCase();return briefs.filter(b=>{let ok=true;if(briefFilter==='ACTIVE')ok=!['Closed','Approved','Cancelled'].includes(b.status);else if(briefFilter==='PAUSED')ok=b.status==='Paused';else if(briefFilter==='REVIEW')ok=['Team Lead Review','In Review','Revision'].includes(b.status);else if(briefFilter==='OVERDUE')ok=timeInfo(b).cls==='red'&&!['Closed','Approved','Cancelled'].includes(b.status);else if(briefFilter==='CLOSED')ok=['Closed','Cancelled'].includes(b.status);if(q)ok=ok&&[b.code,b.client,b.project,b.assignee,b.status].join(' ').toLowerCase().includes(q);return ok})}
 function renderBriefs(){const list=filteredBriefs();document.getElementById('briefList').innerHTML=list.length?list.map(briefMarkup).join(''):`<div class='empty'>No matching briefs.</div>`}
-// ONIT v0.40.24: keep the live countdown, but update text nodes rather than rebuilding the list every second.
+// ONIT v0.40.29: keep the live countdown, but update text nodes rather than rebuilding the list every second.
 let onitLastOverdueRebuildAt=0;
 function refreshVisibleBriefTimers(){
   const section=document.getElementById('briefs'),host=document.getElementById('briefList');
@@ -3781,4 +3781,24 @@ html body .bsLiveCard.urgent .bsLiveFooter b *{
 }
 </style>
 
-
+<style id="onitPlatformHealthContrastV2">
+/* Scoped final cascade: match ONIT System Console's neutral dark surface. */
+html body #platformHealth.phPanel{background:#171717;border:1px solid #303030;border-radius:19px;padding:26px 28px;color:#fff;box-shadow:0 12px 24px rgba(18,18,18,.09)}
+html body #platformHealth.phPanel,html body #platformHealth.phPanel *{color:#fff!important;-webkit-text-fill-color:#fff!important}
+html body #platformHealth .phHead h2{font-size:20px;font-weight:850;letter-spacing:-.025em;line-height:1.25}
+html body #platformHealth .phHead p,html body #platformHealth .phNote,html body #platformHealth .phName small,html body #platformHealth .phDetails p{color:#d0d0d0!important;-webkit-text-fill-color:#d0d0d0!important;line-height:1.55}
+html body #platformHealth .phMetrics small{font-size:11px;font-weight:800;letter-spacing:.075em;text-transform:uppercase}
+html body #platformHealth .phMetrics strong{font-size:31px;font-weight:850}
+html body #platformHealth .phMetrics>div,html body #platformHealth .phOrg,html body #platformHealth .phDetails>div{border-color:#444}
+html body #platformHealth .phDetails{background:#252525;border:1px solid #414141;border-radius:13px;padding:12px 15px}
+html body #platformHealth .phOrg summary{min-height:52px;padding:14px 0}
+html body #platformHealth .phOrg summary::after{color:#d0d0d0!important;-webkit-text-fill-color:#d0d0d0!important}
+html body #platformHealth .phDot{background:#a4a4a4}
+html body #platformHealth .phDot.phGood{background:#72d7aa}
+html body #platformHealth .phDot.phBad{background:#ff9d9d}
+html body #platformHealth button.secondary,html body #platformHealth button.secondary *{background:#fff!important;color:#171717!important;-webkit-text-fill-color:#171717!important;border-color:#fff!important;font-weight:800}
+html body #platformHealth button.secondary{border-radius:999px}
+html body #platformHealth button.secondary:hover{background:#eaeaea!important}
+html body #platformHealth summary:focus-visible,html body #platformHealth button:focus-visible{outline:2px solid #fff;outline-offset:3px}
+@media(max-width:500px){html body #platformHealth.phPanel{padding:16px;border-radius:15px}html body #platformHealth .phMetrics strong{font-size:24px}html body #platformHealth .phMetrics small{font-size:10px;letter-spacing:0}html body #platformHealth .phStatus{font-size:10px}html body #platformHealth .phDetails b{text-align:left}}
+</style>
