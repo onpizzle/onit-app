@@ -35,10 +35,10 @@ const FIREBASE_CONFIG={apiKey:'AIzaSyAmpqFDMfo6zAorD-f14hTQnSNFDFU6VHM',authDoma
 let messaging=null;
 try{firebase.initializeApp(FIREBASE_CONFIG);messaging=firebase.messaging();}catch(e){}
 
-const UI_VERSION='0.40.43';
-const UI_REVISION=41043;
+const UI_VERSION='0.40.44';
+const UI_REVISION=41044;
 const DASHBOARD_UI_REVISION=41001;
-const CACHE='onit-v0.40.43-q2';
+const CACHE='onit-v0.40.44-q2';
 const STATIC=['./icons/notification-badge.png','./icons/favicon-32.png','./icons/favicon-16.png','./icons/maskable-192.png','./icons/maskable-512.png','./onit-design-runtime.js','./onit-design-preview.html','./christmas.css','./christmas.js','./account-lifecycle.js','./creative-work.js','./creative-work.css','./offline.html','./manifest.webmanifest','./icons/icon-192.png','./icons/icon-512.png','./icons/apple-touch-icon.png','./assets/onit-logo-horizontal.png','./cases-module.css','./cases-module.js','./activation-command.css','./activation-command.js','./ideas-dump.css','./ideas-dump.js','./visual-contrast.css','./pulse-module.css','./pulse-module.js','./executive-reports.css','./executive-reports.js','./module-studio.css','./module-studio.js','./assist-traffic-module.css','./assist-traffic-module.js','./core-intelligence.css','./core-intelligence.js','./autocare-module.css','./autocare-module.js','./authority-engine.js','./sync-engine.js','./release-guard.js','./command-palette.css','./command-palette.js','./dialog-system.css','./dialog-system.js','./attention-loop.css','./attention-loop.js','./rewards-module.css','./rewards-module.js','./ui-system.css','./ui-system.js'];
 
 const STATIC_PATHS=new Set(STATIC.map(path=>new URL(path,self.location.href).pathname));
