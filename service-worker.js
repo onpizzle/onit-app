@@ -35,11 +35,11 @@ const FIREBASE_CONFIG={apiKey:'AIzaSyAmpqFDMfo6zAorD-f14hTQnSNFDFU6VHM',authDoma
 let messaging=null;
 try{firebase.initializeApp(FIREBASE_CONFIG);messaging=firebase.messaging();}catch(e){}
 
-const UI_VERSION='0.40.45';
-const UI_REVISION=41045;
+const UI_VERSION='0.40.46';
+const UI_REVISION=41046;
 const DASHBOARD_UI_REVISION=41001;
-const CACHE='onit-v0.40.45-q2';
-const STATIC=['./icons/notification-badge.png','./icons/favicon-32.png','./icons/favicon-16.png','./icons/maskable-192.png','./icons/maskable-512.png','./onit-design-runtime.js','./onit-design-preview.html','./christmas.css','./christmas.js','./account-lifecycle.js','./creative-work.js','./creative-work.css','./offline.html','./manifest.webmanifest','./icons/icon-192.png','./icons/icon-512.png','./icons/apple-touch-icon.png','./assets/onit-logo-horizontal.png','./cases-module.css','./cases-module.js','./activation-command.css','./activation-command.js','./ideas-dump.css','./ideas-dump.js','./visual-contrast.css','./pulse-module.css','./pulse-module.js','./executive-reports.css','./executive-reports.js','./module-studio.css','./module-studio.js','./assist-traffic-module.css','./assist-traffic-module.js','./core-intelligence.css','./core-intelligence.js','./autocare-module.css','./autocare-module.js','./authority-engine.js','./sync-engine.js','./release-guard.js','./command-palette.css','./command-palette.js','./dialog-system.css','./dialog-system.js','./attention-loop.css','./attention-loop.js','./rewards-module.css','./rewards-module.js','./ui-system.css','./ui-system.js'];
+const CACHE='onit-v0.40.46-q2';
+const STATIC=['./icons/notification-badge.png','./icons/favicon-32.png','./icons/favicon-16.png','./icons/maskable-192.png','./icons/maskable-512.png','./onit-design-runtime.js','./christmas.css','./christmas.js','./account-lifecycle.js','./creative-work.js','./creative-work.css','./offline.html','./manifest.webmanifest','./icons/icon-192.png','./icons/icon-512.png','./icons/apple-touch-icon.png','./assets/onit-logo-horizontal.png','./cases-module.css','./cases-module.js','./activation-command.css','./activation-command.js','./ideas-dump.css','./ideas-dump.js','./visual-contrast.css','./pulse-module.css','./pulse-module.js','./executive-reports.css','./executive-reports.js','./module-studio.css','./module-studio.js','./assist-traffic-module.css','./assist-traffic-module.js','./core-intelligence.css','./core-intelligence.js','./autocare-module.css','./autocare-module.js','./authority-engine.js','./sync-engine.js','./release-guard.js','./command-palette.css','./command-palette.js','./dialog-system.css','./dialog-system.js','./attention-loop.css','./attention-loop.js','./rewards-module.css','./rewards-module.js','./ui-system.css','./ui-system.js'];
 
 const STATIC_PATHS=new Set(STATIC.map(path=>new URL(path,self.location.href).pathname));
 
@@ -68,6 +68,8 @@ self.addEventListener('message',event=>{const d=event.data||{};if(d.type==='AUTO
 self.addEventListener('fetch',event=>{
   const req=event.request;if(req.method!=='GET')return;const url=new URL(req.url);if(url.origin!==self.location.origin)return;
   const path=url.pathname.toLowerCase();
+  const isRenderer= /\/onit-design-preview(?:-v\d+\.\d+\.\d+)?\.html$/.test(path);
+  if(isRenderer){event.respondWith(fetch(req,{cache:'no-store'}));return;}
   const isShell=req.mode==='navigate'||path.endsWith('/index.html')||path.endsWith('/version.json')||path.endsWith('/service-worker.js')||path.endsWith('/reset.html');
   if(isShell){
     event.respondWith((async()=>{try{return await fetch(req,{cache:'no-store'})}catch(e){return req.mode==='navigate'?(await caches.match('./offline.html'))||Response.error():Response.error()}})());return;
