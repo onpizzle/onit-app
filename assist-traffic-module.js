@@ -122,22 +122,24 @@ function v0365TeamCurrentWorkMarkup(w){
     return `<li class='teamProWorkItem'><span class='teamProWorkDot ${paused?'paused':''}' aria-hidden='true'></span><span class='teamProWorkTitle'>${escapeHTML(label)}</span><span class='teamProWorkStatus'>${paused?'Paused':'In progress'}</span></li>`;
   }).join('')}</ul>`:(!Array.isArray(w.workingOn)&&Number(w.activeCount||0)>0)
     ?`<p class='teamProWorkEmpty'>Current work details are updating. Reopen ONIT to refresh.</p>`
-    :`<p class='teamProWorkEmpty'>No work currently in progress.</p>`;
+    :`<p class='teamProWorkEmpty'>No current tasks visible to you.</p>`;
   return `<div class='teamProWork'><div class='teamProWorkHeading'><strong>WHAT THEY'RE WORKING ON</strong><span>VIEW ONLY</span></div>${body}</div>`;
 }
-function v030TeamCard(w,rowIndex){
+function v030TeamCard(w,rowIndex,sourceIndex){
   const u=v030UserById(w.userId),open=teamOpenCount(w),busy=Number(w.activeCount||0)>0,status=busy?'Working':'Available',
     rawId=String(w.userId||''),encoded=safeInlineArg(rawId),
     // Original data position survives sorting/filtering and separates duplicate IDs.
-    key=rawId+':'+(teamWorkload||[]).indexOf(w),expanded=v0365ExpandedTeamIds.has(key),
+    key=rawId+':'+sourceIndex,expanded=v0365ExpandedTeamIds.has(key),
     panelId='teamActions-'+rowIndex,
     assist=isOwner()&&u&&permissionProfile(u)!=='ORG_OWNER'?`<button class='secondary v030AssistButton' onclick="event.stopPropagation();v030StartAssist('${encoded}')">ASSIST USER</button>`:'',
     traffic=isTrafficManagerUser()&&open?`<button class='secondary' onclick="event.stopPropagation();v030OpenPersonWork('${encoded}')">MANAGE WORK</button>`:'',
     meta=(assist||traffic||w.nextDeadline)?`<div class='teamProWorkAdmin'>${w.nextDeadline?`<div class='teamProDeadline'><span>Next deadline</span><b>${escapeHTML(formatDateTime(w.nextDeadline))}</b></div>`:''}${assist||traffic?`<div class='teamProActionButtons'>${assist}${traffic}</div>`:''}</div>`:'';
-  const extra=`<div class='teamProActionTray ${expanded?'':'hidden'}' id='${panelId}'>${v0365TeamCurrentWorkMarkup(w)}${meta}</div>`;
-  return `<article class='teamProCard ${busy?'isWorking':'isAvailable'}' data-team-key='${escapeHTML(key)}' data-team-name='${escapeHTML(w.fullName||'team member')}'><div class='teamProTop'><div class='teamProIdentity'><div class='avatar teamProAvatar' data-avatar-user='${escapeHTML(rawId)}'>${escapeHTML(initials(w.fullName||''))}</div><div class='teamProName'><b>${escapeHTML(w.fullName||'Team member')}</b><span>${escapeHTML(w.position||w.department||'')}</span></div></div><div class='teamProStatusWrap'><span class='teamProStatus ${busy?'working':'available'}'><i></i>${status}</span><button type='button' class='teamProChevron ${expanded?'open':''}' aria-label='${expanded?'Hide':'View'} current work for ${escapeHTML(w.fullName||'team member')}' aria-controls='${panelId}' aria-expanded='${expanded?'true':'false'}' onclick="v0365ToggleTeamActions(event)">›</button></div></div><div class='teamProDivider'></div><div class='teamProStats'><div class='teamProMetric'><span class='teamProMetricIcon'>${v0365StatIcon('open')}</span><div><b>${open}</b><span>Open tasks</span></div></div><div class='teamProMetric teamProMetricLate'><span class='teamProMetricIcon'>${v0365StatIcon('late')}</span><div><b>${Number(w.overdueCount||0)}</b><span>Overdue</span></div></div></div>${extra}</article>`;
+  const extra=`<div class='teamProActionTray ${expanded?'':'hidden'}' id='${panelId}'>${v0365TeamCurrentWorkMarkup(w)}</div>`;
+  return `<article class='teamProCard ${busy?'isWorking':'isAvailable'}' data-team-key='${escapeHTML(key)}' data-team-name='${escapeHTML(w.fullName||'team member')}'><div class='teamProTop'><div class='teamProIdentity'><div class='avatar teamProAvatar' data-avatar-user='${escapeHTML(rawId)}'>${escapeHTML(initials(w.fullName||''))}</div><div class='teamProName'><b>${escapeHTML(w.fullName||'Team member')}</b><span>${escapeHTML(w.position||w.department||'')}</span></div></div><div class='teamProStatusWrap'><span class='teamProStatus ${busy?'working':'available'}'><i></i>${status}</span><button type='button' class='teamProChevron ${expanded?'open':''}' aria-label='${expanded?'Hide':'View'} current work for ${escapeHTML(w.fullName||'team member')}' aria-controls='${panelId}' aria-expanded='${expanded?'true':'false'}' onclick="v0365ToggleTeamActions(event)">›</button></div></div><div class='teamProDivider'></div><div class='teamProStats'><div class='teamProMetric'><span class='teamProMetricIcon'>${v0365StatIcon('open')}</span><div><b>${open}</b><span>Open tasks</span></div></div><div class='teamProMetric teamProMetricLate'><span class='teamProMetricIcon'>${v0365StatIcon('late')}</span><div><b>${Number(w.overdueCount||0)}</b><span>Overdue</span></div></div></div>${extra}${meta}</article>`;
 }
-function v030RenderTeam(){const host=v030ById('teamGrid');if(!host)return;v0365RenderTeamControls();const rows=v0365TeamRows();host.innerHTML=rows.length?rows.map(v030TeamCard).join(''):`<div class='empty'>No team members match this view.</div>`;hydrateProfilePhotos()}
+function v030RenderTeam(){const host=v030ById('teamGrid');if(!host)return;v0365RenderTeamControls();const rows=v0365TeamRows();
+  const positions=new Map((teamWorkload||[]).map((person,index)=>[person,index]));
+  host.innerHTML=rows.length?rows.map((person,index)=>v030TeamCard(person,index,positions.get(person))).join(''):`<div class='empty'>No team members match this view.</div>`;hydrateProfilePhotos()}
 renderTeam=v030RenderTeam;
 function v030OpenPersonWork(encoded){const id=decodeURIComponent(encoded),rows=v030InMotionRows().filter(x=>String(x.userId)===String(id));if(!rows.length)return onitAlert('No active work is currently in motion for this person.');v030TrafficTab='motion';show('home');ONITAccount.later(()=>{v030RenderTrafficCommand();v030ById('trafficCommandRoot')?.scrollIntoView({behavior:'smooth',block:'start'})},80)}
 

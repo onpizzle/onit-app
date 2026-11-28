@@ -23,7 +23,10 @@ h1{margin:0 0 8px}.dot{color:#20b15a}.muted{color:#666;line-height:1.5}
   try{
     if('serviceWorker' in navigator){
       const regs=await navigator.serviceWorker.getRegistrations();
-      await Promise.all(regs.map(r=>r.unregister()));
+      const workerUrl=new URL('./service-worker.js',location.href).href;
+      const scopeUrl=new URL('./',location.href).href;
+      const owned=regs.filter(r=>r.scope===scopeUrl && [r.active,r.waiting,r.installing].some(w=>w && new URL(w.scriptURL).pathname===new URL(workerUrl).pathname));
+      await Promise.all(owned.map(r=>r.unregister()));
     }
     if('caches' in window){
       const keys=await caches.keys();
